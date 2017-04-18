@@ -12,7 +12,7 @@ tensorflow有三种把数据放入计算图中的方式:
 ## Queue
 
 `Queue`,队列,用来存放数据(跟`Variable`似的),`tensorflow`中的`Queue`中已经实现了同步机制,所以我们可以放心的往里面添加数据还有读取数据.如果`Queue`中的数据满了,那么`en_queue`操作将会阻塞,如果`Queue`是空的,那么`dequeue`操作就会阻塞.在常用环境中,一般是有多个`en_queue`线程同时像`Queue`中放数据,有一个`dequeue`操作从`Queue`中取数据.一般来说`enqueue`线程就是准备数据的线程,`dequeue`线程就是训练数据的线程.
-![](https://www.tensorflow.org/images/IncremeterFifoQueue.gif)
+![](imgs/IncremeterFifoQueue.gif)
 
 
 ## Coordinator(协调者)
