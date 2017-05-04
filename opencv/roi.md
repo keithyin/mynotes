@@ -24,4 +24,6 @@ Mat roi = img(Range(begin_row, end_row), Range(begin_col, end_row))
 
 ```
 
+**`roi`中保存的是ROI区域的指针，改变`roi`等价于改变原图。**
+
 **opencv中一会(x,y)，一会(row, col)，好恼火！！！**
