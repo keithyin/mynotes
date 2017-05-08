@@ -1,5 +1,6 @@
 # 如何创建一个`TFRecord File`
 
+**注意：在创建TFRecord File的时候，是不会用到tf的graph的，不会有tensor，一切都跟命令式编程一样。**
 
 ```python
 def _int64_feature(value):
