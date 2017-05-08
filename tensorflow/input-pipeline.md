@@ -80,10 +80,14 @@ coord.join(enqueue_threads)
 我们先梳理一些之前说的东西.`Queue`是一个队列,`QueueRunner`用来创建多个线程对`Queue`进行`enqueue`操作.`Coordinator`可用来协调`QueueRunner`创建出来的线程共同停止工作.
 
 下面来看tensorflow的输入流水线.
+
 1. 准备文件名
 2. 创建一个`Reader`从文件中读取数据
 3. 定义文件中数据的解码规则
 4. 解析数据
+
+`即：（文件名 -> Rreader -> decoder）`
+
 
 从文件里读数据,读完了,就换另一个文件.文件名放在`string_input_producer`中.
 下面的代码是来自官网的一个示例
@@ -185,7 +189,9 @@ def input_pipeline(filenames, batch_size, num_epochs=None):
       min_after_dequeue=min_after_dequeue)
   return example_batch, label_batch
 ```
+
 这里面重要的一个方法就是`tf.train.shuffle_batch`,它所干的事情有:
+
 1. 创建一个`RandomShuffleQueue`用来保存样本
 2. 使用`QueueRunner`创建多个`enqueue`线程向`Queue`中放数据
 3. 创建一个`dequeue_many` OP
