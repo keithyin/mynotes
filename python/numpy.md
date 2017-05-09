@@ -25,5 +25,10 @@ data_array[np.newaxis, :].shape # [1,2,2]
 data_array[:,np.newaxis,:].shape #[2,1,2]
 data_array[:, np.newaxis].shape #[2,1,2]
 data_array[:,:,np.newaxis].shape #[2,2,1]
+```
 
+## repeat
+```python
+img = img[np.newaxis, :].repeat(3, axis=0)# axis 指定要在哪个维度上重复，
+# 原img作为一个重复单元
 ```
