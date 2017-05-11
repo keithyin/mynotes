@@ -14,11 +14,12 @@
 filename_queue = tf.train.string_input_producer(
       filenames, num_epochs=num_epochs, shuffle=True)
 ```
+**如果传入，num_epochs参数的话，记得用tf.local_variables_initializer().run()!!!,注意是local。原因是tf把num_epochs设置成了local variable， tf.local_variables_initializer().run()不会初始化local variable。**
 
 ## TFRecordReader
 使用`TFRecordReader`从`filename_queue`中读取数据
 ```python
-reader = tf.SomeReader()
+reader = tf.TFRecordReader()
 key, record_string = reader.read(filename_queue)
 ```
 
@@ -70,3 +71,35 @@ example_batch, label_batch = tf.train.shuffle_batch(
       min_after_dequeue=min_after_dequeue)
 ```
 好了，可以使用返回的`batch`进行训练了。
+
+## 下面介绍下 Session block怎么写
+
+1. 首先要创建一个 coord， 用于协调各线程的运行
+2. 启动线程
+3. 训练
+4. 把线程 join 起来。
+```python
+with tf.Session() as sess:
+  # Initialize the variables (like the epoch counter).
+  tf.local_variables_initializer().run()#初始化num epoch变量
+  tf.global_variables.initializer().run() # 初始化其它全局变量
+  # 创建coord，用于协调各线程
+  coord = tf.train.Coordinator()
+  # 启动线程
+  threads = tf.train.start_queue_runners(sess=sess, coord=coord)
+  # 训练
+  try:
+      while not coord.should_stop():
+          # Run training steps or whatever
+          sess.run(train_op)
+
+  except tf.errors.OutOfRangeError:
+      print('Done training -- epoch limit reached')
+  finally:
+      # When done, ask the threads to stop.
+      coord.request_stop()
+
+  # Wait for threads to finish.
+  coord.join(threads)
+  sess.close()
+```

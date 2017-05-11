@@ -108,7 +108,6 @@ writer.write(example.SerializeToString())
 4. 用Example包装 Features
 ```
 
-
 ## 参考资料
 [http://warmspringwinds.github.io/tensorflow/tf-slim/2016/12/21/tfrecords-guide/](http://warmspringwinds.github.io/tensorflow/tf-slim/2016/12/21/tfrecords-guide/)
 [https://github.com/tensorflow/tensorflow/blob/r1.1/tensorflow/examples/how_tos/reading_data/convert_to_records.py](https://github.com/tensorflow/tensorflow/blob/r1.1/tensorflow/examples/how_tos/reading_data/convert_to_records.py)
