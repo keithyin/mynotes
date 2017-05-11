@@ -86,7 +86,7 @@ coord.join(enqueue_threads)
 3. 定义文件中数据的解码规则
 4. 解析数据
 
-`即：（文件名 -> Rreader -> decoder）`
+`即：（文件名 -> reader -> decoder）`
 
 从文件里读数据,读完了,就换另一个文件.文件名放在`string_input_producer`中.
 下面的代码是来自官网的一个示例
