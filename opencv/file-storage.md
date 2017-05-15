@@ -69,3 +69,6 @@ fs.release();
 keith
 ```
 这样就读出来了。
+
+## 参考资料
+[http://www.cnblogs.com/fourseas/p/5519681.html](http://www.cnblogs.com/fourseas/p/5519681.html)
