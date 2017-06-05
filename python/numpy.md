@@ -32,3 +32,15 @@ data_array[:,:,np.newaxis].shape #[2,2,1]
 img = img[np.newaxis, :].repeat(3, axis=0)# axis 指定要在哪个维度上重复，
 # 原img作为一个重复单元
 ```
+
+
+
+## 索引方式
+
+```python
+import numpy as np
+
+val = np.array([1,2,3,4,5,6,7,8,9])
+indiced_val = val[1:-1:3]  # [begin:end:step]
+```
+

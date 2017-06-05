@@ -57,3 +57,55 @@
 
 *  identification问题，对于新加入的人脸，怎么处理，需要 zero-shot
 *  identification和verification问题都可以帮助我们找到人脸的特征
+
+
+
+## faceNet
+
+**创新点：**
+
+* 直接优化人脸图片的embedding，而不是原来人们用的神经网络的中间层
+* harmonic embeddings（和谐的 嵌入？？）
+* harmonic  triplet loss
+* 直接学习欧式 embedding，我们可以学习其它距离？
+* triplet based loss function
+* ​
+
+**数据处理：**
+
+* triplet 
+  * 包含两个匹配的人脸 thumbnail, 和一个不匹配的人脸 thumbnail
+  * thumbnail are tight crops of face area, 就切脸那部分（怎么切的？）
+  * 切完的 thumbnail， 可能会进行  放缩（scale），变换（translation）
+  * 如何选择 triplet很重要
+    * 提出了一个新颖的在线 **负样本** 挖掘策略， 保证随着训练的进行，triplet的可分辨性越来越难
+    * 什么样的策略？ 神奇的很
+* 如何选择 triplet?
+  * 目的：给定 $x_i^a$ 找到，$x_i^p=\text{argmax}_{x_i^p}||f(x_i^a)-f(x_i^p)||_2^2$  和$x_i^n=\text{argmin}_{x_i^n}||f(x_i^a)-f(x_i^n)||_2^2$
+  * 计算所有数据集的$\text{argmax}$ 和$\text{argmin}$是不可行的，那该怎么办？
+    * 每n步，用最近的checkpoint，生成一次triplets，然后在子集上计算$\text{argmax}$ 和$\text{argmin}$.   在子集上计算是什么意思？
+    * 在线生成triplets。 从 mini-batch中选择 $\text{argmax}$ 和$\text{argmin}$。
+
+**训练：**
+
+* 选用两个网络：ZFnet  或者 Inception(2014)
+
+
+
+**测试：**
+
+* 为了提高聚簇的准确性
+  * 开发了一个 hard-positive 挖掘算法，`对于同一个人的embedding，鼓励球体聚簇`
+
+**尚不明了的东西:**
+
+* 什么是 curriculum learning?
+* collapsed model
+
+
+
+**想法:**
+
+* 在加上人脸的其它手工特征，一起放入 `neural network` 是不是效果会更好。
+* ​
+
