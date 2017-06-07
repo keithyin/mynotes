@@ -38,7 +38,7 @@
 * 如何使   $p_{data}(o_t)=p_{\pi_\theta}(o_t)$ ?   `DAgger`
   * 从 $p_{\pi_\theta}(o_t)$ 采集数据，而不是从 $p_{data}(o_t)$ 中
   * 直接执行 $\pi_\theta(u_t|o_t)$ ，但是需要标记$u_t$
-  *  
+  * ​
 * 模仿学习的损失函数
   * $c(x,u) = -\text{log}p(u=\pi^*(x)|x)$ 
   * $\pi^*(x)$   人类  `policy`
@@ -55,11 +55,46 @@
 
 $$min \sum_{t=1}^TE[c(x_t, u_t)] $$
 
-$x_{t+1} \text{~}p(x_{t+1}|x_t,u_t)$
+$x_{t} \text{~}p(x_{t}|x_{t-1},u_{t-1})$
 
 
 
 强化学习（表示一种方法时）忽略模型 $x_{t+1} \text{~}p(x_{t+1}|x_t,u_t)$ 
 
 
+
+# 强化学习-笔记3
+
+* can the machine make its own decisions?
+  * How can we choose actions under perfect knowledge of the system dynamics?
+  * Optimal control, trajectory optimization, planning
+
+## Making decisions under known dynamics?
+
+* $c(x_t, u_t)$ 
+* $min \sum_{t=1}^Tc(x_t, u_t)$
+* $x_{t} \text{~}p(x_{t}|x_{t-1},u_{t-1})$  , $x_t = f(x_{t-1}, u_{t-1})$
+
+
+
+**术语：**
+
+* shooting method: optimize over actions only
+* collocation method: optimize over actions and states, with constraints
+
+## Trajectory optimization: bp through dynamical systems
+
+
+
+## Linear dynamics: linear-quadratic regulator(LQR)
+
+* shooting method
+
+## Nonlinear dynamics
+
+
+
+## Discrete systems:
+
+## Case study
 

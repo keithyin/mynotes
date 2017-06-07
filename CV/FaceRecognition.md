@@ -109,3 +109,26 @@
 * 在加上人脸的其它手工特征，一起放入 `neural network` 是不是效果会更好。
 * ​
 
+
+
+
+## Deep Face Recognition
+
+
+
+##  Joint Face Detection and Alignment using Multi-task Cascaded Convolutional Networks
+
+* detection & alignment
+
+
+
+**创新点:**
+
+* 提出了一个框架，将`detection`和`alignment`搞到了一起
+* 使用了级联`CNN`
+* 提出的框架包含了三个阶段
+  * 浅层CNN快速生成候选窗口
+  * 然后，通过将第一步产生的窗口通过一个比较复杂的CNN映射来 调整window
+  * 最后，用一个更牛逼的CNN调整结果，最终输出5个人脸关键点。
+* 提出一个方法用于创建 合理的人脸数据，只需要有限的人类标注
+* ​
