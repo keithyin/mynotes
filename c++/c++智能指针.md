@@ -67,4 +67,22 @@
 
   * 当指向某个对象的最后一个`shared_ptr`被销毁，那么这个对象也会被自动销毁。
 
-  ​
+```c++
+//visual studio 2013 test demo
+#include <memory>
+#include <iostream>
+using namespace std;
+
+int main(){
+	shared_ptr<int> p(new int(32));
+	cout << "reference:" << p.use_count() << endl;
+	cout << *p << endl;
+	shared_ptr<int> p2(p);
+	cout << "reference:" << p2.use_count() << "    reference :" << p.use_count() << endl;
+	cout << *p2 << endl;
+	*p2 = 2;
+	cout << *p2 << endl;
+	cout << *p << endl;
+}
+```
+

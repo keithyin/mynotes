@@ -134,3 +134,4 @@ const float *blob_ptr = (const float *) blob->cpu_data();
 
 * `net`的 `blob` 是 `feature maps`
 * `Layer` 的 `blob` 是权重和偏置
+
