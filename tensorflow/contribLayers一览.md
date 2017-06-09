@@ -56,7 +56,7 @@ layers.conv2d  (inputs,
 
 * `reuse` : 是否 `reuse` 该层
 
-* `variables_collections`: 将`创建的variable`加到哪些`collection`中
+* `variables_collections`: 将`创建的variable`加到哪些`collection`中，这样我们就可以从指定的`collection`中获取我们的`variable`了。
 
 * `outputs_collections`: 输出加入到哪些`collections`中
 
