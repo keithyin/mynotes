@@ -110,3 +110,9 @@ with tf.Session() as sess:
 
 [tf.FixedLenFeature vs tf.VarLenfeature](https://stackoverflow.com/questions/41921746/tensorflow-varlenfeature-vs-fixedlenfeature)
 
+
+
+## 参考资料
+
+[https://www.tensorflow.org/api_guides/python/io_ops#Converting](https://www.tensorflow.org/api_guides/python/io_ops#Converting)
+
