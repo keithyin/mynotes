@@ -38,3 +38,36 @@ v_{k+1}(s)&=\sum_{a\in A}\pi(a|s)\Bigr( \mathcal{R}_s^a+\gamma\sum\mathcal{P}_{s
 v^{k+1}&=\mathcal{R}^\pi+\gamma\mathcal{P}^\pi v^k
 \end{aligned}
 $$
+
+## 如何提高`policy` , `control`?
+
+**算法1：**
+
+* 给定一个 `policy` $\pi$
+
+  * evaluate the policy $\pi$
+
+    $v_\pi(s)=\Bbb{E}[R_{t+1}+\gamma R_{t+2}+...|S_t=s]$
+
+  * improve the policy by acting greedily with respect to $v_\pi$
+
+    $\pi'=greedy(v_\pi)$
+
+* This process of policy iteration always converges to $\pi^\star$
+
+**算法2:**
+
+* Consider a *deterministic* policy, $a=\pi(s)$
+
+* We can improve the policy by acting greedily
+
+  $\pi'(s)=\text{arg} \max\limits_{a\in A}q_\pi(s,a)$ 
+
+* This improves the value from any state $s$ over one step
+
+  $q_\pi(s,\pi'(s))=\max\limits_{a\in A}q_\pi(s,a)\ge q_\pi(s,\pi(s))=v_\pi(s)$
+
+* It therefor improves the value function, $v_\pi'(s)\ge v_\pi(s)$
+
+* ​
+
