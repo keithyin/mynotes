@@ -14,10 +14,10 @@ The future is independent of the past given the present.(给定当前的状态�
 
 马尔科夫过程是一个无记忆的随机过程，即：一个随机状态序列 $S_1,S_2,....$满足马尔科夫性质
 
-**一个马尔科夫过程可以表示成为一个二元组<$S,P$>**
+**一个马尔科夫过程可以表示成为一个二元组<$\mathcal{S},\mathcal{P}$>**
 
-* $S$ 是一个有限状态集合
-* $P$ 是状态之间的转移概率 $P_{ss'}=\text{P}(S_{t+1}=s'|S_t=s)$
+* $\mathcal{S}$ 是一个有限状态集合
+* $\mathcal{P}$ 是状态之间的转移概率 $\mathcal{P}_{ss'}=\Bbb{P}(S_{t+1}=s'|S_t=s)$
 
 
 
@@ -30,11 +30,11 @@ The future is independent of the past given the present.(给定当前的状态�
 
 
 
-一个 **Markov Reward Process** 是一个四元组 <$S,P,R,\gamma$>
+一个 **Markov Reward Process** 是一个四元组 <$\mathcal{S},\mathcal{P},\mathcal{R},\gamma$>
 
-* $S$: 有限状态的集合
-* $P$: 状态转移矩阵 $P_{ss'}=\Bbb{P}[S_{t+1}=s'|S_t=s]$
-* $R$:  奖励函数 $R_s=\Bbb{E}[\text{R}_{t+1}|S_t=s]$, 
+* $\mathcal{S}$: 有限状态的集合
+* $\mathcal{P}$: 状态转移矩阵 $\mathcal{P}_{ss'}=\Bbb{P}[S_{t+1}=s'|S_t=s]$
+* $\mathcal{R}$:  奖励函数 $\mathcal{R}_s=\Bbb{E}[\text{R}_{t+1}|S_t=s]$, 
   * 为什么下标是$t+1$呢？，这里强行解释一下，因为$Reward$是在离开$s$状态时获得的，所以是$\text{R}_{t+1}$
 * $\gamma$:  衰减因子
 
@@ -74,7 +74,7 @@ v(s)&=\Bbb{E}[G_t|S_t=s] \\
 &=\Bbb{E}[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\
 &=\Bbb{E}[R_{t+1}+\gamma G_{t+1}|S_t=s]\\
 &=\Bbb{E}[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\
-v(s)&=R_s+\gamma\sum_{s'\in S}P_{ss'}v(s')
+v(s)&=\mathcal{R}_s+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}v(s')
 \end{aligned}
 $$
 
@@ -88,14 +88,14 @@ $$
 
 
 
-**MDP是一个五元组<$S,A,P,R,\gamma$>**
+**MDP是一个五元组<$\mathcal{S},\mathcal{A},\mathcal{P},\mathcal{R},\gamma$>**
 
-* $S$是一个有限状态集合
-* $A$是一个有限动作集合(actions)
-* $P$ 依旧是状态转移矩阵，只不过公式有点小变化，
-  * $P_{ss'}^a=\Bbb{P}[S_{t+1}=s'|S_t=s,A_t=a]$
-* $R$是奖励函数
-  * $R_s^a=\Bbb{E}(R_{t+1}|S_t=s,A_t=a)$
+* $\mathcal{S}$是一个有限状态集合
+* $\mathcal{A}$是一个有限动作集合(actions)
+* $\mathcal{P}$ 依旧是状态转移矩阵，只不过公式有点小变化，
+  * $\mathcal{P}_{ss'}^a=\Bbb{P}[S_{t+1}=s'|S_t=s,A_t=a]$
+* $\mathcal{R}$是奖励函数
+  * $\mathcal{R}_s^a=\Bbb{E}(R_{t+1}|S_t=s,A_t=a)$
 * $\gamma$ 是衰减因子
 
 
@@ -110,11 +110,13 @@ $$
 
 
 
+
 **给定MDP和$\pi$, MDP是可以转化为MRP的：**
 
-* <$S,A,P,R,\gamma$>($\pi$) --> <$S,P^\pi,R^\pi,\gamma$>
-* $P_{ss'}^\pi=\sum_{a\in A}\pi(a|s)P_{ss'}^a$
-* $R^\pi=\sum_{a\in A}\pi(a|s)R_s^a$
+* <$\mathcal{S},\mathcal{A},\mathcal{P},\mathcal{R},\gamma$>($\pi$) --> <$\mathcal{S},\mathcal{P}^\pi,\mathcal{R}^\pi,\gamma$>
+* $\mathcal{P}_{ss'}^\pi=\sum_{a\in A}\pi(a|s)\mathcal{P}_{ss'}^a$
+* $\mathcal{R}^\pi=\sum_{a\in A}\pi(a|s)\mathcal{R}_s^a$
+
 
 
 
@@ -122,6 +124,47 @@ $$
 
 * state-value function $v_\pi(s)$
   * $v_\pi(s)=\Bbb{E}[G_t|S_t=s]$
+  * 当前状态能够获得的期望`return`
 * action-value function $q_\pi(s,a)$
   * $q_\pi(s,a)=\Bbb{E}_\pi[G_t|S_t=s, A_t=a]$
+  * 当前状态下，选择`Action` `a`，获得的期望`return`
+* 两类值函数之间的关系 (下面公式也叫做 Bellman Expectation Equation)(给定$\pi$，可以用来求$v_\pi(s), q_\pi(s,a)$)
+  * $v_\pi(s)=\sum_{a\in A}\pi(a|s)q_\pi(s,a)$
+  * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s')$
+  * $v_\pi(s)=\sum_{a\in A}\pi(a|s)(\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s'))$
+  * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^a\sum_{a'\in A}\pi(a'|s')q_\pi(s',a'))$
+
+
+
+
+**最优值函数：**
+
+最优值函数的定义只出现在`MDP`这里，因为有`D`嘛，所以就可以找到`D`，使得值函数最优：
+
+* 最优 state-value function $v_\star(s)$
+
+  * $v_\star(s)=max_\pi v_\pi(s)$
+
+  * 即，找到最优的$\pi$ 使得 $v_\pi(s)$的值最大，这个最大的$v_\pi(s)$就是我们想要的
+* 最优action-value function $q_\star(s,a)$
+  * $q_\star(s,a)=max_\pi q_\pi(s,a)$
+  * 即，找到最优的$\pi$ 使得 $q_\pi(s,a)$的值最大，这个最大的$q_\pi(s,a)$就是我们想要的
+
+
+
+**Bellman Optimality Equation**
+$$
+\begin{aligned}
+v_\star(s) &= \max_a q_\star(s,a) \\
+ q_\star(s,a)&= \mathcal{R}_s^a+\gamma\sum_{s' \in S}\mathcal{P}_{ss'}^av_\star(s') \\
+ v_\star(s) &= \max_a \Bigl(  \mathcal{R}_s^a+\gamma\sum_{s' \in S}\mathcal{P}_{ss'}^av_\star(s') \Bigl)\\
+ q_\star(s,a)&= \mathcal{R}_s^a+\gamma\sum_{s' \in S}\mathcal{P}_{ss'}^a  \max_{a'} q_\star(s',a')
+\end{aligned}
+$$
+
+* 以上式子可以用来求解最优 `policy`
+
+
+
+
 

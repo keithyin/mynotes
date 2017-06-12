@@ -61,7 +61,7 @@ img = tf.reshape(image, image_shape)
 ## 下面介绍进一步处理过程
 
 * 对图片数据进行crop，resize 一些操作。
-[https://www.tensorflow.org/api_guides/python/image](https://www.tensorflow.org/api_guides/python/image)
+  [https://www.tensorflow.org/api_guides/python/image](https://www.tensorflow.org/api_guides/python/image)
 
 ## 使用tf.train.shuffle_batch
 
@@ -103,3 +103,10 @@ with tf.Session() as sess:
   coord.join(threads)
   sess.close()
 ```
+
+
+
+## 其它
+
+[tf.FixedLenFeature vs tf.VarLenfeature](https://stackoverflow.com/questions/41921746/tensorflow-varlenfeature-vs-fixedlenfeature)
+
