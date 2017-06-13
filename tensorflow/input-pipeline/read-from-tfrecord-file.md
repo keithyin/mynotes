@@ -70,6 +70,16 @@ example_batch, label_batch = tf.train.shuffle_batch(
       [img, label], batch_size=batch_size, capacity=capacity,
       min_after_dequeue=min_after_dequeue)
 ```
+```python
+# 如何计算capacity
+#dequeue后的所剩数据的最小值
+min_after_dequeue = 10000
+#queue的容量
+capacity = min_after_dequeue + 3 * batch_size
+```
+
+
+
 好了，可以使用返回的`batch`进行训练了。
 
 ## 下面介绍下 Session block怎么写
