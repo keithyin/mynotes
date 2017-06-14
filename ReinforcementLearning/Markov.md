@@ -25,7 +25,7 @@ The future is independent of the past given the present.(给定当前的状态�
 
 **A Markov reward process is a Markov chain with values.**
 
-* 首先是一个`Markov Process` 
+* 首先是一个`Markov Process`
 * 然后是离开某个状态都有一个奖励值，（注意奖励，是在离开状态的时候获得的）
 
 
@@ -34,7 +34,7 @@ The future is independent of the past given the present.(给定当前的状态�
 
 * $\mathcal{S}$: 有限状态的集合
 * $\mathcal{P}$: 状态转移矩阵 $\mathcal{P}_{ss'}=\Bbb{P}[S_{t+1}=s'|S_t=s]$
-* $\mathcal{R}$:  奖励函数 $\mathcal{R}_s=\Bbb{E}[\text{R}_{t+1}|S_t=s]$, 
+* $\mathcal{R}$:  奖励函数 $\mathcal{R}_s=\Bbb{E}[\text{R}_{t+1}|S_t=s]$,
   * 为什么下标是$t+1$呢？，这里强行解释一下，因为$Reward$是在离开$s$状态时获得的，所以是$\text{R}_{t+1}$
 * $\gamma$:  衰减因子
 
@@ -130,6 +130,7 @@ $$
   * 当前状态下，选择`Action` `a`，获得的期望`return`
 * 两类值函数之间的关系 (下面公式也叫做 Bellman Expectation Equation)(给定$\pi$，可以用来求$v_\pi(s), q_\pi(s,a)$)
   * $v_\pi(s)=\sum_{a\in A}\pi(a|s)q_\pi(s,a)$
+  
   * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s')$
   * $v_\pi(s)=\sum_{a\in A}\pi(a|s)(\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s'))$
   * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^a\sum_{a'\in A}\pi(a'|s')q_\pi(s',a'))$
@@ -153,6 +154,7 @@ $$
 
 
 **Bellman Optimality Equation**
+
 $$
 \begin{aligned}
 v_\star(s) &= \max_a q_\star(s,a) \\
@@ -163,8 +165,3 @@ v_\star(s) &= \max_a q_\star(s,a) \\
 $$
 
 * 以上式子可以用来求解最优 `policy`
-
-
-
-
-
