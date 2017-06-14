@@ -80,3 +80,25 @@ $x_k-\mu_{k-1}$: 可以看作 `error term `, 是真实值和期望值的差距.
 
 
 ## Temporal-Difference Learning
+
+* TD methods learn directly from episodes of experience
+* TD is model-free: no knowledge of MDP transitions/rewards
+* TD learns from **incomplete** episodes, by **bootstrapping**
+* **TD updates a guess towards a guess**
+
+### TD 和 Monte-Carlo 对比
+
+* 目标: learn $v_\pi$ online from experience under policy $\pi$
+* Incremental every-visit Monte-Carlo
+  * Update value $V(S_t) toward **actual** return $G_t$
+$$
+V(S_t)\leftarrow V(S_t)+\alpha\Bigr( G_t-V(S_t)\Bigr)
+$$
+
+* Simplest temporal-difference learning algorithm:TD(0)
+  * Update value $V(S_t)$ toward **estimated** return $R_{t+1}+\gamma V(S_{t+1})$
+$$
+V(S_t)\leftarrow V(S_t)+\alpha\Bigr(R_{t+1}+\gamma V(S_{t+1})-V(S_t)\Bigr)
+$$
+  * $R_{t+1}+\gamma V(S_{t+1})$ is called **TD target**
+  * $R_{t+1}+\gamma V(S_{t+1})-V(S_t)$ is called **TD error**
