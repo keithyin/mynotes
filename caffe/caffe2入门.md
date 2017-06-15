@@ -6,7 +6,7 @@
 
 ## Workspace
 
-* `workspace`:  存放数据的地方。网络中的所有数据都存放在`workspace`中，同时，`workspace`还管理它的`Net`(计算图)。`caffe2` `python`接口，有个默认的`workspace`，名字叫`default`
+* `workspace`:  存放数据的地方。网络中的所有数据都存放在`workspace`中)。`caffe2` `python`接口，有个默认的`workspace`，名字叫`default`
 
 * 在`caffe2`中，数据由`Blob`保存。`Blob`中保存的数据就是个`ndarray`
 
@@ -132,7 +132,7 @@ workspace.FeedBlob("label", label)
 # Create net using a model helper，使用helper创建网络就简单的多了
 m = model_helper.ModelHelper(name="my first net")
 
-# how to init the parameters 
+# how to init the parameters
 weight = m.param_init_net.XavierFill([], 'fc_w', shape=[10, 100])
 bias = m.param_init_net.ConstantFill([], 'fc_b', shape=[10, ])
 
@@ -161,9 +161,8 @@ for j in range(0, 100):
     workspace.FeedBlob("label", label)
 
     workspace.RunNet(m.name, 10)   # run for 10 times
-    
+
     #可以将值取出来看看
     print(workspace.FetchBlob("softmax"))
     print(workspace.FetchBlob("loss"))
 ```
-

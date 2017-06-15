@@ -92,7 +92,7 @@ print('Created init net.')
 
 * 定义完图了，可以搞事情了
 
-  ```pyth
+  ```python
   workspace.RunNetOnce(init_net) #init_net运行一次就ok了。
   workspace.CreateNet(train_net)
 
