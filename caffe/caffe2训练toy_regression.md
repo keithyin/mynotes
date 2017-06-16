@@ -105,5 +105,7 @@ print('Created init net.')
 
 ## 总结
 
-* caffe2 中 模型参数保存在workspace中的`Blob`中
+* caffe2 中 模型参数保存在`workspace`中的`Blob`中
+* caffe2 中的模型的中间结果也保存在 `workspace` 中的 `Blob` 中
+* 尝试这把  计算的梯度 Fetch 出来,发现没搞定.有时间看看还有其它的方法不.
 * 需要手动写出来更新参数的公式，官方没有提供简单的吗？应该会有吧。
