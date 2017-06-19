@@ -125,27 +125,28 @@ See the [advanced tutorial](https://tensorflow.github.io/serving/serving_advance
 
 ## Extensibility
 
-TensorFlow Serving provides several extension points where you can add new functionality.
+`TensorFlow Serving` 提供了几个可以添加新功能的扩展点。
 
-Version Policy
+**Version Policy**
 
-Version Policies specify the sequence of version loading and unloading within a single servable stream.
+`Version Policies`说明了在单一 `servable stream`中一系列版本的加载和卸载。 
 
-TensorFlow Serving includes two policies that accommodate most known use- cases. These are the Availability Preserving Policy (avoid leaving zero versions loaded; typically load a new version before unloading an old one), and the Resource Preserving Policy (avoid having two versions loaded simultaneously, thus requiring double the resources; unload an old version before loading a new one). For simple usage of TensorFlow Serving where the serving availability of a model is important and the resource costs low, the Availability Preserving Policy will ensure that the new version is loaded and ready before unloading the old one. For sophisticated usage of TensorFlow Serving, for example managing versions across multiple server instances, the Resource Preserving Policy requires the least resources (no extra buffer for loading new versions).
+`TensorFlow Serving` 包含两个 `policies` 来提供常用的 使用情景。第一个是 `Availability Preserving Policy` (avoid leaving zero versions loaded; typically load a new version before unloading an old one), 第二个是 `Resource Preserving Policy` (avoid having two versions loaded simultaneously, thus requiring double the resources; unload an old version before loading a new one). For simple usage of TensorFlow Serving where the serving availability of a model is important and the resource costs low, the Availability Preserving Policy will ensure that the new version is loaded and ready before unloading the old one. For sophisticated usage of TensorFlow Serving, for example managing versions across multiple server instances, the Resource Preserving Policy requires the least resources (no extra buffer for loading new versions).
 
-Source
+**Source**
 
-New Sources could support new filesystems, cloud offerings and algorithm backends. TensorFlow Serving provides some common building blocks to make it easy & fast to create new sources. For example, TensorFlow Serving includes a utility to wrap polling behavior around a simple source. Sources are closely related to Loaders for specific algorithms and data hosting servables.
 
-See the Custom Source document for more about how to create a custom Source.
+`New Sources` 可能支持  `new filesystems`, `cloud offerings` 和 `algorithm backends`. `TensorFlow Serving` 提供了一些通用的 组件 使得创建一个新的`Sources` 更快，更简单。例如： `TensorFlow Serving` 包含一个 `utility to wrap polling behavior around a simple source`. Sources are closely related to Loaders for specific algorithms and data hosting servables.
 
-Loaders
+See the [Custom Source](https://tensorflow.github.io/serving/custom_source) document for more about how to create a custom Source.
+
+**Loaders**
 
 Loaders are the extension point for adding algorithm and data backends. TensorFlow is one such algorithm backend. For example, you would implement a new Loader in order to load, provide access to, and unload an instance of a new type of servable machine learning model. We anticipate creating Loaders for lookup tables and additional algorithms.
 
 See the Custom Servable document to learn how to create a custom servable.
 
-Batcher
+**Batcher**
 
 Batching of multiple requests into a single request can significantly reduce the cost of performing inference, especially in the presence of hardware accelerators such as GPUs. TensorFlow Serving includes a request batching widget that lets clients easily batch their type-specific inferences across requests into batch requests that algorithm systems can more efficiently process. See the Batching Guide for more information.
 
