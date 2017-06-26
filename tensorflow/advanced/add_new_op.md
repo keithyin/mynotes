@@ -1,5 +1,9 @@
 # tensorflow 自定义 op
 
+本文只是简单的翻译了 [https://www.tensorflow.org/extend/adding_an_op](https://www.tensorflow.org/extend/adding_an_op) 的简单部分，高级部分请移步官网。
+
+
+
 可能需要新定义 `c++ operation` 的几种情况：
 
 * 现有的 `operation` 组合不出来你想要的 `op`
@@ -124,11 +128,11 @@ REGISTER_KERNEL_BUILDER(Name("ZeroOut").Device(DEVICE_CPU), ZeroOutOp);
 
 ### **Multi-threaded CPU kernels**
 
-
+[请移步官网](https://www.tensorflow.org/extend/adding_an_op)
 
 ### **GPU kernels**
 
-
+[请移步官网](https://www.tensorflow.org/extend/adding_an_op)
 
 ## Build the op library
 
@@ -157,7 +161,112 @@ g++ -std=c++11 -shared zero_out.cc -o zero_out.so -fPIC -I $TF_INC -O2
 
 ## Use the op in Python
 
+`Tensorflow` 的 python 接口提供了 `tf.load_op_library` 函数用来加载动态 `library`，同时将 `op` 注册到`tensorflow` 框架上。`load_op_library` 返回一个 `python module`，它包含了 `op`和 `kernel` 的 `python wrapper` 。因此，一旦你编译好了一个 `op`，就可以使用下列代码通过 `python`来执行它：
 
+```python
+import tensorflow as tf
+zero_out_module = tf.load_op_library('./zero_out.so')
+with tf.Session(''):
+  zero_out_module.zero_out([[1, 2], [3, 4]]).eval()
+
+# Prints
+array([[1, 0], [0, 0]], dtype=int32)
+```
+
+
+
+记住：生成的函数的名字是 `snake_case` name。如果在`c++`文件中， `op` 的名字是` ZeroOut`，那么在`python` 中，名字是 `zero_out`。
+
+[完整的代码在文章的最后](#代码)
+
+
+
+## Verify that the op works
+
+一个验证你的自定义的`op`是否正确工作的一个好的方法是 为它写一个测试文件。创建一个 `zero_out_op_test.py` 文件，内容为：
+
+```python
+import tensorflow as tf
+
+class ZeroOutTest(tf.test.TestCase):
+  def testZeroOut(self):
+    zero_out_module = tf.load_op_library('./zero_out.so')
+    with self.test_session():
+      result = zero_out_module.zero_out([5, 4, 3, 2, 1])
+      self.assertAllEqual(result.eval(), [5, 0, 0, 0, 0])
+
+if __name__ == "__main__":
+  tf.test.main()
+```
+
+然后运行这个 `test`
+
+
+
+
+
+## 代码
+
+```c++
+//zero_out.cc 文件
+#include "tensorflow/core/framework/op.h"
+#include "tensorflow/core/framework/shape_inference.h"
+#include "tensorflow/core/framework/op_kernel.h"
+using namespace tensorflow;
+
+REGISTER_OP("ZeroOut")
+    .Input("to_zero: int32")
+    .Output("zeroed: int32")
+    .SetShapeFn([](::tensorflow::shape_inference::InferenceContext* c) {
+      c->set_output(0, c->input(0));
+      return Status::OK();
+    });
+
+class ZeroOutOp : public OpKernel {
+ public:
+  explicit ZeroOutOp(OpKernelConstruction* context) : OpKernel(context) {}
+
+  void Compute(OpKernelContext* context) override {
+    // 将输入 tensor 从 context 中取出。
+    const Tensor& input_tensor = context->input(0);
+    auto input = input_tensor.flat<int32>();
+
+    // 创建一个 ouput_tensor, 使用 context->allocate_ouput() 给它分配空间。
+    Tensor* output_tensor = NULL;
+    OP_REQUIRES_OK(context, context->allocate_output(0, input_tensor.shape(),
+                                                     &output_tensor));
+    auto output_flat = output_tensor->flat<int32>();
+
+    // Set all but the first element of the output tensor to 0.
+    const int N = input.size();
+    for (int i = 1; i < N; i++) {
+      output_flat(i) = 0;
+    }
+
+    // Preserve the first input value if possible.
+    if (N > 0) output_flat(0) = input(0);
+  }
+};
+REGISTER_KERNEL_BUILDER(Name("ZeroOut").Device(DEVICE_CPU), ZeroOutOp);
+```
+
+```shell
+#创建动态链接库的命令
+g++ -std=c++11 -shared zero_out.cc -o zero_out.so -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -I $TF_INC -O2
+```
+
+
+
+## 总结
+
+`tensorflow` 自定义 `op` 的方法可以总结为：
+
+1. 写个 `diy_op.cc` 文件
+2. 用 `g++` 把这个文件编译成动态链接库
+3. 在 `python` 中使用 `tf.load_op_library`  将库导入。
+4. 就可以使用了。
+
+其它的方法就是用 `bazel` 编译了，毕竟用的不多。
 
 ## 参考资料
 
