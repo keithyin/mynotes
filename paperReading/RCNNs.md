@@ -124,7 +124,7 @@ $$
 * CNN , 用于提取 region 的特征
   * 从每个 region proposals 中提取 4096 维的特征。
   * 为了CNN可以计算 region proposals 的 4096维的特征，直接将 region proposals warp成 227×227大小（用的 ALEX-net）
-  * **warp:** 将紧致bbox中的像素在 warp之前，首先扩大了原来的紧致bbox
+  * **warp:** 将紧致 bbox中的像素在 warp之前，首先扩大了原来的紧致bbox
 * SVM 分类器，用来分类 region 类别
 
 
