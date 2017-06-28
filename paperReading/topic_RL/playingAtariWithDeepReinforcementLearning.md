@@ -49,8 +49,45 @@
 
 **Bellman equation:**(intuition)
 
-* ​
+* 如果已知当前状态 $s$ 的 下个状态 $s'$  的 $Q^*(s',a')$ 已知。那么，当前状态的最优的最优 $Q$ 函数是
+  $$
+  Q^*(s,a)=\Bbb E_{s'\in S}\Biggr(r+\gamma\max_{a'}Q^*\Bigr(s',a'\Bigr) \Bigr|s,a\Biggr)
+  $$
 
+
+
+
+最原始的方法，是使用 `lookup table` 来存储 $Q(s,a)$ 的值，可以想象，如果 $s,a$ 的数量非常多，全部存储到内存几乎是不可能的。所以本论文用 神经网络来估计 $Q^*(s,a)$ 的值。
+
+**使用神经网络的好处是：**
+
+* 可以适用于 大规模的 RL 实践中
+* 有更好的泛化能力，更新 一次，对所有的状态都会有影响
+
+
+
+
+**如何训练 Q-Network：**
+
+* 最小化一系列的 `loss function` $L_i(\theta_i)$    $i$ 代表 $iteration$ ，$iteration$ 又代表啥呢？
+  $$
+  L_i(\theta_i)=\Bbb E{s,a\sim \rho (\bullet) }\Biggr[\Bigr(y_i-Q(s,a;\theta_i)\Bigr)^2\Biggr]
+  $$
+
+* 其中 $y_i$ 就是在 监督学习中经常见到的 标签，那么 强化学习的 $y_i$ 如何定义呢？
+  $$
+  y_i=\Bbb E_{s'\in \mathcal E}\Biggr(r+\gamma\max_{a'}Q\Bigr(s',a';\theta_{i-1}\Bigr) \Bigr|s,a\Biggr)
+  $$
+
+* 可以看到，是使用 $\theta_{i-1}$ 来定义的第 $i$ 个 $iteration$ 的 $target$ 
+
+* $\rho(s,a)$ 表示 序列中的 $s,a$ 分布，称之为 $behaviour ~distribution$
+
+* 目标函数的导数为
+  $$
+  \nabla L_i(\theta_i) =\Bbb E_{s,a\sim \rho (\bullet) ,s'\in \mathcal E}\Biggr[\Biggr(r+\gamma\max_{a'}Q\Bigr(s',a';\theta_{i-1}\Bigr)-Q\Bigr(s,a;\theta_i\Bigr)\Biggr)\nabla_{\theta_i}Q\Bigr(s,a;\theta_i\Bigr)\Biggr]
+  $$
+  ​
 
 
 ## DQN 的前身
