@@ -73,6 +73,19 @@ hellomake: hellomake.c hellofunc.c
 
 
 
+**makefile文件的简单格式：**
+
+```shell
+<target>: [ <dependency > ]*
+   [ <TAB> <command> <endl> ]+
+```
+
+* target : 通常是一个文件
+* dependence:  target 依赖的文件
+* 要运行的命令，基于 target 和  依赖
+
+
+
 
 ## 参考资料
 

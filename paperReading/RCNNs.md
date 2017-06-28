@@ -144,3 +144,36 @@ $$
 
 因为需要用 CNN 进行特征提取，然后进行分类，所以，预训练 CNN 是有必要的，需要保证可以提取到一个好的特征，然后用来分类或干其他。
 
+* Pre train，使用 ImageNet 数据集进行 预训练
+* 微调：使用 warped 的 region 进行微调
+  * 微调如何打标签：IoU 大于0.5 的当作正例，其它的作为反例。
+  * 正例就是类别， 反例就是背景吧。
+  * 微调的时候，2000个框中，从正例 proposal中 均匀采32个，从负例 proposal中，采96个，128个样本组成 mini-batch。
+
+
+
+**测试时候是怎么玩的：**
+
+* 用 selective search 提取2000个 region proposals
+* warp 每个 proposal  然后放入 CNN 提取特征。
+* 对特征用 SVM 分类
+* 如果两个 proposal region 有很高的 IOU，那就取，分类得分最高的那个？是这么理解么
+
+
+
+**第一次阅读留下的问题：**
+
+* 如何 `warp` region 中 的图像？
+* 对于 正例采32,负例采96的解释有疑问！！！
+* tight bounding box 指的啥。
+
+> Prior to warping, dilate the tight bounding box, make p pixels around the original
+>
+> 解释： $ratio=\frac{w_{proposal}}{227-2p}$,  将原图按此比例进行变换，然后以 proposal 的中心为中心点，截取227大小的图片作为输入。如果 $w_{proposal}$ 比 $227-2p$ 小， 那么原图要扩张一下，然后再从扩张的原图切，为什么要搞成这样撒？
+
+
+
+## 参考资料
+
+[http://www.jianshu.com/p/deb0f69f5597](http://www.jianshu.com/p/deb0f69f5597)
+
