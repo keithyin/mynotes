@@ -39,8 +39,8 @@ $$
 
 **总结：**
 
-* anchor 只是概念上的一个东西，假设那个地方有一个anchor，然后判断这个anchor是positive还是negative的，或者既不是positive也不是negative。
-* anchor负责预测离它最近的一个 bounding-box
+* `anchor`  只是概念上的一个东西，假设那个地方有一个anchor，然后判断这个anchor是positive还是negative的，或者既不是positive也不是negative。
+* `anchor` 负责预测离它最近的一个 bounding-box
 
 
 
