@@ -167,14 +167,50 @@ See also: [`op_def_builder.cc:FinalizeAttr`](https://www.github.com/tensorflow/t
   // 1.  {'<string1>', '<string2>'}， 这样，属性的值只能取 'string1' 或 'string2'
   REGISTER_OP("EnumExample")
       .Attr("e: {'apple', 'orange'}");
-  // 2.  {<type1>, <type2>}， 这样的话，属性值可以是 'type1'类型 或 'type2'类型
+
+  // 2.  {<type1>, <type2>}， 这样的话，属性值可以是 'type1' 或 'type2'。
+  // t 是个 type 类型！！！{<type1>, <type2>} 表示 了 t 是 type 类型。
   REGISTER_OP("RestrictedTypeExample")
       .Attr("t: {int32, float, bool}");
-
   ```
 
-  ​
+  ```c++
+  // 这种语法表示的是，a是个 int，而且值要大于等于2
+  REGISTER_OP("MinIntExample")
+      .Attr("a: int >= 2");
+  ```
 
+  ```c++
+  // 设置 默认值
+  REGISTER_OP("AttrDefaultExample")
+      .Attr("i: int = 0");
+  ```
+
+
+
+
+### 多态性
+
+**类型多态性：**
+
+```c++
+REGISTER_OP("ZeroOut")
+    .Attr("T: {float, int32}")
+    .Input("to_zero: T")
+    .Output("zeroed: T");
+```
+
+
+
+
+
+
+
+## 注意
+
+`tensorflow` 自定义 `op` 需要注意的事：
+
+* ​
 
 
 ## 参考资料
