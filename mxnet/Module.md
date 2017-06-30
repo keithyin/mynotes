@@ -144,6 +144,254 @@ mod.fit(train_iter,
 
  
 
+## 当调用Module.bind 的时候，后端发生了什么？
+
+**首先看创建mod的时候：**
+
+```python
+#接口
+def __init__(self, symbol, data_names=('data',), label_names=('softmax_label',),
+                 logger=logging, context=ctx.cpu(), work_load_list=None,
+                 fixed_param_names=None, state_names=None)
+
+####### 实例
+mod = mx.mod.Module(symbol=net,
+                    context=mx.cpu(),
+                    data_names=['data'],
+                    label_names=['softmax_label'])
+# 传入了 data_names 和 label_names 还有一个 state_names ，只是没传进去
+# inputs_names 就是 data_names 加 label_names 加 label_names
+# arg_names 是 net.list_arguments() 即，计算net的值所需要的所有的 Varaible。
+# mod对象中有个 _param_names 这个表示arg_names 中去掉 input_names 的 name，即不将input涉及的
+# Symbol 作为模型 参数。
+# self._fixed_param_names = fixed_param_names 用来指明哪些参数不需要更新
+# self._aux_names = symbol.list_auxiliary_states()
+# self._data_names = data_names
+# self._label_names = label_names
+# self._state_names = state_names
+# self._output_names = symbol.list_outputs()
+
+#############先不管这些params 是啥，继续看bind################################
+# self._arg_params = None  
+# self._aux_params = None
+# self._params_dirty = False
+
+##可以看出，创建 mod 对象的时候，也就是对几个对象属性赋了值。
+```
+
+**mod.bind**
+
+```python
+#接口
+def bind(self, data_shapes, label_shapes=None, for_training=True,
+             inputs_need_grad=False, force_rebind=False, shared_module=None,
+             grad_req='write')
+###实例
+mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
+# 这个函数将 Symbol 与 executor bind起来。
+# 这个函数中调用了这么对象 ，我们看一下这个对象的源码， 这个代码返回了一个 DPEG 对象
+self._exec_group = DataParallelExecutorGroup(self._symbol, self._context,
+                     self._work_load_list, self._data_shapes,  self._label_shapes,                            self._param_names, for_training, inputs_need_grad, shared_group,                          logger=self.logger, fixed_param_names=self._fixed_param_names,
+                     grad_req=grad_req,  state_names=self._state_names)
+
+# mod 拿到了这个对象之后，做了啥呢？
+if shared_module is not None:
+    self.params_initialized = True
+    self._arg_params = shared_module._arg_params
+    self._aux_params = shared_module._aux_params
+elif self.params_initialized:
+    # if the parameters are already initialized, we are re-binding
+    # so automatically copy the already initialized params
+    self._exec_group.set_params(self._arg_params, self._aux_params)
+else:
+    assert self._arg_params is None and self._aux_params is None
+    param_arrays = [ nd.zeros(x[0].shape, dtype=x[0].dtype)
+                          for x in self._exec_group.param_arrays ]
+    self._arg_params = {name:arr for name, arr in zip(self._param_names, param_arrays)}
+
+    aux_arrays = [nd.zeros(x[0].shape, dtype=x[0].dtype)
+                                for x in self._exec_group.aux_arrays]
+    self._aux_params = {name:arr for name, arr in zip(self._aux_names, aux_arrays)}
+    
+## 看到这里，看到了 NDArray 的影子，mod 给每个 param_params 都创建了一个 NDArray，
+## Symbol 变 NDArray 咯
+## mod 中的 _arg_params 存放的是 name:NDArray，是 param 的 NDArray，为什么叫 _arg_params
+## 而不叫_param_prarams。
+# 名字是 *_params 的都是代表的 name:NDArray 键值对
+# 名字是 *_arrays 存放的是 NDArray
+```
+
+
+
+**mod.init_params**
+
+> 看完了 bind，bind 时候是将所有的 arg_params 初始化为 0 的 NDArray，而且还保存了一个 DPEG 对象，还不是道是干嘛的。
+
+```python
+def init_params(self, initializer=Uniform(0.01), arg_params=None, aux_params=None,
+                    allow_missing=False, force_init=False)
+# 初始化 arg_params 和 aux_params ,调用 initializer，这里嘛，不同的参数可以调用不同的方法
+
+for name, arr in self._arg_params.items():
+    desc = InitDesc(name, attrs.get(name, None))
+    _impl(desc, arr, arg_params)
+
+for name, arr in self._aux_params.items():
+    desc = InitDesc(name, attrs.get(name, None))
+    _impl(desc, arr, aux_params)
+
+self.params_initialized = True
+self._params_dirty = False
+
+# copy the initialized parameters to devices，拷贝到 GPU上去。。
+self._exec_group.set_params(self._arg_params, self._aux_params)
+```
+
+
+
+
+
+**mod.forward**
+
+> 进行前向传导
+
+```python
+def forward(self, data_batch, is_train=None):
+    assert self.binded and self.params_initialized
+    
+    # 调用的 executor 的 forward 方法
+    # 还记得在 mod.init_params 的时候，我们已经设置过 extc_group 中 模型参数的值了。
+    self._exec_group.forward(data_batch, is_train)
+```
+
+
+
+**mod.update_metric**
+
+> 更新 metric 的值， 除了更新一下metric 的值，啥也不干
+
+
+
+**mod.backward**
+
+> 反向传导
+
+```python
+def backward(self, out_grads=None):
+    assert self.binded and self.params_initialized
+    # 反向传导，用的 也是 exec，看来这玩意是核心计算单元啊
+    self._exec_group.backward(out_grads=out_grads)
+```
+
+
+
+**mod.update**
+
+> 模型参数更新阶段了
+
+```python
+# 看了这个方法，我们 获得的信息是：
+# self._exec_group.param_arrays 模型参数在这
+# self._exec_group.grad_arrays  backward 求完的梯度在这
+def update(self):
+    assert self.binded and self.params_initialized and self.optimizer_initialized
+
+    self._params_dirty = True
+    if self._update_on_kvstore:
+        _update_params_on_kvstore(self._exec_group.param_arrays,
+                                  self._exec_group.grad_arrays,
+                                  self._kvstore)
+    else:
+        # 看这个最简单的方法吧
+        # self._updater 是通过optimizer获取的
+        _update_params(self._exec_group.param_arrays,
+                       self._exec_group.grad_arrays,
+                       updater=self._updater,
+                       num_device=len(self._context),
+                       kvstore=self._kvstore)
+
+        
+def _update_params(param_arrays, grad_arrays, updater, num_device,
+                   kvstore=None):
+    """Perform update of param_arrays from grad_arrays not on kvstore."""
+    for index, pair in enumerate(zip(param_arrays, grad_arrays)):
+        # 两个都是 NDArray 列表
+        arg_list, grad_list = pair
+        if grad_list[0] is None:
+            continue
+        # 先不管 kvstore
+        if kvstore:
+            # push gradient, priority is negative index
+            kvstore.push(index, grad_list, priority=-index)
+            # pull back the sum gradients, to the same locations.
+            kvstore.pull(index, grad_list, priority=-index)
+        # 
+        for k, p in enumerate(zip(arg_list, grad_list)):
+            # w: arg, g: grad
+            w, g = p
+            # 这边进行更新参数咯
+            updater(index*num_device+k, g, w)
+```
+
+
+
+
+
+**DataParallelExecutorGroup：**
+
+> 看名字是 数据并行
+
+```python
+def __init__(self, symbol, contexts, workload, data_shapes, label_shapes, param_names,
+                 for_training, inputs_need_grad, shared_group=None, logger=logging,
+                 fixed_param_names=None, grad_req='write', state_names=None)
+
+# self.param_names = param_names
+# self.arg_names = symbol.list_arguments()
+# self.aux_names = symbol.list_auxiliary_states()
+# self.grad_req = {} ，用来保存模型中所有的 参数的 梯度需求情况。
+# self.batch_size = None
+# self.slices = None
+# self.execs = []
+# self._default_execs = None
+# self.data_arrays = None
+# self.label_arrays = None
+# self.param_arrays = None
+# self.state_arrays = None
+# self.grad_arrays = None
+# self.aux_arrays = None
+# self.input_grad_arrays = None
+
+# self.data_shapes = None
+# self.label_shapes = None
+# self.data_names = None
+# self.label_names = None
+# self.data_layouts = None
+# self.label_layouts = None
+# self.output_names = self.symbol.list_outputs()
+# self.output_layouts = [DataDesc.get_batch_axis(self.symbol[name].attr('__layout__'))
+                       for name in self.output_names]
+# self.num_outputs = len(self.symbol.list_outputs())
+
+# self.bind_exec(data_shapes, label_shapes, shared_group)
+```
+
+
+
+## 总结
+
+> mxnet 是把计算图部分 编译成一个函数，然后前向，后向，更新的部分，是命令式编程。
+
+* 核心计算模块： `Executor`
+  * 保存着模型参数
+  * 执行前向计算，后向计算。
+* 参数更新模块： `Optimizer`
+  * 负责参数更新
+* 助手模块： `Module`
+  * 调用 `Initilizer` 初始化 模型参数
+  * 更方便的 前向，后向，更新操作
+
+
 
 
 

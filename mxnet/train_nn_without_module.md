@@ -50,7 +50,7 @@ exe = y.simple_bind(mx.cpu(), x=(5,4), grad_req='null')
 * 用来执行前向过程，`y=executor.forward()` 得到的是 a list of NDArray。
 * `e.outputs` 得到的也是  a list of NDArray，使用这个命令时，首先要 `forward` 一下。
 * `executor` 的 `grad_arrays` 属性中保存着 Symbol 的梯度。
-* `arg_arrays` 保存着参数列表
+* `arg_arrays` 保存着参数列表 `NDArray`
 
 ```python
 import mxnet as mx
