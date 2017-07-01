@@ -57,6 +57,7 @@
 
 
 
+
 最原始的方法，是使用 `lookup table` 来存储 $Q(s,a)$ 的值，可以想象，如果 $s,a$ 的数量非常多，全部存储到内存几乎是不可能的。所以本论文用 神经网络来估计 $Q^*(s,a)$ 的值。
 
 **使用神经网络的好处是：**
@@ -79,7 +80,7 @@
   y_i=\Bbb E_{s'\in \mathcal E}\Biggr(r+\gamma\max_{a'}Q\Bigr(s',a';\theta_{i-1}\Bigr) \Bigr|s,a\Biggr)
   $$
 
-* 可以看到，是使用 $\theta_{i-1}$ 来定义的第 $i$ 个 $iteration$ 的 $target$ 
+* 可以看到，是使用 $\theta_{i-1}$ 来定义的第 $i$ 个 $iteration$ 的 $target$ , $y_i$ 是 $target$ 哦。和原始的 $Q-Learning$ 还是一样的。只不过原始 $Q-Learning$ 是直接 改变 $Q(s,a)$ ，而现在是通过改变 $\theta$ 间接改变 $Q(s,a)$。
 
 * $\rho(s,a)$ 表示 序列中的 $s,a$ 分布，称之为 $behaviour ~distribution$
 
@@ -90,13 +91,20 @@
   ​
 
 
-## DQN 的前身
 
-**Model Free Control：**
 
-* 不难看出，`dqn` 解决的是一个 `model-free control` 问题。`model-free control` 问题有以下几种解决方法。
-  * Monte-Carlo Policy Iteration
-  * Monte-Carlo Control
-  * GLIE Monte-Carlo Control
-  * Sarsa
+## Q-Learning
+
+> Q-Learning: Off-Policy TD Control
+
+**传统 Q-Learning 算法如下：**
+$$
+Q(s,a)\leftarrow Q(s,a)+\alpha\Biggr[r+\gamma\max_{a'}Q^*\Bigr(s',a'\Bigr) - Q(s,a)\Biggr]
+$$
+
+* DQN 直接优化 target 那一块 真的靠谱吗？
+* 两个更新的方法目标是一样的吗？都是期望 $Q(s,a)$ 更加逼近 $target$
+* 看起来这个 $\alpha$ 没有加入到 DQN 中啊，有点尴尬
+
+
 
