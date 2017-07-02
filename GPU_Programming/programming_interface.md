@@ -228,6 +228,18 @@ Using page-locked host memory has several benefits:
 
 
 
+**Mapped Memory：**
+
+> A block of page-locked host memory can also be mapped into the address space of the device by passing flag cudaHostAllocMapped to cudaHostAlloc() or by passing flag cudaHostRegisterMapped to cudaHostRegister().
+>
+> 分配的 page-locked 的内存块可以直接映射到 device 的地址空间中。
+>
+> 一般情况下，Kernel中处理的数据必须来自设备内存。
+>
+> 使用 Mapped Memory，Kernel可以直接处理 host 内存的数据（可以这么理解）。实际上数据的传输是隐式的在进行。
+
+
+
 
 ## 参考资料
 
