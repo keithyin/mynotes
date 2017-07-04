@@ -1,5 +1,17 @@
 # 闲谈
 
+## gcc(g++) 命令
+
+```shell
+gcc -o test test.cc #-o 指定输出文件的名字,否则默认为 a.out, 生成可执行文件, 编译链接一体执行
+gcc -o test test.cc -I/usr/local/include #-I 参数指定 include 文件夹, 为啥-I后面没有空格,很是纠结
+
+```
+
+
+
+
+
 ## 环境变量
 
 * `windows` 中到的 `path` 与 `linux`中的 `PATH` (windows对大小写不敏感，linux对大小写敏感)
@@ -31,11 +43,11 @@
 
 **改正了其错误地方**
 
-这是是用在链接的时候的。这时候涉及到的环境变量：
+**链接**。这时候涉及到的环境变量：
 
 * LIBRARY_PATH
 
-这是是用在程序运行的时候的。这时候涉及到的环境变量：
+**程序运行的时候**。这时候涉及到的环境变量：
 
 * LD_LIBRARY_PATH
 
@@ -108,6 +120,16 @@ As pointed below, your libraries can be static or shared. If it is static then t
 * 在 `/etc/ld.so.conf/` 中新添加一个文件 `your.conf`
   * 然后在文件中添加动态库路径
 * 默认的动态库搜索路径`/lib, /usr/lib `
+
+
+
+
+## g++ 编译opencv 程序
+
+```shell
+g++ -o test test.cc  `pkg-config --cflags --libs opencv` # 最后的那个一定要用上,要不然就日狗了.
+```
+
 
 
 

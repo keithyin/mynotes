@@ -86,3 +86,18 @@ int main(){
 }
 ```
 
+
+
+## unique_ptr
+
+> 一个 unique_ptr "拥有"其指向的对象。与 shared_ptr 不同，某个时刻，只能有一个 unique_ptr 指向一个给定对象（shared_ptr 允许多个指针指向同一个对象）。当 unique_ptr 被销毁时，它所指向的对象也被销毁。
+
+```c++
+unique_ptr<double> p1; //可以指向double 的 unique_ptr
+unique_ptr<double> p2(new double(42.0)); // p2指向一个值为42.0 的double
+unique_ptr<double> p3(p2); //错误，unique_ptr 不支持拷贝
+p1 = p2; //错误：unique_ptr 不支持赋值
+
+p2.release() ; // p2放弃对指针的控制权，返回指针
+```
+
