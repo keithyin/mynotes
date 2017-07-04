@@ -130,6 +130,8 @@ As pointed below, your libraries can be static or shared. If it is static then t
 g++ -o test test.cc  `pkg-config --cflags --libs opencv` # 最后的那个一定要用上,要不然就日狗了.
 ```
 
+[来自](https://stackoverflow.com/questions/31634757/how-to-correct-undefined-reference-error-in-compiling-opencv)
+
 
 
 
