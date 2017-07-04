@@ -20,6 +20,12 @@
 
 
 
+* Width Multiplier
+* Resolution Multiplier
+  * 这两个参数真心鸡肋。 
+
+
+
 
 
 ## 问题
