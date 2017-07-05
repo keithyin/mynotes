@@ -15,6 +15,7 @@
 #ifndef KERNEL_EXAMPLE_H_
 #define KERNEL_EXAMPLE_H_
 
+// 用于执行核心的计算部分
 template <typename Device, typename T>
 struct ExampleFunctor {
   void operator()(const Device& d, int size, const T* in, T* out);
@@ -80,6 +81,7 @@ REGISTER_CPU(float);
 REGISTER_CPU(int32);
 
 // Register the GPU kernels.
+
 #ifdef GOOGLE_CUDA
 #define REGISTER_GPU(T)                                          \
   REGISTER_KERNEL_BUILDER(                                       \
@@ -105,6 +107,7 @@ using namespace tensorflow;
 #define EIGEN_USE_GPU
 
 // Define the CUDA kernel.
+// 实现 CUDA kernel
 template <typename T>
 __global__ void ExampleCudaKernel(const int size, const T* in, T* out) {
   for (int i = blockIdx.x * blockDim.x + threadIdx.x; i < size;
@@ -114,6 +117,7 @@ __global__ void ExampleCudaKernel(const int size, const T* in, T* out) {
 }
 
 // Define the GPU implementation that launches the CUDA kernel.
+// 这个是 GPU kernel 的launcher
 template <typename T>
 struct ExampleFunctor<GPUDevice, T> {
   void operator()(const GPUDevice& d, int size, const T* in, T* out) {

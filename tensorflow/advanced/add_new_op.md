@@ -26,9 +26,7 @@
 
 **You define the interface of an op by registering it with the TensorFlow system. **
 
-
-
-在注册 `op` 的时候，你需要指定：
+在定义 `op`接口 的时候，你需要指定：
 
 *  `op` 的名字
 *  `op` 的输入（名字，类型），`op` 的输出（名字，类型）
@@ -53,6 +51,7 @@
 
   using namespace tensorflow;
 
+  // 这里定义的接口 会决定 python中调用 op 时的参数。
   REGISTER_OP("ZeroOut")
       .Input("to_zero: int32")
       .Output("zeroed: int32")
@@ -257,6 +256,188 @@ g++ -std=c++11 -shared zero_out.cc -o zero_out.so -fPIC -D_GLIBCXX_USE_CXX11_ABI
 
 
 
+## 注意事项
+
+* `REGISTER_OP("ZeroOut")` 中， op的名字必须遵循驼峰命名法。
+* `Compute()` 方法一定要线程安全。
+* 定义`OP` 的类名可以随便起，但也不要太随便。在 `REGISTER_KERNEL_BUILDER` 时对应好就可以了。
+* 在`C++` 文件中，如果 定义`op`接口时的名字是 `ZeroOut` 的话，那么，在`python` 中的 `op`名字是`zero_out`。
+
+
+
+
+## 定义梯度
+
+**方法一：** 在python 中用 tf api实现
+
+```python
+from tensorflow.python.framework import ops
+from tensorflow.python.ops import array_ops
+from tensorflow.python.ops import sparse_ops
+
+@ops.RegisterGradient("ZeroOut")
+def _zero_out_grad(op, grad):
+  """The gradients for `zero_out`.
+  Args:
+    op: The `zero_out` `Operation` that we are differentiating, which we can use
+      to find the inputs and outputs of the original op.
+    grad: Gradient with respect to the output of the `zero_out` op.
+
+  Returns:
+    Gradients with respect to the input of `zero_out`.
+  """
+  to_zero = op.inputs[0]
+  shape = array_ops.shape(to_zero)
+  index = array_ops.zeros_like(shape)
+  # 从这看出，计算梯度的时候，也是喜欢把输入进来的梯度 展平。
+  first_grad = array_ops.reshape(grad, [-1])[0] 
+  to_zero_grad = sparse_ops.sparse_to_dense([index], shape, first_grad, 0)
+  return [to_zero_grad]  # List of one Tensor, since we have one input
+```
+
+
+
+**方法二：** 使用 c++ 定义一个 GradOp，然后在 python 中调用这个 Op
+
+```python
+import tensorflow as tf
+from tensorflow.python.framework import ops
+import roi_pooling_op
+import pdb
+
+
+@ops.RegisterShape("RoiPool")
+def _roi_pool_shape(op):
+  """Shape function for the RoiPool op.
+  """
+  dims_data = op.inputs[0].get_shape().as_list()
+  channels = dims_data[3]
+  dims_rois = op.inputs[1].get_shape().as_list()
+  num_rois = dims_rois[0]
+
+  pooled_height = op.get_attr('pooled_height')
+  pooled_width = op.get_attr('pooled_width')
+
+  output_shape = tf.TensorShape([num_rois, pooled_height, pooled_width, channels])
+  return [output_shape, output_shape]
+
+@ops.RegisterGradient("RoiPool")
+def _roi_pool_grad(op, grad, _):
+  """The gradients for `roi_pool`.
+  Args:
+    op: The `roi_pool` `Operation` that we are differentiating, which we can use
+      to find the inputs and outputs of the original op.
+    grad: Gradient with respect to the output of the `roi_pool` op.
+  Returns:
+    Gradients with respect to the input of `zero_out`.
+  """
+  data = op.inputs[0]
+  rois = op.inputs[1]
+  argmax = op.outputs[1]
+  pooled_height = op.get_attr('pooled_height')
+  pooled_width = op.get_attr('pooled_width')
+  spatial_scale = op.get_attr('spatial_scale')
+
+  # compute gradient, roi_pool_grad 是在c++ 中定义过的op
+  data_grad = roi_pooling_op.roi_pool_grad(data, rois, argmax, grad, pooled_height, pooled_width, spatial_scale)
+
+  return [data_grad, None]  # List of one Tensor, since we have one input
+```
+
+**方法三：** 在 c++ 代码中 REGISTER_OP_GRADIENT， 这个方法不需要我们在python中做其它额外操作。
+
+* 首先，熟悉一下 FunctionDefHelper，tf中的大多数 Grad 都是通过 FDH 定义的，下面的MatMulGrad 就是个例子
+
+  ```c++
+  // 地址 https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/ops/math_grad.cc
+  #include <vector>
+  #include "tensorflow/core/framework/function.h"
+  #include "tensorflow/core/lib/core/errors.h"
+
+  namespace tensorflow {
+
+  typedef FunctionDefHelper FDH;
+  static Status MatMulGradHelper(FunctionDef* g, const string& opname,
+                                 const string& attr_adj_x,
+                                 const string& attr_adj_y, const string& x0,
+                                 bool ax0, const string& x1, bool ax1,
+                                 const string& y0, bool ay0, const string& y1,
+                                 bool ay1) {
+    *g = FDH::Define(
+        // Arg defs，输入参数定义
+        {"x: T", "y: T", "dz: T"},
+        // Ret val defs ，返回值定义
+        {"dx: T", "dy: T"},
+        // Attr defs，属性定义
+        {{"T: {half, float, double}"}},
+        // Nodes，节点定义，梯度计算可能会需要多个 op
+        {
+            { // 第一个 op，用来求 dx
+              {"dx"}, //op 的输出
+              opname, // op 的名字
+              {x0, x1}, // op 的输入
+              { //Attr
+                {"T", "$T"}, // op 的属性， $T 代表参数定义/属性定义时的 T
+                {attr_adj_x, ax0}, // op 的属性 
+                {attr_adj_y, ax1} // op的属性
+              }
+            },
+            {
+              {"dy"},
+              opname,
+              {y0, y1},
+              {
+                {"T", "$T"}, 
+                {attr_adj_x, ay0}, 
+                {attr_adj_y, ay1}
+              }
+            },
+        });
+    return Status::OK();
+  }
+
+  Status MatMulGradCommon(const string& opname, const string& attr_adj_x,
+                          const string& attr_adj_y, const AttrSlice& attrs,
+                          FunctionDef* g) {
+    DataType T;
+    TF_RETURN_IF_ERROR(GetNodeAttr(attrs, "T", &T));
+    if (T == DT_COMPLEX64 || T == DT_COMPLEX128) {
+      return errors::Unimplemented(
+          "MatMul gradient for complex is not supported yet.");
+    }
+    bool ta;
+    bool tb;
+    TF_RETURN_IF_ERROR(GetNodeAttr(attrs, attr_adj_x, &ta));
+    TF_RETURN_IF_ERROR(GetNodeAttr(attrs, attr_adj_y, &tb));
+    if (!ta && !tb) {
+      return MatMulGradHelper(g, opname, attr_adj_x, attr_adj_y, "dz", false, "y",
+                              true, "x", true, "dz", false);
+    }
+    if (!ta && tb) {
+      return MatMulGradHelper(g, opname, attr_adj_x, attr_adj_y, "dz", false, "y",
+                              false, "dz", true, "x", false);
+    }
+    if (ta && !tb) {
+      return MatMulGradHelper(g, opname, attr_adj_x, attr_adj_y, "y", false, "dz",
+                              true, "x", false, "dz", false);
+    }
+    CHECK(ta && tb);
+    return MatMulGradHelper(g, opname, attr_adj_x, attr_adj_y, "y", true, "dz",
+                            true, "dz", true, "x", true);
+  }
+
+  Status MatMulGrad(const AttrSlice& attrs, FunctionDef* g) {
+    return MatMulGradCommon("MatMul", "transpose_a", "transpose_b", attrs, g);
+  }
+  // Grad 函数的签名 (const AttrSlice& attrs, FunctionDef* g)
+  // 第一个用来接受 所求梯度的 op 的属性，第二个用来定义 Grad 计算操作。
+  REGISTER_OP_GRADIENT("MatMul", MatMulGrad);  
+  ```
+
+  > 可以看出，Grad 的定义就是使用 已有的 op 来定义 Grad 的计算。
+
+
+
 ## 总结
 
 `tensorflow` 自定义 `op` 的方法可以总结为：
@@ -267,6 +448,8 @@ g++ -std=c++11 -shared zero_out.cc -o zero_out.so -fPIC -D_GLIBCXX_USE_CXX11_ABI
 4. 就可以使用了。
 
 其它的方法就是用 `bazel` 编译了，毕竟用的不多。
+
+
 
 ## 参考资料
 
