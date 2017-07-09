@@ -2,9 +2,34 @@
 
 > 在学习 tensorflow 自定义 op 的时候碰到的，google 了一下，也没有找到详细的介绍，难道是姿势不对？？ 
 >
-> 通过看 了一些示例，这里打算强行解释一波
+> 通过看 了一些示例，这里打算强行解释一波。
 
 
+
+## 概览
+
+**如果想用 work shard，首先 代码能够并行化计算。work shard 是一个代码并行化工具。不用自己头疼的写多线程代码了。**
+
+**什么样的代码能够并行化计算 ---> 每一个输出数据都能表示成相互无关的**
+
+
+
+**work_shard 的最后一个参数就是要 shard 的 work， 这个 work 的签名为 void shard(int64 start, int64 limit)，work_shard 就是将 (start, limit) 给划分成多块，然后 块给 一个线程来计算。**
+
+
+
+``` python
+# 如何使用 work_shard
+# 1. 包含头文件
+# 2. 该用的地方用就行了
+# 3. 链接的时候 g++ 会自动找到实现去链接的，不用操心。
+```
+
+
+
+
+
+## 代码
 
 **work_shard声明代码** [地址](https://github.com/KeithYin/Faster-RCNN_TFpy2/blob/master/lib/roi_pooling_layer/work_sharder.h)
 
