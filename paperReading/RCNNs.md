@@ -173,6 +173,150 @@ $$
 
 
 
+## NMS (Non-Maximum Suppression)
+
+[代码来自](http://www.pyimagesearch.com/2014/11/17/non-maximum-suppression-object-detection-python/)
+
+```python
+#  Felzenszwalb et al.
+def non_max_suppression_slow(boxes, overlapThresh):
+	# if there are no boxes, return an empty list
+	if len(boxes) == 0:
+		return []
+ 
+	# 保存的 bbox 放在这个list中。
+	pick = []
+ 
+	# 获取各个 bbox 的坐标
+	x1 = boxes[:,0]
+	y1 = boxes[:,1]
+	x2 = boxes[:,2]
+	y2 = boxes[:,3]
+ 
+	# 计算 bbox 的区域面积 ，通过右下角的 y 坐标对 bbox 排序。小 --> 大，为什么右下角的y坐标？？
+	area = (x2 - x1 + 1) * (y2 - y1 + 1)
+	idxs = np.argsort(y2)
+    
+    # keep looping while some indexes still remain in the indexes
+	# list
+    # 对 idxs 逆序读取。
+	while len(idxs) > 0:
+		# grab the last index in the indexes list, add the index
+		# value to the list of picked indexes, then initialize
+		# the suppression list (i.e. indexes that will be deleted)
+		# using the last index
+		last = len(idxs) - 1
+		i = idxs[last]
+		pick.append(i)
+		suppress = [last] # 准备从 idxs 中删掉这个，因为它已经被添加到 pick 中去了。
+        
+        # 遍历 idxs 中的所有 indexes， 计算 重叠 ratio 来确定 扔掉那些 bbox。
+		for pos in range(0, last):
+			# grab the current index
+			j = idxs[pos]
+ 
+            # i 是右下角 y 轴坐标 最远的bbox 的索引。
+            # j 是 idxs 中的顺序索引
+            # 获得的是 两个 bbox 的 重叠区域
+			xx1 = max(x1[i], x1[j])
+			yy1 = max(y1[i], y1[j])
+			xx2 = min(x2[i], x2[j])
+			yy2 = min(y2[i], y2[j])
+ 
+			# 计算两个 bbox 重叠区域的 w，h
+			w = max(0, xx2 - xx1 + 1)
+			h = max(0, yy2 - yy1 + 1)
+ 
+			# 计算 重叠区域 和 j bbox 的 重叠ratio
+			overlap = float(w * h) / area[j]
+ 
+			# 如果重叠 ratio 超过了某个值，说明 i bbox 有能力代表 j，
+    		# j 就可以丢弃了。
+			if overlap > overlapThresh:
+				suppress.append(pos)
+ 
+		# 将该丢弃的 bbox 的 索引从 idxs 中删除。
+		idxs = np.delete(idxs, suppress)
+ 
+	# 返回 picked 的 bbox
+	return boxes[pick]
+```
+
+
+
+
+
+[代码来自](https://www.pyimagesearch.com/2015/02/16/faster-non-maximum-suppression-python/)
+
+```python
+# 思想和上面的代码一样，更充分的利用了 array 计算。
+# import the necessary packages
+import numpy as np
+ 
+# Malisiewicz et al.
+def non_max_suppression_fast(boxes, overlapThresh):
+	# if there are no boxes, return an empty list
+	if len(boxes) == 0:
+		return []
+ 
+	# if the bounding boxes integers, convert them to floats --
+	# this is important since we'll be doing a bunch of divisions
+	if boxes.dtype.kind == "i":
+		boxes = boxes.astype("float")
+ 
+	# initialize the list of picked indexes	
+	pick = []
+ 
+	# grab the coordinates of the bounding boxes
+	x1 = boxes[:,0]
+	y1 = boxes[:,1]
+	x2 = boxes[:,2]
+	y2 = boxes[:,3]
+ 
+	# compute the area of the bounding boxes and sort the bounding
+	# boxes by the bottom-right y-coordinate of the bounding box
+	area = (x2 - x1 + 1) * (y2 - y1 + 1)
+	idxs = np.argsort(y2)
+ 
+	# keep looping while some indexes still remain in the indexes
+	# list
+	while len(idxs) > 0:
+		# grab the last index in the indexes list and add the
+		# index value to the list of picked indexes
+		last = len(idxs) - 1
+		i = idxs[last]
+		pick.append(i)
+ 
+		# find the largest (x, y) coordinates for the start of
+		# the bounding box and the smallest (x, y) coordinates
+		# for the end of the bounding box
+		xx1 = np.maximum(x1[i], x1[idxs[:last]])
+		yy1 = np.maximum(y1[i], y1[idxs[:last]])
+		xx2 = np.minimum(x2[i], x2[idxs[:last]])
+		yy2 = np.minimum(y2[i], y2[idxs[:last]])
+ 
+		# compute the width and height of the bounding box
+		w = np.maximum(0, xx2 - xx1 + 1)
+		h = np.maximum(0, yy2 - yy1 + 1)
+ 
+		# compute the ratio of overlap
+		overlap = (w * h) / area[idxs[:last]]
+ 
+		# delete all indexes from the index list that have
+		idxs = np.delete(idxs, np.concatenate(([last],
+			np.where(overlap > overlapThresh)[0])))
+ 
+	# return only the bounding boxes that were picked using the
+	# integer data type
+	return boxes[pick].astype("int")
+```
+
+
+
+
+
+
+
 ## 参考资料
 
 [http://www.jianshu.com/p/deb0f69f5597](http://www.jianshu.com/p/deb0f69f5597)
