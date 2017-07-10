@@ -22,4 +22,24 @@
   add(i = 1, j = 2); //这样是错误的
   ```
 
-  ​
+## 函数指针
+
+
+
+```c++
+// 定义：func 是一个函数指针，指向一个 参数列表为空，返回值为void 的函数
+void (*func)();
+
+
+// printf 是一个函数指针，等价与 &printf()
+void printf(){
+  a++;
+}
+
+int main(){
+  void (*fp)();
+  fp = printf;
+  (*fp)(); // 调用。
+}
+```
+
