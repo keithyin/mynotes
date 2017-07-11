@@ -313,6 +313,35 @@ def non_max_suppression_fast(boxes, overlapThresh):
 
 
 
+## SSD
+
+> single shot MultiBox Detector
+
+Our approach, named SSD, discretizes the output space of bounding boxes into a set of default boxes over different aspect ratios and scales per feature map location.
+
+
+
+At prediction time, the network generates scores for the presence of each object category in each default box and produces adjustments to the box to better match the object shape.
+
+
+
+Our improvements include using a small convolutional filter to predict object categories and offsets in bounding box locations, using separate predictors (filters) for different aspect ratio detections, and applying these filters to multiple feature maps from the later stages of a network in order to perform detection at multiple scales.
+
+
+
+**The core of SSD is predicting category scores and box offsets for a fixed set of default bounding boxes using small convolutional filters applied to feature maps.**
+
+
+
+**The SSD approach is based on a feed-forward convolutional network that produces
+a fixed-size collection of bounding boxes and scores for the presence of object class
+instances in those boxes**
+
+
+
+
+
+
 
 
 
