@@ -1,6 +1,70 @@
 # c++ class 基础
 
+**需要注意的几点**
+
+* 类中定义的方法，调用不用方法的先后顺序。
+
+```c++
+class LinkStack{
+public:
+	struct Node{
+		int data;
+		Node* next;
+	}; // 这里建一个结构体。
+	LinkStack(){
+		top_node = new Node;
+		top_node->data = NULL;
+		top_node->next = nullptr;
+	}
+
+	bool push(int val){
+		Node* new_node = new Node;
+		new_node->data = val;
+		new_node->next = top_node;
+		top_node = new_node;
+		return true;
+	}
+	bool pop(int &val){
+		if (is_empty()){ // 虽然在这后面才定义，但是在这就可以调用，为啥？？
+			val = 0;
+			cout << "the stack is empty" << endl;
+			return false;
+		}
+		val = top_node->data;
+		Node* old_node = top_node;
+		top_node = top_node->next;
+		delete old_node;
+	}
+	bool is_empty(){
+		if (top_node->next == nullptr)
+			return true;
+		return false;
+	}
+
+private:
+	Node* top_node; // point to the top node, not the top+1
+};
+```
+
+**delete**
+
+```c++
+Stack* stack = new Stack;
+cout << stack << endl;
+// 删除的仅是 stack 指向的对象
+delete stack;
+// stack 保存的指针还是有的
+cout << stack << endl;
+```
+
+
+
+
+
+
+
 ## 语法
+
 ```c++
 class Name{
 public:
