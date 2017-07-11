@@ -44,6 +44,10 @@ public:
 private:
 	Node* top_node; // point to the top node, not the top+1
 };
+
+int main(){
+  LinkStack::Node node; //类中类可以这么用。
+}
 ```
 
 **delete**
