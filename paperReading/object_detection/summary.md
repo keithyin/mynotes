@@ -333,17 +333,42 @@ Our improvements include using a small convolutional filter to predict object ca
 
 
 
-**The SSD approach is based on a feed-forward convolutional network that produces
-a fixed-size collection of bounding boxes and scores for the presence of object class
-instances in those boxes**
+>  The SSD approach is based on a feed-forward convolutional network that produces a fixed-size collection of bounding boxes and scores for the presence of object class instances in those boxes 
+
+* 前向卷积网络 生成一个 固定大小的集合，集合中包含 bbox 和 这些 bbox 的分类概率
 
 
 
+> We associate a set of default bounding boxes with each feature map cell, for multiple feature maps at the top of the network. The default boxes tile the feature map in a convolutional manner, so that the position of each box relative to its corresponding cell is fixed.
+
+将 default bbox 与 feature map cell 关联起来。
 
 
 
+> At each feature map cell, we predict the offsets relative to the default box shapes in the cell, as well as the per-class scores that indicate the presence of a class instance in each of those boxes.
 
 
+
+> During training we need to determine which default boxes correspond to a ground truth detection and train the network accordingly.
+
+训练的时候，要确定 哪个 默认的 bbox 负责 ground truth bbox。如何确定呢？ 使用 jaccard overlap，如果 jaccard overlap 超过一个阈值， 那么就用那个默认的 bbox 来表示 ground truth bbox，这样的话，可以多个 默认的 bbox 来对应 一个 ground-truth bbox。
+
+> jaccard overlap: 交集除以并集
+
+
+
+$x_{ij}^p=\{0,1\}$  : i-th 默认的 bbox，j-th ground-truth bbox,   $p$ 类 
+
+目标函数为：
+$$
+L(x,c,l,g)=\frac{1}{N}\Biggr(L_{conf}\Bigr(x,c\Bigr)+\alpha L_{loc}\Bigr(x,l,g\Bigr)\Biggr)
+$$
+![](../imgs/ssd.png)
+
+**几点疑问**
+
+* 为什么不用左上角的点 而用 中心点
+* $\hat{g}_j^{cx}$  不是一个 [0,1] 的值。
 
 
 ## 参考资料
