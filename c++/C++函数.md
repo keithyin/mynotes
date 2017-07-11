@@ -31,7 +31,7 @@
 void (*func)();
 
 
-// printf 是一个函数指针，等价与 &printf()
+// printf 是一个函数指针，等价与 &printf，在需要的地方，c++会将函数名转成指针。
 void printf(){
   a++;
 }
