@@ -69,6 +69,17 @@ std::cin ...;
 
 
 
+## 类型别名
+
+```c++
+typedef double wages; //wages 是 double 的同义词
+
+typedef wages base, *p; // base 是 double 的同义词，p 是 double* 的同义词
+//上面 typedef wages *p 这个地方可能有点怪异，但是如果这么想，*p 与 double 同义，那么 p 与啥同义？
+
+using SI = Sales_item; //SI 是  Sales_item 的同义词
+```
+
 
 
 
