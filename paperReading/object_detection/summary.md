@@ -365,6 +365,12 @@ L(x,c,l,g)=\frac{1}{N}\Biggr(L_{conf}\Bigr(x,c\Bigr)+\alpha L_{loc}\Bigr(x,l,g\B
 $$
 ![](../imgs/ssd.png)
 
+> To handle different object scales, some methods [4,9] suggest processing the image at different sizes and combining the results afterwards.However, by utilizing feature maps from several different layers in a single network for prediction we can mimic the same effect, while also sharing parameters across all object scales
+
+
+
+> Fortunately, within the SSD framework, the default boxes do not necessary need to correspond to the actual receptive fields of each layer. We design the tiling of default boxes so that **specific feature maps learn to be responsive to particular scales of the objects.** 
+
 **几点疑问**
 
 * 为什么不用左上角的点 而用 中心点
