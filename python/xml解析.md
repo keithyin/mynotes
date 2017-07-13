@@ -55,10 +55,15 @@ import xml.etree.ElementTree as ET
 </collection>
 ```
 
+
+
+
+
 ```python
 # findall, 
 # ElementTree.findall(), 查找root 下 所有名字为 path 的节点。
 # Element.findall(path) 查找当前元素下一级 的所有名字为 path 的节点 
+tree = ET.parse('movie.xml')
 objs = tree.findall('movie') 
 
 # 查找第一个满足的 元素
@@ -66,6 +71,5 @@ obj = tree.find('movie')
 
 # 如果 obj是个文本节点，则输出里面的内容，否则输出空
 print(obj.text)
-
 ```
 
