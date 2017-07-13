@@ -40,7 +40,7 @@
 
 * 支持 `NDArray` 的 `operator` 同样也支持 `Symbol`
 
-* `mx.sym` 中同时也包含了大量的神经网络层：
+* `mx.sym` 中同时也包含了大量的**神经网络层**：
 
   ```python
   # 每个 Symbol 都有一个唯一的 string name。Symbol和NDArray都表示一个Tensor
@@ -58,7 +58,7 @@
 
 * **注意 mx.sym 与 mx.symbol 是指的同一个包**
 
-* 也可以手动定义 weight
+* 也可以手动定义 weight或  bias
 
   ```python
   net = mx.symbol.Variable('data')
@@ -76,6 +76,8 @@
 **碰到的第二个上下文管理器：**
 
 * mx.name.Prefix(str): 用来给Symbol名字加前缀的。
+
+
 
 
 
@@ -188,8 +190,14 @@ b = mx.sym.Variable('b')
 b = a + a * a
 
 data = mx.nd.ones((2,3))*2
-ex = b.bind(ctx=mx.cpu(), args={'a':data, 'b':data})
+ex = b.bind(ctx=mx.cpu(), args={'a':data, 'b':data}) # 共享相同的内容。
 ex.forward()
 ex.outputs[0].asnumpy()
 ```
+
+
+
+## 参考资料
+
+[http://mxnet.io/tutorials/basic/symbol.html](http://mxnet.io/tutorials/basic/symbol.html)
 

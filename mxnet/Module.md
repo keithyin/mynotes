@@ -160,7 +160,7 @@ mod = mx.mod.Module(symbol=net,
                     data_names=['data'],
                     label_names=['softmax_label'])
 # 传入了 data_names 和 label_names 还有一个 state_names ，只是没传进去
-# inputs_names 就是 data_names 加 label_names 加 label_names
+# inputs_names 就是 data_names 加 label_names
 # arg_names 是 net.list_arguments() 即，计算net的值所需要的所有的 Varaible。
 # mod对象中有个 _param_names 这个表示arg_names 中去掉 input_names 的 name，即不将input涉及的
 # Symbol 作为模型 参数。
