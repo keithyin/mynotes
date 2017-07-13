@@ -158,3 +158,14 @@ public:
 * 析构函数
 * 拷贝构造函数
 * type::operator=(type)
+
+
+
+## 对象创建
+
+```c++
+People people("name", 22);
+People people = People("name", 22);
+People *people = new People("name", 22);
+```
+
