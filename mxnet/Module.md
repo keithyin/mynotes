@@ -161,8 +161,8 @@ mod = mx.mod.Module(symbol=net,
                     label_names=['softmax_label'])
 # 传入了 data_names 和 label_names 还有一个 state_names ，只是没传进去
 # inputs_names 就是 data_names 加 label_names
-# arg_names 是 net.list_arguments() 即，计算net的值所需要的所有的 Varaible。
-# mod对象中有个 _param_names 这个表示arg_names 中去掉 input_names 的 name，即不将input涉及的
+# arg_names: 是 net.list_arguments() 即，计算net的值所需要的所有的 Varaible。
+# _param_names 这个表示arg_names 中去掉 input_names 的 name，即不将input涉及的
 # Symbol 作为模型 参数。
 # self._fixed_param_names = fixed_param_names 用来指明哪些参数不需要更新
 # self._aux_names = symbol.list_auxiliary_states()
@@ -370,7 +370,7 @@ def __init__(self, symbol, contexts, workload, data_shapes, label_shapes, param_
 # self.label_layouts = None
 # self.output_names = self.symbol.list_outputs()
 # self.output_layouts = [DataDesc.get_batch_axis(self.symbol[name].attr('__layout__'))
-                       for name in self.output_names]
+#                        for name in self.output_names]
 # self.num_outputs = len(self.symbol.list_outputs())
 
 # self.bind_exec(data_shapes, label_shapes, shared_group)
@@ -388,13 +388,45 @@ def __init__(self, symbol, contexts, workload, data_shapes, label_shapes, param_
 * 参数更新模块： `Optimizer`
   * 负责参数更新
 * 助手模块： `Module`
-  * 调用 `Initilizer` 初始化 模型参数
-  * 更方便的 前向，后向，更新操作
+  * 调用 `Initilizer` 初始化 模型参数，保存着初始化的 `Variable`
+  * 更方便的 前向，后向，更新操作（帮助我们调用了 executor）
 
 
 
 
+## 模型的保存和加载
 
+**保存**
+
+```python
+# construct a callback function to save checkpoints
+model_prefix = 'mx_mlp'
+checkpoint = mx.callback.do_checkpoint(model_prefix)
+
+mod = mx.mod.Module(symbol=net)
+mod.fit(train_iter, num_epoch=5, epoch_end_callback=checkpoint)
+
+```
+
+
+
+**加载**
+
+```python
+sym, arg_params, aux_params = mx.model.load_checkpoint(model_prefix, 3)
+assert sym.tojson() == net.tojson()
+
+# assign the loaded parameters to the module
+mod.set_params(arg_params, aux_params)
+
+## 或
+mod = mx.mod.Module(symbol=sym)
+mod.fit(train_iter,
+        num_epoch=8,
+        arg_params=arg_params,
+        aux_params=aux_params,
+        begin_epoch=3)
+```
 
 ## 参考资料
 
