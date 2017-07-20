@@ -145,7 +145,9 @@ void dot_product(const std::vector<int> &v1, const std::vector<int> &v2, int &re
      for(int i = L; i < R; ++i){
          partial_sum += v1[i] * v2[i];
      }
-  	 // 用 mutex 的对象来进行同步
+  	 // 用 mutex 的对象来进行同步， 
+  	 // 使用 lock_guard 或 或者 barrier.lock() ; barrier.unlock();
+  	 // lock_gurad 在构造函数中 lock， 在析构函数中 unlock()
      std::lock_guard<std::mutex> block_threads_until_finish_this_job(barrier);
      result += partial_sum;
 }
@@ -165,4 +167,54 @@ int main(){
   ...
 }
 ```
+
+
+
+## join detach
+
+一旦线程启动，我们可以通过 `join` 让代码知道我们是想 等待这个线程执行完，或者通过 `detach` 告诉代码让这个线程自己玩。如果没有显式的做 `join` 或 `detach` 工作的话，`std::thread` 对象会随着 主线程的执行完毕而被销毁（这时 `std::thread` 代表的线程可能还没有执行完，会报错）。
+
+
+
+**join：** 阻塞线程运行
+
+```c++
+#include <iostream>
+#include <thread>
+
+void foo() { std::cout << "foo()\n"; }
+void bar() { std::cout << "bar()\n"; }
+
+int main()
+{
+	std::thread t([]{
+		        foo();
+			bar();						 
+	                });
+    t.join();  // 主线程会阻塞在这个位置，直到t线程执行完
+	return 0;
+}
+```
+
+**detach：** daemon thread（不等待线程执行完）
+
+当线程 `detach` 后，线程的执行由 `c++ Runtime Library` 控制。
+
+
+
+## 线程数量
+
+* `std::thread::hardware_ concurrency()` 会返回 `cpu` 的核心数
+
+
+
+
+
+## 参考资料
+
+[http://www.bogotobogo.com/cplusplus/multithreaded4_cplusplus11.php](http://www.bogotobogo.com/cplusplus/multithreaded4_cplusplus11.php)
+
+[http://www.bogotobogo.com/cplusplus/C11/7_C11_Thread_Sharing_Memory.php](http://www.bogotobogo.com/cplusplus/C11/7_C11_Thread_Sharing_Memory.php)
+
+
 
