@@ -283,6 +283,18 @@ def backward(self, out_grads=None):
     self._exec_group.backward(out_grads=out_grads)
 ```
 
+还记得在 `DataParallelExecutorGroup` 初始化函数时有一个成员属性  `self.grad_arrays` 不出所料的话，这个属性就是保存 反向传导 计算出的梯度的地方。
+
+`DataParallelExecutorGroup` 中有一个 `_collect_arrays` 方法，这个方法是用来：
+
+* 从 `executor` 中取 `grad_arrays` 的值，赋给 `self.grad_arrays` 属性
+
+> 遗留问题：在 `executor` 中没有找到 给 grad_arrays 赋值的语句
+
+
+
+
+
 
 
 **mod.update**
