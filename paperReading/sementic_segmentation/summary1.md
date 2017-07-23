@@ -94,7 +94,18 @@
 
 
 
+## Efficient Inference in Fully Connected CRFs with Gaussian Edge Potentials
 
+**key contributions**
+
+* highly efficient approximate inference algorithm for fully connected CRF models
+
+
+
+**details:**
+
+* adjacency CRF structure is limited in its ability to model long-range connections within the image and smooth the object boundaries
+* ​
 
 ## 总结
 
@@ -103,14 +114,14 @@
 * DCNN 的某些不变性并不是 语义分割任务所需要的
 * 物体的多尺度问题
 * 物体的多角度问题
-* DCNN 过程中 分辨率下降也不是 语义分割任务所期望的
+* corse segmentation problem
 
 
 
 **分辨率的降低如何解决？**
 
 * deconv
-* 插值方法
+* 插值方法 + crf 
 
 
 
