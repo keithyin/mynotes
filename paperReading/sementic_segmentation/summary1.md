@@ -94,6 +94,22 @@
 
 
 
+
+## RefineNet
+
+> RefineNet: generic **multi-path** refinement network that explicitly **exploits all the information** available **along the down-sampling process** to enable high-resolution prediction using **long-range** residual connections.
+
+**key contribution**
+
+
+
+**detail**
+
+* repeated subsampling operations like pooling or strided convolution striding in deep CNNs lead to a significant decrease in the initial image resolution
+
+
+
+
 ## Efficient Inference in Fully Connected CRFs with Gaussian Edge Potentials
 
 **key contributions**
@@ -106,6 +122,70 @@
 
 * adjacency CRF structure is limited in its ability to model long-range connections within the image and smooth the object boundaries
 * ​
+
+
+
+
+
+## PyDenseCRF
+
+```python
+import pydensecrf.densecrf as dcrf
+
+from pydensecrf.utils import compute_unary, create_pairwise_bilateral, \
+    create_pairwise_gaussian, unary_from_softmax
+
+import skimage.io as io
+
+image = train_image
+
+softmax = final_probabilities.squeeze()
+
+## tranpose 一下维度
+softmax = processed_probabilities.transpose((2, 0, 1))
+
+# 需要 -log(P)，这个就是求 -log(P) 的
+unary = unary_from_softmax(processed_probabilities)
+
+# The inputs should be C-continious -- we are using Cython wrapper
+unary = np.ascontiguousarray(unary)
+
+d = dcrf.DenseCRF2D(image.shape[0] , image.shape[1], 2)
+
+# 给 DenseCRF 设定 unary potential
+d.setUnaryEnergy(unary)
+
+
+###################开始设定pair-wise potential ######################
+# This potential penalizes small pieces of segmentation that are
+# spatially isolated -- enforces more spatially consistent segmentations
+# 这个是 位置 那个部分，只需要shape 足矣， sdims 表示的是 rho/gamma 参数，两维嘛，就两个一样的
+feats = create_pairwise_gaussian(sdims=(10, 10), shape=image.shape[:2])
+# compat 是 w_2 参数
+d.addPairwiseEnergy(feats, compat=3,
+                    kernel=dcrf.DIAG_KERNEL,
+                    normalization=dcrf.NORMALIZE_SYMMETRIC)
+
+# This creates the color-dependent features --
+# because the segmentation that we get from CNN are too coarse
+# and we can use local color features to refine them
+# 这个 是 bilateral 那项，sdims 和上面一样，位置相关的参数，schan是 颜色强度相关的参数
+feats = create_pairwise_bilateral(sdims=(50, 50), schan=(20, 20, 20),
+                                   img=image, chdim=2)
+
+# compat 是 w_1
+d.addPairwiseEnergy(feats, compat=10,
+                     kernel=dcrf.DIAG_KERNEL,
+                     normalization=dcrf.NORMALIZE_SYMMETRIC)
+
+Q = d.inference(5)
+
+res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
+```
+
+
+
+
 
 ## 总结
 
