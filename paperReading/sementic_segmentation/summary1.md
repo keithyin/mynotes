@@ -17,12 +17,6 @@
 * the same size with the input image
 * channel 为 类别的数量。每个 channel 代表一个类
 
-**Network**
-
-
-
-**conclusion**
-
 
 
 **question**
