@@ -183,7 +183,10 @@ Q = d.inference(5)
 res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 ```
 
+**参考资料**
+[http://warmspringwinds.github.io/tensorflow/tf-slim/2016/12/18/image-segmentation-with-tensorflow-using-cnns-and-conditional-random-fields/](http://warmspringwinds.github.io/tensorflow/tf-slim/2016/12/18/image-segmentation-with-tensorflow-using-cnns-and-conditional-random-fields/)
 
+[https://github.com/lucasb-eyer/pydensecrf](https://github.com/lucasb-eyer/pydensecrf)
 
 
 
