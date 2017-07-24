@@ -77,6 +77,7 @@
 
 
 
+
 ## DeepLab:2
 
 **key contribution**
@@ -91,6 +92,7 @@
 
 * remove the downsampling operator from the last few maxpooling layers instead `upsample the filter(atrous)`
 * 去掉两层  maxpooling，  用 `atrous` 代替，最终的结果 上采样8， 得到原图尺寸的 class-map
+* 有 multi-scale 融合的 方法。
 
 
 
@@ -99,13 +101,71 @@
 
 > RefineNet: generic **multi-path** refinement network that explicitly **exploits all the information** available **along the down-sampling process** to enable high-resolution prediction using **long-range** residual connections.
 
+
+
 **key contribution**
 
+* multi-path refinement network
+* residual connections (resNet proposed it)
+* chained residual pooling
+* good performance
 
 
-**detail**
+
+**intuition**
 
 * repeated subsampling operations like pooling or strided convolution striding in deep CNNs lead to a significant decrease in the initial image resolution
+* argue that features from all layers are helpful for semantic segmentation
+
+  ​
+
+
+**details**
+
+* input adaptation convolution
+* one ReLU in chained residual pooling
+
+
+
+**summary**
+
+* 整合所有 分辨率的 层，为啥最终输出 1/4, 不直接输出 1/1？？？
+* this structure is similar with SSD
+
+
+
+**my comments**
+
+* 输出 1/1 的 score map ，不用 双线性插值
+* 最后再用 crf 搞一下
+* using refine-net in input
+* SSD  with residual shotcuts????
+
+
+
+
+**Question:**
+
+* how to upsample within Multi-resolution Fusion
+
+
+
+**deeplab 的两个缺点**
+
+* computation expensive
+* atrous losses important details
+
+
+
+**为什么deeplab都是生成 1/8 的 score map， 然后用 双线性插值上采样**
+
+* 如果生成 1/4 或者 1/1 的 score map， 内存受不了，因为 feature map 太大
+
+
+
+
+## PSPnet: Pyramid Scene Parsing Network
+
 
 
 
@@ -197,7 +257,8 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 * DCNN 的某些不变性并不是 语义分割任务所需要的
 * 物体的多尺度问题
 * 物体的多角度问题
-* corse segmentation problem
+* coarse segmentation problem
+* 感受野问题
 
 
 
@@ -210,11 +271,23 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 
 **物体的多尺度问题如何解决？**
 
-* 同一层，搞不同的感受野
+* 同一层，搞不同的感受野，需要层中有不同大小的核，或有不同 dilate-rate 的 atrous-conv
 * 对 输入图像进行不同尺度的下采样，得到的结果 fuse 一下
 
 
 
+
+**coarse segmentation problem**
+
+* refine-net，不同分辨率的特征都用到
+
+
+
+**感受野问题的解决方法**
+
+* 大 核，导致问题-计算量大
+* atrous conv， 导致问题-计算量大
+* 大 pooling kernel，小 stride，导致问题-计算量大
 
 
 
