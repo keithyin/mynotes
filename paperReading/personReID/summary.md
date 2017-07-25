@@ -52,3 +52,12 @@ How to correctly match two images of the same person under intensive appearance 
 * instance retrieval : usually there is no training data because one does not know the content of the query in advance and the gallery may contain various types of objects.
 * person-ReID : person re-ID is similar in that the training classes are available, which includes images of different identities. Person re-ID is also similar to instance retrieval in that the testing identities are unseen.
 
+
+
+## Deep Metric Learning for Person Re-Identification
+
+**key contribution**
+
+* learn similarity metric from image pixels directly
+* siamese deep neural network
+* ​
