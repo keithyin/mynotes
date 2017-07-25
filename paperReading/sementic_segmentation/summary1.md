@@ -253,6 +253,8 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 * 物体的多角度问题
 * coarse segmentation problem
 * 感受野问题
+* 分类与定位问题 （LargeKernel matters）
+* 物体的想关性（比如，船在水上）
 
 
 
@@ -266,7 +268,7 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 **物体的多尺度问题如何解决？**
 
 * 同一层，搞不同的感受野，需要层中有不同大小的核，或有不同 dilate-rate 的 atrous-conv
-* 对 输入图像进行不同尺度的下采样，得到的结果 fuse 一下
+* 对 输入图像进行不同尺度的下采样，通过模型计算，上采样，得到的结果 fuse 一下
 
 
 
