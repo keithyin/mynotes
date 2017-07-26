@@ -27,9 +27,12 @@ Data:
 * there cannot be separate objects or entities that have all their properties in common
 * foreground and background
 
+
+
 ## Methods
 
-
+* metric learning
+* ​
 
 ## the issues in this task and corresponding solver
 
@@ -79,6 +82,52 @@ How to correctly match two images of the same person under intensive appearance 
 
 
 
+
+## Recurrent Convolutional Network for video based Person Re-Identification
+
+**key contributions**
+
+* ​
+
+**intuition**
+
+* using color and optical flow information to capture appearance and motion
+
+
+
+## Other
+
+大致就是分成数据扩充（标签扩充、gan生成，无监督那篇）
+
+part匹配（其实pose或者human parsing，human segmentation之类也算是吧）
+
+loss设计（基本都是多个loss联合）
+
+度量学习（在线的马氏距离学习之类，还有一些验证方法，比如全连接相减，15年cvpr、16nips的featuremap融合）。
+
+
+
+
+
+## Video-based VS Image-based
+
+* video is more natural way in this scenario
+* temporal information .. we can do a lot of things based on it.
+
+
+
+## What kind information can be used for person re-identification
+
+* color
+* face
+* body shape
+* motion (temporal)
+
+
+
+
+
+
 ## Terminology
 
 * **cross database experiment** : train on one dataset and test on the other dataset
@@ -86,3 +135,10 @@ How to correctly match two images of the same person under intensive appearance 
 * **object recognition** : 
 * **classification** : 
 * **probe image** : query image
+
+
+
+## 参考资料
+
+[https://zhuanlan.zhihu.com/p/26168232](https://zhuanlan.zhihu.com/p/26168232)
+
