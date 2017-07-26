@@ -320,7 +320,7 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 * coarse segmentation problem
 * 感受野问题
 * 分类与定位问题 （LargeKernel matters）
-* 物体的想关性（比如，船在水上）
+* 物体的想关性(整体与局部的关系)（比如，船在水上）
 
 
 
@@ -351,6 +351,13 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 * atrous conv， 导致问题-计算量大
 * 大 pooling kernel，小 stride，导致问题-计算量大
 
+
+
+
+**整体与局部的关系**
+
+* the dilated conv with different rate(Atrous Spatial Pyramid pooling)
+* pyramid pooling
 
 
 
