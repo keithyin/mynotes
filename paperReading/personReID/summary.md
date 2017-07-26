@@ -36,8 +36,9 @@ Data:
 How to correctly match two images of the same person under intensive appearance changes
 
 * lighting
-* pose
+* pose : can we apply affine transform on it?
 * viewpoint
+* low resolution
 
 
 
@@ -59,5 +60,29 @@ How to correctly match two images of the same person under intensive appearance 
 **key contribution**
 
 * learn similarity metric from image pixels directly
-* siamese deep neural network
-* ​
+* combine the separate modules together that is learning the color feature, texture feature and metric in a unified framework.
+
+
+
+**intuition**
+
+* two sub-networks does not share the same weights and biases, each sub-network can adapt to its corresponding view..... (??????)
+
+
+
+**detail**
+
+* does not need the two sub-networks share the same weights and biases.
+* siamese network,  `sample-pair-->label`
+* learn three SCNNs for image part
+* Hinge loss is robust to outliers
+
+
+
+## Terminology
+
+* **cross database experiment** : train on one dataset and test on the other dataset
+* **metric learning** : 
+* **object recognition** : 
+* **classification** : 
+* **probe image** : query image
