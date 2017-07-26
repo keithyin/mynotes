@@ -160,6 +160,72 @@
 
 ## PSPnet: Pyramid Scene Parsing Network
 
+**key contributions**
+
+* exploit the capability of **global context information** by **different-region-based** context aggregation through our **pyramid pooling module together with the proposed pyramid scene parsing network**
+* auxiliary loss
+
+
+
+
+**scenario**
+
+* complex-scene parsing
+
+
+
+**The advantage of using PSP**
+
+在 `Pyramid Pooling Modules` 中
+
+1. 全局 pooling，然后 双线性插值(双线性插值后，feature map 上的值是一样的吧)， 说明这个图像整体是表示啥的。
+2. pooling 的 stride 逐渐减小， 然后再双线性插值，告诉我们这个图像 这一大块是啥东西。
+3. 双线性插值后，concat 起来。这样，不同 level 的特征就被整合起来了。
+4. 然后通过 整体，局部，可以很完美的分类。分类的时候也考虑到了整体。
+
+
+
+**fcn's issuse for complex-scene parsing**
+
+
+
+**key points for complex-scene parsing**
+
+* context relationship, how to model it?
+* confusion categories (caused by the annotation)
+* Inconspicuous 
+
+
+
+## large kernel matters
+
+**intuition**
+
+* in classification, the stacked small filters is more efficient than large kernel
+* in segmentation, we find that large kernel( and effective receptive field) plays an important role when we want to classification and segmentation simultaneously.
+* classification and segmentation are contradictory
+* classification wants invariant to various transformations like translation and rotation
+
+**key contribution**
+
+* Global Convolutional Network
+* residual-based boundary refinement to further refine the object boundaries
+
+
+
+**GCN (Global Convolutional Network)**
+
+* from the localization view, the model should be fully convolutional
+* from the classification view, large kernel
+
+
+
+**thinking:**
+
+* 分类问题需要各种不变性，但是语义分割问题需要 各种敏感性，有什么更好的方法让这两个问题结合起来
+  * 分类中的不变性用另一种 方式来体现，比如 deformable-conv
+
+
 
 
 
@@ -289,8 +355,15 @@ res = np.argmax(Q, axis=0).reshape((image.shape[0], image.shape[1]))
 ## 对语义分割问题的思考
 
 * 对 anchor 点 分类的时候，需要考虑附近的 像素点 才能有可能分类正确，需要看到多大范围呢？
+* PSP 告诉我们，不仅要看，还要有全局观和部分观测
 * pooling 在图像分类上的优势显著，但是在其它任务上就不一定 ok 了。
 
+
+
+
+## 语义分割存在的问题
+
+* 好模型都太大了，怎么能又小又好呢？
 
 ## 参考资料
 
