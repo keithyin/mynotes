@@ -67,6 +67,30 @@ $$
 
 
 
+## 为什么 policy-gradient
+
+多数 model-free 强化学习算法都是基于 `policy-iteration` 的，即：
+
+- 先进行 `policy-evaluation`
+- 然后用，`policy-improvement`  $\pi^{\mu^{k+1}}(s)=\arg\limits_a \max Q^{\mu^k}(s,a)$
+
+现在问题来了，如果 $a$ 是连续的话，还咋找 全局最大值，有点痛苦。这时候就是 policy-gradient 方法大显身手的时候了
+
+* move the policy in the direction of the gradient of $Q$ , 而不是 找全局最大值，这时是 policy-network
+* 如何理解 **the gradient of $Q$** 呢？$Q$ 对 $a$ 的梯度？$Q$ 对 a 的梯度的方向当然是 $Q$ 值上升的方向。所以，如果有 policy-network, 梯度相应的修改肯定没错。会导致 $Q$ 值上升。
+
+$$
+\theta^{t+1} \leftarrow \theta^t+\alpha\Biggr[\nabla_\theta Q^{\mu^k}\Bigr(s,\mu_\theta(s)\Bigr)\Biggr]
+$$
+
+再进一步：
+$$
+\theta^{t+1} \leftarrow \theta^t+\alpha\Biggr[\nabla_\theta\mu_\theta(s)\nabla_a Q^{\mu^k}\Bigr(s,a\Bigr)\Biggr|_{a=\mu_\theta(s)}\Biggr]
+$$
+
+
+
+
 ## other
 
 **stochastic VS deterministic**
@@ -80,6 +104,9 @@ $$
   * 需要考虑 exploration 问题。
   * require less samples
 
+
+
 ## summary
 
 * 在高维任务中，确定性 policy 的性能要比 随机 policy 的性能要好
+
