@@ -14,4 +14,11 @@
 **疑问**
 
 * 这个算法中也用到了  dqn， 这 TM。。。。怎么就没有 action 连续的问题了。如何用的呢？
-* ​
+
+
+
+
+**文中对 原始 DQN 进行了一些修改**
+
+* soft target updates
+  * 创建了一个 `actor-critic` 网络的副本（target network），$Q'(s,a|\theta^{Q'})$ 和 $\mu'(s|\theta^{\mu'})$ , 用他们来计算 target value.  这个 target 就是 target policy 的。
