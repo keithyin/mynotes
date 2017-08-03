@@ -4,6 +4,9 @@
 
 * **value based**
 * **policy based**
+* **derivative-free optimization methods(cross-entropy method..)**
+
+
 
 
 
@@ -198,6 +201,13 @@ $$
 * 异步更新 参数 是可行的，根据 related work 中陈述来说
 * 用过期的 数据来 更新梯度也是可行的，只要过期的数据最终被丢弃掉
 
+
+
+
+## TRPO (Trust Region Policy Optimization)
+
+*  The core idea is to avoid parameter updates that change your policy too much, as enforced by a constraint on the KL divergence between the distributions predicted by the old and the new policy on a batch of data (instead of conjugate gradients the simplest instantiation of this idea could be implemented by doing a line search and checking the KL along the way).
+* ​
 
 
 ## exploration policy
