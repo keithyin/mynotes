@@ -91,16 +91,19 @@ $$
 **相对于 DQN 的创新点**
 
 DQN 的 $Y_t$ 是：
+
 $$
 Y_t\equiv r+\gamma\max_{a'}Q(s',a';\theta^-_i)
 $$
 等价于：
+
 $$
 Y^Q_t \equiv r+\gamma Q(S_{t+1}, \arg\limits_{a'}\max Q(S_{t+1},a';\theta_t^-); \theta_t^-)
 $$
 
 
  Double DQN 的 $Y_t$ 是：
+ 
 $$
 Y^{DoubleQ}_t \equiv r+\gamma Q(S_{t+1}, \arg\limits_{a'}\max Q(S_{t+1},a';\theta_t^-); \theta'_t)
 $$
@@ -207,7 +210,7 @@ $$
 ## TRPO (Trust Region Policy Optimization)
 
 *  The core idea is to avoid parameter updates that change your policy too much, as enforced by a constraint on the KL divergence between the distributions predicted by the old and the new policy on a batch of data (instead of conjugate gradients the simplest instantiation of this idea could be implemented by doing a line search and checking the KL along the way).
-* ​
+*  ​
 
 
 ## exploration policy
