@@ -423,7 +423,21 @@ for val, grad in zip(e.arg_arrays, e.grad_arrays):
 
 
 
+## 总结
 
+可以这么理解 mxnet：
+
+* Executor 是一个 类，里面保存着模型的 arguments （模型参数和 输入输出）
+* feedforward 传入的参数改变了模型的输入输出，然后用Executor 计算
+* backward 会求出所有 arguments 的梯度，就看你更不更新了。
+
+
+
+**在使用 simple_bind 的时候**
+
+* Symbol 对象中分配 了 模型 arguments（及其梯度）和 辅助参数的空间
+* bind 方法使用这些 分配好的 空间（引用）
+* bind 方法不会创建 新的空间来存 （arguments，。。。）
 
 
 
@@ -448,5 +462,5 @@ arg_type, out_type, _ = c.infer_type(a='float32', b='float32')
 
 ## 遗留问题
 
-* 如何不求 输入的 梯度呢？
+* 如何不求 输入的 梯度呢？ 不取回来就好了。
 
