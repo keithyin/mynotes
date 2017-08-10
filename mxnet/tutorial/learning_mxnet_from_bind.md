@@ -441,6 +441,23 @@ for val, grad in zip(e.arg_arrays, e.grad_arrays):
 
 
 
+
+```python
+# 测试代码
+x = mx.sym.Variable("x")
+y = x + 1
+x_array = mx.nd.array([1., 2.], ctx=mx.cpu())
+executor = y.bind(ctx=mx.cpu(), args=[x_array])
+executor.forward()
+print(executor.outputs[0].asnumpy())
+x_array[1] = 3.
+executor.forward()
+print(executor.outputs[0].asnumpy())
+```
+
+
+
+
 ## shape 推断 和 类型 推断
 
 ```python
