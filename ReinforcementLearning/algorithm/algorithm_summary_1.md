@@ -101,9 +101,8 @@ $$
 Y^Q_t \equiv r+\gamma Q(S_{t+1}, \arg\limits_{a'}\max Q(S_{t+1},a';\theta_t^-); \theta_t^-)
 $$
 
-
  Double DQN 的 $Y_t$ 是：
- 
+
 $$
 Y^{DoubleQ}_t \equiv r+\gamma Q(S_{t+1}, \arg\limits_{a'}\max Q(S_{t+1},a';\theta_t^-); \theta'_t)
 $$
