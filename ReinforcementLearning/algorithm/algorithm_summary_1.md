@@ -74,7 +74,7 @@ $$
 
 **DQN 在第 `i` iteration 的loss function为**
 $$
-L_i(\theta_i) = \mathbb E_{(s,a,r,s')\sim U(D)}\Biggr[\Biggr(r+\gamma\max_{a'}Q(s',a';\theta^-_i)-Q(s,a;\theta_i)\Biggr)\Biggr]
+L_i(\theta_i) = \mathbb E_{(s,a,r,s')\sim U(D)}\Biggr[\Biggr(r+\gamma\max_{a'}Q(s',a';\theta^-_i)-Q(s,a;\theta_i)\Biggr)^2\Biggr]
 $$
 
 * $\theta_i$ 是 第 i 步，Q-network 的参数，即 value-network 的参数 
@@ -159,6 +159,8 @@ Double Q-Learning: 一个 $Q$ 用来 选择 action，另一个 $Q$ 用来 evalua
 $$
 Y^{DoubleQ}_t \equiv R_{t+1}+\gamma Q(S_{t+1}, \arg\limits_a\max Q(S_{t+1},a;\theta_t); \theta'_t)
 $$
+
+
 **如何判断 Deep Q-Learning overestimate 了**
 
 * 通过学习好的 policy，做出一个 discounted value
