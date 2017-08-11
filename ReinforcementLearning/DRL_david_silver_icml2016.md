@@ -153,8 +153,13 @@ $$
 * Similar speedup to Gorila - on a single machine
 
 
-
 ## Policy-Based DRL
+
+参数化 policy-network， **state 作为输入**，**action 作为输出**
+
+在 Value-based DRL 中，**state,action 作为输入**， **value作为输出**
+
+ 
 
 * 用神经网络来表示 policy ， policy-network
 
