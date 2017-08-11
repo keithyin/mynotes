@@ -200,7 +200,7 @@ $Q^\pi(s,a)$ 告诉我们，take action $a$ 是好是坏。
 
 
 * deterministic
-  * action 是 连续的 （**deterministic policy**）
+  * （**deterministic policy**）
 
 $$
 \frac{\partial L(\mu)}{\partial\mu} =\mathbb E\Biggr[\frac{\partial Q^\pi(s,a)}{\partial a}\frac{\partial a}{\partial \mu}\Biggr]
@@ -214,18 +214,33 @@ $\frac{\partial a}{\partial \mu}$  告诉我们，如何调整 policy-network �
 
 
 
+**Estimate Value Function**
+$$
+Q(s,a;w) \approx Q^\pi(s,a)
+$$
+
+
+
+
 **Algorithms**
 
 * DDPG
 * DPG
-* A3C
+* A3C 
+
+
+**A3C**
+
+* Q-value estimated by an n-step sample
+* $Q(s_t,a_t)=r_{t+1}+\gamma r_{t+2}+...+\gamma^{n-1}V(s_{t+n},a_{t+n})$
+
 
 
 
 **DRL with Continuous Actions (high-dimensional)**
 
 * 没法简单的计算 $\max\limits_aQ(s,a)$, 因为是连续的空间，没法简单的求全局最大值
-  * Actor-critic 方法没有使用 $\max$
+  * Actor-critic 方法没有使用 $\max$ , Actor-critic 算法可以完美用在 continuous action 环境下
 * Q-values 对 a 是可导的
   * Deterministic policy gradients exploit knowledge of $\frac{\partial Q}{\partial a}$
 * ​
