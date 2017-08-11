@@ -155,16 +155,17 @@ $$
 
 ## Policy-Based DRL
 
-参数化 policy-network， **state 作为输入**，**action 作为输出**
+参数化 policy-network， 
 
-在 Value-based DRL 中，**state,action 作为输入**， **value作为输出**
+* **state 作为输入**，**action 作为输出**
+* **state 作为输入，softmax action 作为输出**
 
- 
+在 Value-based DRL 中，**state,action 作为输入**， **value作为输出** 
 
 * 用神经网络来表示 policy ， policy-network
 
 $$
-a = \pi(a|s;\mu) 
+a = \pi(a|s;\mu)
 $$
 
 $$
@@ -184,24 +185,33 @@ $$
 
 
 * 策略梯度
-  * stochastic policy
-    * action 是 随机的
+  * stochastic policy 
+    * action 是 随机的 (**policy gradient  theorem，随机 policy**)
 
 
 $$
 \frac{\partial L(\mu)}{\partial\mu} =\mathbb E\Biggr[\frac{\partial\log\pi(a|s;\mu)}{\partial \mu}Q^\pi(s,a)\Biggr]
 $$
 
+$\frac{\partial\log\pi(a|s;\mu)}{\partial \mu}$ 告诉我们，参数应该怎么调整 才可以更经常的 取到 action $a$
+
+$Q^\pi(s,a)$ 告诉我们，take action $a$ 是好是坏。
 
 
-* 
-  * deterministic
-    * action 是 连续的
 
+* deterministic
+  * action 是 连续的 （**deterministic policy**）
 
 $$
-\frac{\partial L(\mu)}{\partial\mu} =\mathbb E\Biggr[\frac{\partial\log\pi(a|s;\mu)}{\partial a}\frac{\partial a}{\partial \mu}\Biggr]
+\frac{\partial L(\mu)}{\partial\mu} =\mathbb E\Biggr[\frac{\partial Q^\pi(s,a)}{\partial a}\frac{\partial a}{\partial \mu}\Biggr]
 $$
+
+$\frac{\partial L(\mu)}{\partial\mu}$ 告诉我们 policy-network 的 参数应该如何调整，会使 expected reward（$Q$）  更大
+
+$\frac{\partial Q^\pi(s,a)}{\partial a}$ 告诉我们，应该如何调整 action $a$ 使得 $Q-value$ 越大
+
+$\frac{\partial a}{\partial \mu}$  告诉我们，如何调整 policy-network 的模型参数，使得 选 $a$ 的概率增加
+
 
 
 **Algorithms**
