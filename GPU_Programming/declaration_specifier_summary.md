@@ -44,6 +44,56 @@ __global__ void cuda_kernel(int a, int b){
 
 
 
+## 设备 memory
+
+`CUDA` 编程模型假设 系统由 **`HOST`** 和 **`DEVICE`** 构成，它们**各自有自己的 memory** , **`kernel`**  操作设备内存，所以，runtime 提供了一下函数：
+
+* 分配设备 memory
+* 回收设备 memory
+* copy 设备  memory
+* host memory 和 device memory 之间的数据传输
+
+
+
+**Device memory can be allocated either as linear memory or as CUDA arrays.**
+
+
+
+**Linear Memory：**
+
+* 使用 `cudaMalloc(), cudaMallocPitch(), cudaMalloc3D()` 分配 （在 host 代码中操作）
+* 使用 `cudaFree()` 释放 （在 host 代码中操作）
+
+**CUDA arrays：**
+
+* `__constant__ float constData[256]`
+
+
+
+**如何通过 runtime API 来访问，GPU gloabl memory 中的 Variable**
+
+```c++
+// host code
+// CUDA arrays
+__constant__ float constData[256]; 
+float data[256]; 
+cudaMemcpyToSymbol(constData, data, sizeof(data)); 
+cudaMemcpyFromSymbol(data, constData, sizeof(data)); 
+
+__device__ float devData; 
+float value = 3.14f; 
+cudaMemcpyToSymbol(devData, &value, sizeof(float)); 
+
+// Linear Memory
+__device__ float* devPointer; 
+float* ptr; 
+cudaMalloc(&ptr, 256 * sizeof(float)); 
+cudaMemcpyToSymbol(devPointer, &ptr, sizeof(ptr));
+
+```
+
+
+
 
 
 
