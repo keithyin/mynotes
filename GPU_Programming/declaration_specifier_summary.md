@@ -5,7 +5,7 @@
 ## 修饰 函数的修饰符
 
 * `__global__` 修饰符：用来声明一个函数是 ` kernel`, `kernel` 具有以下特征
-  * 在 `host` 上调用
+  * 在 `host` 上调用 (callable from the host)
   * 在 `device` 上执行
 
 ```c++
@@ -24,8 +24,33 @@ __global__ void cuda_kernel(int a, int b){
 
 
 
+**`__global__ vs __device__`**
+
+* 被 `__global__` 修饰的函数 称之为 `kernel`
+
+
+* `__device__` 修饰的函数只能由  `__device__` 修饰的函数或 `__global__` 修饰的函数调用！
+* `__global__` 修饰的函数可以 由 `host` 调用，通过 `<<<...>>>`
+* `__device__` 修饰的函数调用的时候不需要 `<<<...>>>`
+* `__device__` 修饰的函数，在  `gpu` 线程上执行。
+
+参考资料：
+
+[https://code.google.com/archive/p/stanford-cs193g-sp2010/wikis/TutorialDeviceFunctions.wiki](https://code.google.com/archive/p/stanford-cs193g-sp2010/wikis/TutorialDeviceFunctions.wiki)
+
+[https://stackoverflow.com/questions/12373940/difference-between-global-and-device-functions](https://stackoverflow.com/questions/12373940/difference-between-global-and-device-functions)
+
+
+
+
+
+
+
+
 
 ## 修饰变量的修饰符
+
+> 变量修饰符 指定了 变量在 设备上的 memory location
 
 * `__device__` 修饰符：声明变量 驻留在 `device` 上，修饰的变量具有以下特征
 
@@ -74,7 +99,7 @@ __device__ void func()
 * `Ns`：`size_t` 类型，指定 每个 block 的 shared memory 的 大小（number of bytes）可选的，默认为0
 * `S`：`cudaStream_t` 类型，指定相关联的 `stream`，可选，默认为0
 
- 
+
 
 
 
@@ -83,4 +108,14 @@ __device__ void func()
 [http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#c-language-extensions](http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#c-language-extensions)
 
 [http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#execution-configuration](http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#execution-configuration)
+
+[https://code.google.com/archive/p/stanford-cs193g-sp2010/wikis](https://code.google.com/archive/p/stanford-cs193g-sp2010/wikis)
+
+[https://stackoverflow.com/questions/33218522/cuda-host-device-variables](https://stackoverflow.com/questions/33218522/cuda-host-device-variables)
+
+[http://www.math-cs.gordon.edu/courses/cps343/presentations/CUDA_Memory.pdf](http://www.math-cs.gordon.edu/courses/cps343/presentations/CUDA_Memory.pdf)
+
+
+
+
 
