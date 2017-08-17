@@ -2,6 +2,22 @@
 
 
 
+## CUDA 中的函数
+
+**Kernel**： 由 `__global__` 修饰，返回值只能是 `void`。
+
+**`__device__` 函数**： 由 `__device__` 修饰，可以有返回值。
+
+**`__host__` 函数**： 由 `__host__` 修饰，函数如果没有修饰，默认是 `__host__` 的。
+
+
+
+**参考资料：**
+
+[http://cui.unige.ch/~chopard/GPGPU/3-more-on-cuda.pdf](http://cui.unige.ch/~chopard/GPGPU/3-more-on-cuda.pdf)
+
+
+
 ## 修饰 函数的修饰符
 
 * `__global__` 修饰符：用来声明一个函数是 ` kernel`, `kernel` 具有以下特征
@@ -15,7 +31,7 @@ __global__ void cuda_kernel(int a, int b){
 ```
 
 * `__device__` 修饰符： 用来声明一个 函数，具有以下特征
-  * 只能在 `device` 上调用
+  * 只能在 `device` 上调用， 有 `__device__` 函数 或 `__global__` 函数调用
   * 在 `device` 上执行
 * `__host__` 修饰符：用来声名一个函数，具有以下特征
   * 只能由 `host` 调用
@@ -138,6 +154,28 @@ __device__ void func()
 
 
 
+**`__device__, __shared__, __constant__` 可以用在**
+
+* `class, struct, union` 的数据成员（data members）
+* formal parameters
+* 在 host 上执行的函数的 局部变量（local variables）
+
+
+
+**一些特征：**
+
+* `__shared__, __constant__`  具有隐式的 静态 存储属性
+* `__device__, __constant__` 变量定义 只允许在 namespace scope 下（包含 global namespace scope）
+* ​
+
+
+
+
+
+
+
+
+
 ## Execution Configuration
 
 在调用 `__global__` 函数时，必须为这次调用指定 `Execution Configuration`，就是 这玩意
@@ -164,6 +202,10 @@ __device__ void func()
 [https://stackoverflow.com/questions/33218522/cuda-host-device-variables](https://stackoverflow.com/questions/33218522/cuda-host-device-variables)
 
 [http://www.math-cs.gordon.edu/courses/cps343/presentations/CUDA_Memory.pdf](http://www.math-cs.gordon.edu/courses/cps343/presentations/CUDA_Memory.pdf)
+
+[Qalifiers-cuda toolkit document](http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#qualifiers)
+
+
 
 
 
