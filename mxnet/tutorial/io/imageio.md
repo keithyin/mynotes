@@ -4,7 +4,7 @@
 
 
 
-## RecordIO
+## RecordIO（mx.recordio）
 
 mxnet 的 RecordIO 允许我们先将数据序列化成 `.rec` 文件，然后再从 `.rec` 文件中将序列化的文件解码出来。
 
@@ -146,7 +146,7 @@ print(mx.recordio.unpack_img(s))
 
 
 
-**使用ImageRecordIter**
+**使用[ImageRecordIter](http://mxnet.io/api/python/io.html#mxnet.io.ImageRecordIter)**
 
 ```python
 data_iter = mx.io.ImageRecordIter(
@@ -163,10 +163,9 @@ for i in range(4):
     plt.subplot(1,4,i+1)
     plt.imshow(data[i].asnumpy().astype(np.uint8).transpose((1,2,0)))
 plt.show()
-
 ```
 
-**使用 ImageIter**
+**使用 [ImageIter](http://mxnet.io/api/python/image.html#mxnet.image.ImageIter)**
 
 ```python
 data_iter = mx.image.ImageIter(batch_size=4, data_shape=(3, 227, 227),
@@ -188,8 +187,12 @@ plt.show()
 ```python
 # mx.image 模块加载加载图片
 b_img = open(path, mode='rb')
-img = mx.image.imdecode(b_img.read())
+img = mx.image.imdecode(b_img.read()) # 将 string 或 byte string 解码成 NDArray
 ```
+
+
+
+
 
 
 
