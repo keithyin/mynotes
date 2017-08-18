@@ -1,5 +1,16 @@
 # 算法总结
 
+**包含以下算法的总结**
+
+* Q-Learning
+* DQN
+* Double-DQN
+* Prioritised replay （待更）
+* Dueling network  （待更）
+* Gorila （待更）
+
+
+
 ## 解决序列决策问题的方法
 
 * **value based**
