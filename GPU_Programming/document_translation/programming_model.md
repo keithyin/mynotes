@@ -1,4 +1,4 @@
-# CUDA 编程（一）：programing model
+# CUDA 编程（一）：programming model
 
 **Programing Model 的三个核心抽象**
 
