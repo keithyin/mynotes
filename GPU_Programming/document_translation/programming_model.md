@@ -51,6 +51,86 @@ int main()
 
  i.e. 多个 **Thread** 构成 **Thread Block**，多个 **Thread Block** 构成 **Thread Grid**。
 
+我们需要在调用 `kernel` 的时候指定：`Thread Block，Thread per Block` 的数量，可以通过 一维，二维，三维的方式指定，这里就涉及到了一个 类 `dim3`。 其中：`dim3(n,1,1) == dim3(n,1) == n`：
+
+```c++
+// Kernel definition
+__global__ void MatAdd(float A[N][N], float B[N][N], float C[N][N]) 
+{ 
+  int i = threadIdx.x; 
+  int j = threadIdx.y; 
+  C[i][j] = A[i][j] + B[i][j]; 
+} 
+int main() 
+{ ... // Kernel invocation with one block of N * N * 1 threads 
+  int numBlocks = 1; 
+ dim3 threadsPerBlock(N, N); // 每个 block 中 thread 的数量
+ MatAdd<<<numBlocks, threadsPerBlock>>>(A, B, C); 
+ ... 
+}
+```
+
+注意：**Thread Block** 中的 线程数量是有限制的，现代 GPU，每个 block 最大可以放 1024 个线程。
+
+
+
+线程块之间要求是独立运行的，`GPU` 无法保证 线程块之间的运行先后顺序。但是在 线程块内，GPU 提供了一个同步机制 **barrier** （通过调用 `__syncthreads()` 实现）。
+
+```c++
+// Kernel definition 
+__global__ void MatAdd(float A[N][N], float B[N][N], float C[N][N]) 
+{ 
+  int i = blockIdx.x * blockDim.x + threadIdx.x; 
+  int j = blockIdx.y * blockDim.y + threadIdx.y; 
+  // 线程块中的 所有线程 都执行到了这句，才可以往下执行，否则阻塞
+  __syncthreads();
+  if (i < N && j < N) C[i][j] = A[i][j] + B[i][j]; 
+} 
+int main() 
+{ 
+  ... 
+  // Kernel invocation 
+  dim3 threadsPerBlock(16, 16); 
+  dim3 numBlocks(N / threadsPerBlock.x, N / threadsPerBlock.y); 
+  MatAdd<<<numBlocks, threadsPerBlock>>>(A, B, C); 
+  ... 
+}
+
+```
+
+
+
+## Memory Hierarchy
+
+**GPU中的Memory 有以下几种类型**
+
+* Global Memory  （所有线程都可访问的存储空间）（生命周期与应用程序一致）
+* Shared Memory （线程块中的线程可以访问的共享存储空间）（生命周期与线程块一致）
+* Local Memory （每个线程私有的存储空间）（生命周期与线程一致）
+
+**还有两种只读的 Memory**
+
+* Constant Memory Space （所有线程可访问）（生命周期与应用程序一致）
+* Texture Memory Space （所有线程可访问）（生命周期与应用程序一致）
+
+
+
+**还差如何分配这些内存**
+
+
+
+## Heterogeneous Programming （混合编程）
+
+在 CUDA 的世界里 称 主机(cpu+memory)为 **host**, 称 GPU 为 **device** 。
+
+CUDA 编程模型认为 CUDA 线程运行在 GPU上，C代码运行在 host 上。
+
+CUDA 编程模型还认为，host 和 device 的 memory spaces 是独立的。将他们分别称作 host memory 和 device memory。
+
+**host** 代码通过调用 CUDA runtime 来管理 GPU 的 `global，constant，texture memory space`。
+
+![](../imgs/heterogeneous-programming.png)
+
 
 
 
