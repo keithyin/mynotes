@@ -125,7 +125,7 @@ int main()
 
 CUDA 编程模型认为 CUDA 线程运行在 GPU上，C代码运行在 host 上。
 
-CUDA 编程模型还认为，host 和 device 的 memory spaces 是独立的。将他们分别称作 host memory 和 device memory。
+CUDA 编程模型还认为，host 和 device 的 memory spaces 是独立的。将他们分别称作 host memory 和 device memory。i.e.  device memory 对运行在 device 上的代码可见，host memory 对运行在 host 上的代码可见。
 
 **host** 代码通过调用 CUDA runtime 来管理 GPU 的 `global，constant，texture memory space`。
 
