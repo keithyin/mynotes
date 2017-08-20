@@ -239,5 +239,14 @@ for (int i = 0; i < 2; ++i)
 
 
 
+**default stream**
+
+如果调用 `kernel` 和 调用`runtime` 的时候没有指定 `stream`， 会有一个默认的 `stream` 被指定。 
 
 
+
+**Explicit Synchronization**
+
+CUDA 也提供了很多方法显示的同步 stream 。
+
+* `cudaDeviceSynchronize()` ,等待所有的 stream 都执行完
