@@ -70,6 +70,9 @@ $\mathcal N$ 是个 noise process
 
 ![](../imgs/DDPG.png)
 
+* **critic** 的更新用到了 next state， **actor** 的更新仅用到了 state
+* action 也可以是离散的，actor 用 softmax 输出，然后用 argmax 获得 action 传给critic，然后 ctiric 对 离散后的 action 求梯度，然后再将梯度传给 actor ？？？ 这样也能玩？不合逻辑啊。。。。完全是强行搞嘛。
+
 
 
 ## 一些细节
@@ -91,7 +94,9 @@ $\mathcal N$ 是个 noise process
 **使用了 action repeats，这个是啥子？**
 
 *  每个 time-step，一个 action 跑三次，每次的 observation 都记录下来
-* 然后将这 9 个（RGB×3） feature map 搞成一个 observation。
+*  然后将这 9 个（RGB×3） feature map 搞成一个 observation。
+
+
 
 
 
