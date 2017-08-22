@@ -28,7 +28,7 @@ self._output_names = symbol.list_outputs()
 ## Module.bind
 
 ```python
-# 会创建一个这个对象
+# 会创建一个这个对象 并在 Module 中开辟 arg_param 和 aux_param 的空间！！！
 self._exec_group = DataParallelExecutorGroup(self._symbol, self._context,
                                                      self._work_load_list, 																	 self._data_shapes,
                                                      self._label_shapes, 																	 self._param_names,
