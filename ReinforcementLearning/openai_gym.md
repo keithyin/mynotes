@@ -35,6 +35,22 @@ observation, reward, done, info=env.step(action) # 执行一个step
 
 
 
+## Spaces， action 空间 与 observation 空间
+
+```python
+import gym
+env = gym.make('CartPole-v0')
+print(env.action_space)
+#> Discrete(2)
+print(env.observation_space)
+#> Box(4,)
+```
+
+* `discrete`  ： 非 0 整数，`Discrete(2)` 代表 action 是 0 或 1，`Discrete`对象有个 `sample` 方法，用来 sample action
+* `box`： 表示一个 shape 为 n 的 box，`Box(4,)` 表示一个 一维数组，有四个元素 
+
+
+
 ## 其它
 
 所有的游戏都在这 [https://github.com/openai/gym/blob/master/gym/envs/__init__.py](https://github.com/openai/gym/blob/master/gym/envs/__init__.py)
