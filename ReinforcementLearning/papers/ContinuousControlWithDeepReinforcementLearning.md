@@ -71,7 +71,7 @@ $\mathcal N$ 是个 noise process
 ![](../imgs/DDPG.png)
 
 * **critic** 的更新用到了 next state， **actor** 的更新仅用到了 state
-* action 也可以是离散的，actor 用 softmax 输出，然后用 argmax 获得 action 传给critic，然后 ctiric 对 离散后的 action 求梯度，然后再将梯度传给 actor ？？？ 这样也能玩？不合逻辑啊。。。。完全是强行搞嘛。
+* action 也可以是离散的，behavior - action 是离散，target  - action 是连续
 
 
 
