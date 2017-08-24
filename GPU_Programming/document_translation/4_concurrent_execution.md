@@ -2,7 +2,7 @@
 
 ## [Asynchronous Concurrent Execution](http://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#asynchronous-concurrent-execution)
 
-CUDA 将以下操作看作独立的 task，他们之间可以并行执行：
+**CUDA 将以下操作看作独立的 task，他们之间可以并行执行：**
 
 - computation on the host
 - computation on the device
@@ -10,6 +10,7 @@ CUDA 将以下操作看作独立的 task，他们之间可以并行执行：
 - Memory transfer from the device to the host
 - Memory transfers within the memory of a given device
 - Memory transfers among devices
+
 
 
 
@@ -140,7 +141,7 @@ asynchronousCPUmethod ( ... ) // Async GPU method
 
 **Implicit Synchronization（隐式同步）**
 
-下列的 operations 会隐式的同步 所有其它 CUDA operations:
+下列的 operations 会隐式的同步 所有其它 CUDA operations,:
 
 * page-locked memory allocation
   * `cudaMallocHost`
