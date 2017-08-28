@@ -31,7 +31,15 @@
 
 **为什么能解决这个问题**
 
+--------------------
 
+Double Q learning is a fix for a problem observed in Q learning, especially in Q-Learning with function approximation: estimates of Q value are noisy, and this makes return estimation biased.
+
+Let's say true return value is 0 for all actions at the current state. But because of the noise in estimation, some of actions may get e.g. small positive values, and other actions can get small negative values (let's say +0.05 and -0.05). In Q-learning return estimate is computed using Q function: we evaluate Q function for all possible actions in this state, and choose an action with a largest Q value. But because of a noise maximum will be a small positive value (0.05), not zero, and it will happen every time. So the estimate in vanilla Q learning is biased.
+
+But if we use another noisy Q2 function instead of Q to select a best action, then in case of noise we can get either small positive or a small negative value (assuming this Q2 is noisy in a different way), so on average the value will be closer to 0 - the estimate becomes unbiased.
+
+-------------------------------
 
 ## 参考资料
 
