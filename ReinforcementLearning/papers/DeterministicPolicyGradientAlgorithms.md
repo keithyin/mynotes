@@ -44,3 +44,22 @@ $$
 
 这里可以看出，无论是 原始的 policy-iteration 方法，还是 dpg， 都是为了 更新 policy，使得  action-value 的值增大。这两种方法是多么的一致。
 
+
+
+**off-policy**
+
+> 1. stochastic off-policy actor-critic algorithms typically use important sampling for both actor and critic.
+> 2. However, because the deterministic policy gradient removes the integral over actions, we can avoid importance sampling in the actor
+> 3. 由于 critic 使用的是 Q-Learning，所以在 critic 中也可以不用使用 importance sampling。
+
+
+
+所以最终得到的结果是：
+
+model-free, off-policy
+
+* critic,  用 Q-learning
+* actor：deterministic policy
+
+
+
