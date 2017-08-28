@@ -40,5 +40,3 @@ V(s) & \leftarrow V(s) + \alpha\delta_t
 $$
 跟原始的 TD(0) 更新公式一样。
 
-
-
