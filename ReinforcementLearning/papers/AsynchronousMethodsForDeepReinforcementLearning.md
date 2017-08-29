@@ -47,6 +47,12 @@ $$
 
 
 
+**如何异步**
+
+* 每个 thread 维护自己的 环境，求自己的梯度（accumulated），
+* 然后异步更新 权重（具体是怎么更新，那个线程到步数了就更新？）
+* RMSprop 那部分怎么搞
+
 ## Glossary
 
 * on-line RL algorithms : 每个 step 都更新
