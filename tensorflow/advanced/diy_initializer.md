@@ -114,3 +114,26 @@ class PointInitializer(Initializer):
 
 
 
+## Variable 初始化到底在干什么
+
+```python
+tf.global_variables_initializer()
+
+# global_variables_initializer 内部
+return variables_initializer(global_variables())
+
+# variables_initializer 内部
+return control_flow_ops.group(*[v.initializer for v in var_list], name=name)
+
+# v.initializer 是啥， v 是 Variable 对象
+def initializer(self):
+  """The initializer operation for this variable."""
+  return self._initializer_op
+
+# self._initializer_op 是啥
+self._initializer_op = state_ops.assign(
+            self._variable, self._initial_value,
+            validate_shape=validate_shape).op  
+# 就是个 assign op， 初始化的时候就是 run 了 Variable 对象的 assign op！！！
+```
+
