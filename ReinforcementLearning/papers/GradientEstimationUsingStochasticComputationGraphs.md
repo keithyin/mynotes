@@ -14,6 +14,26 @@
 
 
 
+## 结论
+
+对于任何 edge $(v,w)$ ，
+
+* 如果 $w$ 是 deterministic 节点，那么 $\frac{\partial w}{\partial v}$ 一定要存在，因为要求梯度啦，deterministic 的梯度就是 $\frac{\partial w}{\partial v}$ 。
+* 如果 $w$ 是 stochastic 节点，那么 概率质量函数 $p(w|v,...)$ 一对要对 $v$ 可导。因为要用到 $\nabla_\theta\log p(x;\theta)$
+
+
+
+**stochastic 的节点会 block 住梯度的反向传导！！！！**
+
+
+
+> 1. If the path from an input $\theta$  to the deterministic node $v$ is blocked by stochastic nodes, the $v$ may be a non-differentiable function of its parents.
+> 2. If the path from input $\theta$ to stochastic node $v$ is blocked by other stochastic nodes, the likelihood of $v$ given its parents need not be differentiable, in fact, it does not need to be known. 
+
+这两句话告诉我们，一旦有 随机节点作怪，$\theta$ 的梯度就直接和最终的 $loss$ 挂钩了，就不用考虑 随机节点之后的梯度能对 $\theta$ 造成什么影响了（造不成影响，之考虑最终的  $loss$, (objective)）。
+
+
+
 
 
 ## 推公式
@@ -50,6 +70,8 @@ $$
 \end{aligned}
 $$
 
+**对期望求导的式子，把期望搞成 求和或者积分的形式，然后再求导是比较好用的。**
+
 
 
 
@@ -67,7 +89,7 @@ $x,y$ 就是随机变量啦，然后我们就是通过采样的方式来估计 l
 
 > optimizing loss functions that involves an expectation over **random variables** 。
 
-这里倒是想起了一点，网络的输入也是随机的呀，感觉这些地方措辞有问题！！！！
+这里倒是想起了一点，网络的输入也是随机的呀，感觉这些地方措辞有问题！！！！（确定性网络用的 PD term （path-wise derivative））
 
 
 
