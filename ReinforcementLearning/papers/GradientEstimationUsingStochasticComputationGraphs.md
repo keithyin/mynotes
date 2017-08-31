@@ -34,6 +34,14 @@
 
 
 
+**Surrogate Loss Function**
+
+将所有的 随机节点 换成一个 surrogate loss 节点，就可以正常的使用反向传播了。
+
+
+
+**deterministic 部分还是使用原来的基本的反向传导方法，对于 stochastic 结点，考虑被影响的 loss**
+
 
 
 ## 推公式
