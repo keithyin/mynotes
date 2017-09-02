@@ -34,6 +34,16 @@
 
 
 
+> The idea of using *learning to learn* or *meta learning* to acquire knowledge or inductive biases has a long history.
+
+
+
+> In this work we consider directly parameterizing the optimizer.
+
+直接对 优化器进行参数化。
+
+
+
 ## Comment
 
 * we can learn everything
@@ -43,5 +53,6 @@
 ## Glossary
 
 * function of interest : 
+* problems of interest: 
 * learn interesting sub-structure
-* inductive biases: 
+* inductive biases:  是对模型（参数）的一种假设，就像  Occam's razor，我们认为 模型简单 训练集效果好的网络，泛化性能好。
