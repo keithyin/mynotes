@@ -1,5 +1,14 @@
 # Learning to Learn by gradient descent by gradient descent
 
+**key word**
+
+* meta-learning
+* learning to learn
+
+
+
+## 文章阅读
+
 开篇一句话相当经典：
 
 > The move from hand-designed features to learned features in machine learning has been wildly successful.
@@ -46,9 +55,41 @@
 
 
 
+
+
 ## Comment
 
+> A classic paper in optimization is ‘No Free Lunch Theorems for Optimization’ which tells us that no general-purpose optimization algorithm can dominate all others. So to get the best performance, we need to match our optimization technique to the characteristics of the problem at hand
+
+
+
+
+
+> specialization to a subclass of problems is in fact the *only* way that improved performance can be achieved in general.
+
 * we can learn everything
+
+
+
+
+要理解这篇文章就要知道什么是 NFL 定理：
+
+* 没有一种 优化算法可以适用与所有任务
+
+就像我们拥有的一些优化算法：RMSprop，ADAM，AdaGrad。。。他们不会适用所有的任务的。
+
+还有一个问题就是：这些算法是人类设计的（就像初期的机器学习算法，特征提取是人类设计的一样），我们能不能直接学习出来 参数的更新的方法。
+
+本文的目的就是学习出一个 **某类问题** 的参数更新方法。 
+
+
+
+> Learning how to learn
+
+how to learn : 在这篇文章中指的是如何更新网络参数
+
+Learning to learn : 学习  如何更新网络参数。
+
 
 
 
