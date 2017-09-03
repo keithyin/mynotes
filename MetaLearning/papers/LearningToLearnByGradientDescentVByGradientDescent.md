@@ -58,6 +58,6 @@
 * problems of interest: 
 * learn interesting sub-structure
 * inductive biases:  是对模型（参数）的一种假设，就像  Occam's razor，我们认为 模型简单 训练集效果好的网络，泛化性能好。
-* optimizee：网络参数 
+* optimizee： 网络（有自己的参数）
 * optimizer：优化器（优化器自身也有参数）
 * coordinate-wise network：
