@@ -7,6 +7,7 @@
 
 
 
+
 ## 文章阅读
 
 开篇一句话相当经典：
@@ -15,7 +16,7 @@
 >
 > In spite of this, optimization algorithms are still designed by hand. In this paper, we show how the design of an optimization algorithm can be cast as learning problem.
 
-大意是：原来的机器学习 是人工选择特征的，深度学习这块是 学习如何选择特征。对于优化方法来说，现在依旧是人工设计的，现在，我们要去学习优化方法。（有点牛逼哦）
+大意是：原来的机器学习 是人工选择特征的，深度学习这块是 学习如何选择特征。对于优化方法来说，现在依旧是人工设计的（SGD，Adam，。。。），现在，我们要去学习优化方法。（有点牛逼哦）
 
 那么关注本文的重点就是：如何将 设计优化算法的问题 转化成 学习问题。
 
