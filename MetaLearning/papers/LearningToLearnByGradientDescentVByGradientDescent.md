@@ -10,6 +10,10 @@
 
 ## 文章阅读
 
+**Abstract**
+
+
+
 开篇一句话相当经典：
 
 > The move from hand-designed features to learned features in machine learning has been wildly successful.
@@ -22,9 +26,19 @@
 
 
 
+**Introduction**
+
 > The performance of vanilla gradient descent, however, is hampered by the fact that it only makes use of gradients and ignores second-order information.
 
 点出了 vanilla-gradient-descent 的问题，没有考虑 二阶导，考虑了二阶导，优化会更快
+
+
+
+
+
+> specialization to a subclass of problems is in fact the *only* way that improved performance can be achieved in general.
+
+专门解决一个子问题 是**提升性能**的唯一方法。
 
 
 
@@ -41,6 +55,14 @@
 > we will explicitly model the update rule $g$ using a recurrent neural network which maintains its own state and hence dynamically updates as function of its iterates.
 
 
+
+
+
+> The goal of this work is to develop a procedure for constructing a learning algorithm which performs well on a particular class of optimization problems. 
+>
+> Casting algorithm design as a learning problem allow us to specify the class of  problems we are interested in through example problem instances.
+
+通过 事例问题实例 来创建一个对应某类问题的优化算法。（learning algorithms 指的是啥？ 优化算法，还是机器学习算法）
 
 
 
@@ -66,8 +88,6 @@
 
 
 
-> specialization to a subclass of problems is in fact the *only* way that improved performance can be achieved in general.
-
 * we can learn everything
 
 
@@ -90,6 +110,37 @@
 how to learn : 在这篇文章中指的是如何更新网络参数
 
 Learning to learn : 学习  如何更新网络参数。
+
+
+
+
+
+## inductive bias (归纳偏好)
+
+> 机器学习算法在学习过程中对某种类型假设的 **偏好** ，称为 **归纳偏好（inductive bias）** （i.e. 机器学习算法更偏向与哪种参数。）
+
+> 任何一个有效的机器学习算法必有其归纳偏好，否则他将被假设空间中看似在训练集上 **等效** 的假设所迷惑，从而无法产生确定的学习结果。（学习结果？ 难道是参数？）
+
+> 归纳偏好可看作学习算法自身在一个可能很庞大的假设空间对假设 **进行选择** 的启发式或 **价值关** （i.e. 可能很多假设都能满足训练集，那么到底选择那个假设呢？ 这就根据 学习算法的 **归纳偏好** 来搞定）
+
+
+
+> 归纳偏好对应了学习算法本身所做出的关于 **什么样的模型更好的假设**
+
+
+
+> 学习算法的归纳偏好与问题是否相配，往往会起到决定性的作用。
+
+
+
+
+
+**有没有一般性的原则来引导算法确立正确的偏好呢？**
+
+* meta learning 来了。。。。
+* 奥卡姆剃须刀 是一个原则
+
+
 
 
 

@@ -39,7 +39,11 @@
 
 
 
+**Meta Learning**
 
+* A meta-learning system **must include a learning subsystem**, which **adapts with experience**.
+* Meta learning starts at a higher level and is **concerned with accumulating experience over several application** of a learning system.
+* ​
 
 
 
