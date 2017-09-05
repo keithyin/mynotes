@@ -66,6 +66,12 @@
 
 
 
+> we can rely on the ability of deep networks to generalize to new examples by learning interesting sub-structure.
+
+sub-structure 是指的样本的子结构吗？比如一张图片，dl 可以搞清楚到底应该关注哪部分，而不是通吃？
+
+
+
 > The idea of using *learning to learn* or *meta learning* to acquire knowledge or inductive biases has a long history.
 
 
