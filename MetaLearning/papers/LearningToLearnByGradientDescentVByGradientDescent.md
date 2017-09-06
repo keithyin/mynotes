@@ -82,6 +82,13 @@ sub-structure 是指的样本的子结构吗？比如一张图片，dl 可以搞
 
 
 
+> In general, these ideas involve learning which occurs at two different time scales: 
+>
+> * rapid learning within tasks and more gradual
+> * meta learning across many different tasks
+>
+> 
+
 
 
 

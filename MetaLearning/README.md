@@ -24,10 +24,13 @@
 **如何实现 Meta Learning**
 
 * 学习更好的优化算法（Learning Optimizers），取代 （Adam，SGD）
-* 学习 初始化参数（fine-tune）
+* 学习 初始化参数（fine-tune）（**train a base learner**）
   * 这种方法有个问题：向小数据集上转型时，会过拟合。
+  * 多任务学习和这个也差不多，都是学习一个 base learner
 * 学习网络超参数
 * Metric Learning： （学习一个好的 metric 的空间）
+
+
 
 
 
