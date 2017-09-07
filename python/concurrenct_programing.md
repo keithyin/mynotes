@@ -167,3 +167,37 @@ pool = ProcessPoolExecutor(n)
 a= pool.submit(func, ...)
 ```
 
+
+
+**如何共享变量**
+
+* shared memory
+
+```python
+from multiprocessing import Process, Value, Array
+# Value, Array 中的数据是进程共享的
+```
+
+
+
+
+
+**同步**
+
+* Lock
+
+```python
+from multiprocessing import Lock
+
+lock = Lock()
+with lock:
+    ...
+   
+
+lock.acquire()
+
+lock.release()
+```
+
+
+
