@@ -51,6 +51,16 @@ print(env.observation_space)
 
 
 
+
+**如何过去 action 的个数**
+
+```python
+num_actions = env.action_space.n
+```
+
+
+
+
 ## 其它
 
 所有的游戏都在这 [https://github.com/openai/gym/blob/master/gym/envs/__init__.py](https://github.com/openai/gym/blob/master/gym/envs/__init__.py)
