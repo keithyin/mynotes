@@ -77,7 +77,26 @@
 * agent 的 observation 是时序相关的，并不是 iid 的。
   * 这个问题是这样：传统的 RL 算法，都是看到一个 obs，然后直接就更新参数，但是 DL 需要训练数据是 IID 的。用传统 RL 的训练方法显然是不行的啦，所以搞出了 experience replay 方法。
   * 为什么 DL 需要的训练数据是 IID 的呢？ 可能的原因是：因为我们用 mini-batch 训练方法，一个 mini-batch 的梯度应该是 整个 batch 的无偏估计，数据 IID 的话，是 无偏，但是如果数据不是 IID 的话，那就不是 无偏了。
+* 如果不好定义 reward，就基本上歇菜了
 
+
+
+
+## Policy
+
+Policy 有两种属性：
+
+* continuous， discrete
+* stochastic，deterministic
+
+
+
+## Value Function
+
+Value Function 有两种：
+
+* state-value Function
+* action-value Function
 
 
 
