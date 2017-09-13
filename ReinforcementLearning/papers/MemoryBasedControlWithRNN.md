@@ -20,3 +20,14 @@
 
 
 > The agent only indirectly observes the underlying state of the MDP through the observations. An optimal agent may, in principle, require access to the entire history $h_t=(o_1, o_2, o_3,....)$
+
+
+
+## 算法
+
+![](../imgs/RDPG.png)
+
+需要注意的几点是：
+
+* 每次往 Replay Buffer 中存 一个  episode （DQN 是每次传一个 transition！！！）
+* ​
