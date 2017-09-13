@@ -100,6 +100,10 @@ Value Function 有两种：
 
 
 
+## on/off policy
+
+* off-policy：可以保证 exploration
+
 
 
 ## Glossary
