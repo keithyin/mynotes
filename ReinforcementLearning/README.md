@@ -12,6 +12,14 @@
 
 
 
+在 DRL 中，深度学习那一块可以看作特征提取工具。
+
+几个重要概念：
+
+* state： The state is sufficient statistic of the environment and thereby comprises all the necessary information for the action to take the best action.
+
+
+
 ## 强化学习
 
 **三大类算法**
@@ -49,6 +57,19 @@
 
 
 
+
+## DRL 面临的问题
+
+* 监督信号只有一个 reward，而且十分稀疏
+* agent 的 observation 是时序相关的，并不是 iid 的。
+  * 这个问题是这样：传统的 RL 算法，都是看到一个 obs，然后直接就更新参数，但是 DL 需要训练数据是 IID 的。用传统 RL 的训练方法显然是不行的啦，所以搞出了 experience replay 方法。
+  * 为什么 DL 需要的训练数据是 IID 的呢？ 可能的原因是：因为我们用 mini-batch 训练方法，一个 mini-batch 的梯度应该是 整个 batch 的无偏估计，数据 IID 的话，是 无偏，但是如果数据不是 IID 的话，那就不是 无偏了。
+
+
+
+
+
+
 ## Glossary
 
 * prediction problem : 也叫做 policy evaluation。给定一个 policy， 计算 state-value function 或 action-value function 的值。
@@ -59,3 +80,5 @@
 * model-free： agent 直接从 experience 中学习，model未知（不知道 状态转移矩阵）
 * on-line mode：training algorithms are executed on data acquired in sequence。
 * off-line mode：也叫 batch mode，并不是看到一个样本就训练。
+* episodic：环境有个终止状态（而且一定会到达这个终止状态）
+* non-episodic： 环境没有终止状态（或者不会到达一个终止状态）（MC的方法歇菜）
