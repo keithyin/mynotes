@@ -19,6 +19,19 @@
 * state： The state is sufficient statistic of the environment and thereby comprises all the necessary information for the action to take the best action.
 
 
+> 对 state 的理解： state 提供足够的信息能够引导我们 做出正确的action ，这就够了。
+>
+> 因为 observation 不等价与 state，这就涉及到如何将 observation （和 action）编码成 state 的方法了，感觉应这么考虑：
+>
+> * 当前这个任务，如果想要做出正确的 action，需要哪些信息
+> * 通过如何 处理 observation 可以得到所需要的信息。
+>
+> 举个例子 --> Atari Pong：
+>
+> * 如果想要正确的控制 挡板，我们应该需要 小球的运动方向和 运动速度 和 位置
+> * 单一帧只能获得 小球的位置，运动方向和速度都无法获取，所以用 4 帧来代表状态
+> * 因为从四帧中 是可以推断出，运动方向，位置，速度的。
+
 
 ## 强化学习
 
