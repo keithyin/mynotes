@@ -30,4 +30,11 @@
 需要注意的几点是：
 
 * 每次往 Replay Buffer 中存 一个  episode （DQN 是每次传一个 transition！！！）
-* ​
+
+
+
+
+
+## 总结
+
+文章的特点就是：**用 rnn 来编码 observation **， 没啥特殊的。
