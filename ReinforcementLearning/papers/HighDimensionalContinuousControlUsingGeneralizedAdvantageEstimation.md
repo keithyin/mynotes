@@ -56,3 +56,7 @@
 
 
 
+**Policy Gradient 算法**
+
+![](../imgs/policy_gradient.png)
+
