@@ -60,3 +60,34 @@
 
 ![](../imgs/policy_gradient.png)
 
+
+
+> that a step in the policy gradient direction should increase the probability of better-than-average actions and decrease the probability of worse-than average actions.
+
+对 policy-gradient 的重解释。 哈，不就是这样吗？
+
+
+
+## $\gamma-just$ estimator
+
+![](../imgs/discounted-approx.png)
+
+如果 estimator $\hat A_t$ 满足：
+
+![](../imgs/gamm-just-1.png)
+
+则立即会满足：
+
+![](../imgs/gamma-just-2.png)
+
+则 称 $\hat A_t$ 为 $\gamma-just$ estimator .
+
+
+
+$\hat A_t$ 为 $\gamma$-just estimator 的一个充分条件是：$\hat A_t$ 可以分解成两个不同的函数
+
+* $Q_t$  ： can depend on any trajectory variables but gives an unbiased estimator of the $\gamma$-discounted $Q$-function.
+* $b_t$：an arbitrary function of the states and actions sampled before $a_t$
+
+![](../imgs/gamma-just-3.png)
+
