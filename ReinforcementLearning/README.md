@@ -33,6 +33,8 @@
 > * 因为从四帧中 是可以推断出，运动方向，位置，速度的。
 
 
+
+
 ## 强化学习
 
 **三大类算法**
@@ -87,7 +89,9 @@
 Policy 有两种属性：
 
 * continuous， discrete
-* stochastic，deterministic
+* stochastic，deterministic（对于 deterministic policy 的算法一般要求 policy 是 continuous）
+
+
 
 
 
@@ -100,9 +104,17 @@ Value Function 有两种：
 
 
 
+
 ## on/off policy
 
 * off-policy：可以保证 exploration
+
+
+
+
+## on/off-line
+
+* ​
 
 
 
