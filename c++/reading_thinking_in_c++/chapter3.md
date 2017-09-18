@@ -196,6 +196,107 @@ int a = (int) b; // 第一种语法
 
 
 
+## 类
+
+**结构体：** 将变量结合起来
+
+**enum：** （结构体）将名字和数字联系起来的一种方式。
+
+```c++
+// 里面是定义了 名字所对应的值
+enum ShapeType{
+  circle,
+  square,
+  rectangle=20
+};
+
+int main(){
+  ShapeType shape=circle; // circle 是可以直接用，是之前定义好的。
+  switch (shape){
+    case circle: // do something
+    case square: // do something
+    case rectangle: // rectangle
+  }
+}
+
+```
+
+
+
+**union：** 
+
+```c++
+union Packed{
+  char i;
+  short j;
+}
+```
+
+
+
+
+
+
+
+```c++
+// 结构体
+struct {};
+
+// enum
+```
+
+
+
+## 数组
+
+* 编译时确定大小
+* 可以是任何类型的数组
+* 指针可以加减 整数，也可以是使用 ++，--
+
+
+
+## 断言
+
+C/C++ 中也有断言, `assert 宏`
+
+```c++
+#include <cassert>
+int main(){
+ int a = 100;
+ assert(a!=100); // Fails 
+}
+```
+
+
+
+## 函数
+
+**复杂声明：从变量名中间开始向外扩展，向右->向左**
+
+函数指针：指向函数的指针
+
+```c++
+void (*funcPtr)(); // 定义了一个函数指针
+
+```
+
+```c++
+#include<iostream>
+using namespace std;
+
+void func(){
+  cout<< "func() called" <<endl;
+}
+
+int main(){
+  void (*fp) ();
+  fp = func; // 既然都这么相等了，为啥不直接调用嘞
+  // fp(); 这个也可以用。
+  (*fp)(); // 还要解引用
+  void (*fp2)() = func;
+}
+```
+
 
 
 
@@ -212,6 +313,7 @@ int a = (int) b; // 第一种语法
 ## Key Word
 
 * typedef : 类型名称重定义
+* ​
 
 
 
