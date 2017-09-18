@@ -118,6 +118,42 @@ Value Function 有两种：
 
 
 
+
+## 几个问题：
+
+* 为什么说 MC 方法 0-bias， high variance
+* 为什么说 TD(0) 方法 low-bias，low variance
+
+
+
+**从值估计的角度来理解？**
+
+假设 trajectory $\tau = \{s_0,a_0,s_1,a_1,...\}$ 
+$$
+p(\tau) = p(s_0)\prod_{t=0}^T \pi(a_t|s_t)p(s_{t+1}|s_t,a_t)
+$$
+
+$$
+G(s_t)=\sum_t^T r_{t+1}+\gamma r_{t+2} + ... + \gamma^{T-t-1} r_T
+$$
+
+$$
+R(s_t) = \mathbb E\Bigr[G(s_t)\Bigr]
+$$
+
+最后一个式子是对 trajectory 的期望。
+
+MC 方法是采一个 trajectory，所以是对 Value 的无偏估计。但是为什么方差大呢？因为 trajectory 会跑偏？
+
+为什么 TD(0) 方差小？ TD target  $r_{t+1}+V(s')$  ，$s'$ 的取值也是有一个分布的吧，不过这个似乎比 trajectory 方差要小一点，但是引入了方差，因为 $r_{t+1} + V(s')$ 并不是 $V(s)$ 的无偏估计，只有 $V(s)=r_{t+1}+V(s')$ 时，才是无偏估计。 
+
+
+
+从 trajectory 的角度来理解？
+
+
+
+
 ## Glossary
 
 * prediction problem : 也叫做 policy evaluation。给定一个 policy， 计算 state-value function 或 action-value function 的值。
