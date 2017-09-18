@@ -132,4 +132,5 @@ Value Function 有两种：
 * non-episodic： 环境没有终止状态（或者不会到达一个终止状态）（MC的方法歇菜）
 * reparameterization trick : [https://www.quora.com/What-is-the-reparameterization-trick-in-variational-autoencoders](https://www.quora.com/What-is-the-reparameterization-trick-in-variational-autoencoders)
 * [path-wise derivative](http://www.mathfinance.cn/pathwise-derivative-vs-finite-difference-for-greeks-computation/)
-* ​
+* ​stationary environment : 
+* changing environment :
