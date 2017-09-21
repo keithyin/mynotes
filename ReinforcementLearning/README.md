@@ -69,6 +69,15 @@
   * ​
 
 
+**另一种分类方法**
+
+* DQN
+  * MC
+  * TD
+* Policy Gradient
+  * MC
+  * TD
+
 
 
 
