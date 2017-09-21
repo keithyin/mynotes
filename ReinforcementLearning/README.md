@@ -74,9 +74,15 @@
 * DQN
   * MC
   * TD
+  * on-policy / off-policy
+  * stochastic / deterministic policy
+  * discrete / continuous policy
 * Policy Gradient
   * MC
   * TD
+  * on-policy / off-policy
+  * stochastic / deterministic policy
+  * discrete / continuous policy
 
 
 
