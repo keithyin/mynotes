@@ -119,7 +119,7 @@ Value Function 有两种：
 
 
 
-## 几个问题：
+## MC-TD bias Variance：
 
 * 为什么说 MC 方法 0-bias， high variance
 * 为什么说 TD(0) 方法 low-bias，low variance
