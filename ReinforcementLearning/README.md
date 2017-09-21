@@ -145,11 +145,36 @@ $$
 
 MC 方法是采一个 trajectory，所以是对 Value 的无偏估计。但是为什么方差大呢？因为 trajectory 会跑偏？
 
-为什么 TD(0) 方差小？ TD target  $r_{t+1}+V(s')$  ，$s'$ 的取值也是有一个分布的吧，不过这个似乎比 trajectory 方差要小一点，但是引入了方差，因为 $r_{t+1} + V(s')$ 并不是 $V(s)$ 的无偏估计，只有 $V(s)=r_{t+1}+V(s')$ 时，才是无偏估计。 
+为什么 TD(0) 方差小？ TD target  $r_{t+1}+V(s')$  ，$s'$ 的取值也是有一个分布的吧，不过这个似乎比 trajectory 方差要小一点，但是引入了偏差，因为 $r_{t+1} + V(s')$ 并不是 $V(s)$ 的无偏估计，只有 $V(s)=r_{t+1}+V(s')$ 时，才是无偏估计。 
 
 
 
 从 trajectory 的角度来理解？
+
+
+
+## 减小 variance 的方法
+
+> 减小 variance 一般是对于 MC 方法而言的，因为 MC 方法方差大。
+
+* 用 TD(0), 不用 MC 方法
+* reward 乘个系数
+
+
+
+**reward 乘个小于 1 的系数**
+
+这个方法的直观解释是，MC 采样，越往后方差越大（一步错，步步错，就是这种感觉），然后对 discounted reward 再进行 discounting。 但是这个方法引入了 偏差。为什么呢？
+
+state-value 的定义是：
+$$
+V(s_t) = \mathbb E\Biggr[r_{t+1}+\gamma r_{t+2}+...\Bigr|s_t\Biggr]
+$$
+直接用采样的结果来计算 $V(s_t)$ 的话，是无偏估计，但是 对于reward 再进行一次 discount 的话，估计的就不是无偏估计了 ，所以会有偏差。
+
+
+
+
 
 
 
