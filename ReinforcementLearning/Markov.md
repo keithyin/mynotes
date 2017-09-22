@@ -67,13 +67,14 @@ $$
 * immediate reward $\text{R}_{t+1}$
 * discounted value of successor state $\gamma v(S_{t+1})$
 
+
 $$
 \begin{aligned}
-v(s)&=\Bbb{E}[G_t|S_t=s] \\
-&=\Bbb{E}[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\
-&=\Bbb{E}[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\
-&=\Bbb{E}[R_{t+1}+\gamma G_{t+1}|S_t=s]\\
-&=\Bbb{E}[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\
+v(s)&=\mathbb{E}[G_t|S_t=s] \\
+&=\mathbb{E}[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\
+&=\mathbb{E}[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\
+&=\mathbb{E}[R_{t+1}+\gamma G_{t+1}|S_t=s]\\
+&=\mathbb{E}[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\
 v(s)&=\mathcal{R}_s+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}v(s')
 \end{aligned}
 $$
@@ -130,7 +131,7 @@ $$
   * 当前状态下，选择`Action` `a`，获得的期望`return`
 * 两类值函数之间的关系 (下面公式也叫做 Bellman Expectation Equation)(给定$\pi$，可以用来求$v_\pi(s), q_\pi(s,a)$)
   * $v_\pi(s)=\sum_{a\in A}\pi(a|s)q_\pi(s,a)$
-  
+
   * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s')$
   * $v_\pi(s)=\sum_{a\in A}\pi(a|s)(\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s'))$
   * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^a\sum_{a'\in A}\pi(a'|s')q_\pi(s',a'))$
