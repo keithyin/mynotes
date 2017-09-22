@@ -14,10 +14,10 @@
 
 **问题**
 
-* reinforcement learning
+* reinforcement learning (model-free)
   * prediction :  **计算当前 policy 的 state-value / action-value**
   * control :  **得到最优的 policy**
-* planning
+* planning (model-based)
   * prediction
   * control
 
