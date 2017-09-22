@@ -15,17 +15,17 @@
 **问题**
 
 * reinforcement learning
-  * prediction
-  * control
+  * prediction :  **计算当前 policy 的 state-value / action-value**
+  * control :  **得到最优的 policy**
 * planning
   * prediction
   * control
 
 **planning 解决方法 model-based（dynamic programming）**
 
-* prediction : （计算当前 policy 的 state-value / action-value）
+* prediction : 
   * policy evaluation （通过迭代法计算当前的 policy 的 state-value / action-value）
-* control : （求出最优的 policy）
+* control : 
   * policy iteration : (先 policy evaluation 再 policy improvement)
   * value iteration：
 
