@@ -226,3 +226,16 @@ $$
 * [path-wise derivative](http://www.mathfinance.cn/pathwise-derivative-vs-finite-difference-for-greeks-computation/)
 * ​stationary environment : 
 * changing environment :
+
+
+
+## 参考资料
+
+[David Silver](http://www0.cs.ucl.ac.uk/staff/D.Silver/web/Teaching.html)
+
+[Berkely RL CS294](http://rll.berkeley.edu/deeprlcourse/#lecture-videos)
+
+[Pong From Pixels karpathy](http://karpathy.github.io/2016/05/31/rl/)
+
+[https://www.nervanasys.com/deep-reinforcement-learning-with-neon/](https://www.nervanasys.com/deep-reinforcement-learning-with-neon/)
+
