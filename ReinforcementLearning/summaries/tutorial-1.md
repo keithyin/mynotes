@@ -50,8 +50,6 @@
 
     * stochastic
       * REINFORCE :  MC  (**DRL**)
-
-
     * continuous
 
   * actor-critic : 

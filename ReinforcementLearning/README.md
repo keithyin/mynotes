@@ -39,17 +39,33 @@
 
 **三大类算法**
 
-* value based
-* policy based
+* value based --- 现在基本就是 Q-Learning 了
+* policy based --- policy gradient 和 actor-critic
 * model based
 
 
 
-**三类问题**
+
+**算法的基本组件**
+
+* MC
+* TD(0)
+* TD($\lambda$)
+
+
+
+**算法的两种性质**
+
+* on-policy
+* off-policy
+
+
+
+
+**两类问题**
 
 * prediction
 * control
-* planning
 
 
 
