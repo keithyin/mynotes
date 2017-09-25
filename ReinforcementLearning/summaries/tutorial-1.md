@@ -105,7 +105,7 @@ environment asks agents a question, and gives agent a **noisy score on its answe
 
 
 
-## Planning 
+## Planning   (Model-Based) 
 
 > 已经有 model，如何用这个 model 搞事情
 
@@ -127,6 +127,10 @@ environment asks agents a question, and gives agent a **noisy score on its answe
 $$
 G_t=R_{t+1}+R_{t+2}+... = \sum_{l=0} \gamma^lR_{t+l+1} \tag{3}
 $$
+**trajectory** (路径)：$(s_0,a_0,r_1,s_1,a_1,r_2, ....s_{T-1},a_{T-1},r_T)$
+
+
+
 **value function**
 
 state-value function
@@ -173,9 +177,72 @@ $$
 
 ![](../imgs/bellman_equation_4.png)
 
-## reinforcement learning
 
 
+Planning-prediction ：Bellman expectation equation, dynamic programming
+
+Planning-control : prediction +  policy improvement ($\varepsilon$-greedy)
+
+
+
+## reinforcement learning (model-free)
+
+* Monte-Carlo Learning
+* Temporal-Difference Learning
+
+**Monte-Carlo Learning**
+
+* 看公式（4），是个 expected return，MC 用 empirical mean return 来估计这个值
+* 具体做法是：
+  * 用当前的 policy 采 $N$ 个 epoch，然后对 state 对应的 reward 求平均
+  * 用这个均值来估计 expected return
+
+
+$$
+V(S_t) \leftarrow V(S_t)+\alpha\Bigr(G_t-V(S_t)\Bigr) \tag{9}
+$$
+(9) 是个 moving average 计算，$G_t$ 是 sampled return。
+
+
+
+**Temporal-Difference Learning**
+
+* update a guess towards a guess
+
+$$
+V(S_t)\leftarrow V(S_t)+\alpha \Bigr(R_{t+1}+\gamma V(S_{t+1})-V(S_t)\Bigr) \tag{10}
+$$
+
+
+
+* $R_{t+1}+\gamma V(S_{t+1})$  称为  TD-target
+* $R_{t+1}+\gamma V(S_{t+1})-V(S_t)$ 称为 TD-error
+
+
+
+**MC vs TD**
+
+* 共同点
+  * model-free
+
+
+* 不同点
+  * MC
+    * 环境需要是 episodic 的，不是 episodic (terminating) 没法用
+  * TD
+    * 环境不需要是 episodic 的 （continuing environment）
+
+
+
+以上介绍的是，prediction（policy evaluation）
+
+如何 control 呢？
+
+* policy evaluation ---> policy improvement ---> policy evaluation ---> ...
+
+
+
+## Policy Gradient
 
 
 
@@ -187,15 +254,32 @@ $$
 
 ### sarsa
 
+* model-free
+* on-policy
+* TD(0)
 
+![](../imgs/sarsa.png)
 
 ### q-learning
+
+* model-free
+* off-policy
+* TD(0)
+
+![](../imgs/q-learning.png)
 
 
 
 ### dqn
 
+* model-free
+* off-policy
+* TD(0)
+* DL
 
+![](../imgs/dqn.png)
+
+[https://github.com/KeithYin/mynotes/blob/90731ba9895273e3d408bb7816c58572da14a292/ReinforcementLearning/papers/playingAtariWithDeepReinforcementLearning.md](https://github.com/KeithYin/mynotes/blob/90731ba9895273e3d408bb7816c58572da14a292/ReinforcementLearning/papers/playingAtariWithDeepReinforcementLearning.md)
 
 ### DDPG
 
