@@ -37,6 +37,8 @@ environment asks agents a question, and gives agent a **noisy score on its answe
   * prediction
   * control
 
+
+
 **planning 解决方法 model-based（dynamic programming）**
 
 * prediction : 
@@ -96,6 +98,13 @@ environment asks agents a question, and gives agent a **noisy score on its answe
 
 
 
+## Planning VS Learning
+
+* Learning is going from experience to a policy
+* planning is going from a model to a policy
+
+
+
 ## Planning 
 
 > 已经有 model，如何用这个 model 搞事情
@@ -138,5 +147,37 @@ $$
 
 
 
+
+
+## Case Study
+
+
+
+### sarsa
+
+
+
+### q-learning
+
+
+
+### dqn
+
+
+
+### DDPG
+
+
+
+### alpha-go
+
+
+
+
+
+
+
 ## 参考资料
+
+[https://www.quora.com/What-is-the-difference-between-reinforcement-learning-and-planning](https://www.quora.com/What-is-the-difference-between-reinforcement-learning-and-planning)
 
