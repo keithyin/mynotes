@@ -96,8 +96,6 @@ environment asks agents a question, and gives agent a **noisy score on its answe
 
 
 
-
-
 ## Planning VS Learning
 
 * Learning is going from experience to a policy
@@ -105,41 +103,75 @@ environment asks agents a question, and gives agent a **noisy score on its answe
 
 
 
+
+
 ## Planning 
 
 > 已经有 model，如何用这个 model 搞事情
 
-* prediction
-* control
+* prediction (给定一个 policy，计算在此 policy 情况下，Value 值)
+* control （寻找最优 policy）
+
+
 
 **MDP**
 
 * 五元组 <$\mathcal S,\mathcal A,\mathcal P,\mathcal R,\gamma$>
 * $\mathcal S$ : a finite set of states
 * $\mathcal A$: a finite set of actions
-* $\mathcal P$ : state transition probability matrix,  $\mathcal P_{ss'}^a = \mathbb P\Bigr[S_{t+1}=s'|S_t=s,A_t=a\Bigr]$
-* $\mathcal R$ : reward function $\mathcal R_s^a = \mathbb E\Bigr[R_{t+1}|S_t=s,A_t=a\Bigr]$
+* $\mathcal P$ : state transition probability matrix,  $\mathcal P_{ss'}^a = \mathbb P\Bigr[S_{t+1}=s'|S_t=s,A_t=a\Bigr]\tag{1}$
+* $\mathcal R$ : reward function $\mathcal R_s^a = \mathbb E\Bigr[R_{t+1}|S_t=s,A_t=a\Bigr] \tag{2}$
 * $\gamma$ : discount factor
 
 **return**
 $$
-G_t=R_{t+1}+R_{t+2}+... = \sum_{l=0} \gamma^lR_{t+l+1}
+G_t=R_{t+1}+R_{t+2}+... = \sum_{l=0} \gamma^lR_{t+l+1} \tag{3}
 $$
 **value function**
 
 state-value function
 $$
-v_\pi = \mathbb E\Bigr[G_t|S_t=s\Bigr]
+v_\pi = \mathbb E\Bigr[G_t|S_t=s\Bigr] \tag{4}
 $$
 action-value function
 $$
-q_\pi=\mathbb E\Bigr[G_t|S_t=s, A_t=a\Bigr]
+q_\pi=\mathbb E\Bigr[G_t|S_t=s, A_t=a\Bigr] \tag{5}
 $$
  **policy**
 $$
-\pi(a|s) = \mathbb P\Bigr[A_t=a|S_t=s\Bigr]
+\pi(a|s) = \mathbb P\Bigr[A_t=a|S_t=s\Bigr] \tag {6}
 $$
 
+**最优 policy**: 所有 policy 能获得最大 value 值的 policy
+$$
+v_\ast = \max_\pi v_\pi(s) \tag{7}
+$$
+
+$$
+q_\ast = \max_\pi q_\pi(s,a) \tag{8}
+$$
+
+
+
+## Bellman Equation
+
+**take one step look ahead**
+
+**bellman expectation equation: for prediction**
+
+![](../imgs/bellman_expection_1.png)
+
+
+
+![](../imgs/bellman_quation_2.png)
+
+
+
+**bellman optimality equation**
+
+![](../imgs/bellman_equation_3.png)
+
+![](../imgs/bellman_equation_4.png)
 
 ## reinforcement learning
 
