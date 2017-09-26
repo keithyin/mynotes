@@ -205,7 +205,11 @@ $$
 
 
 
+## Learning & Planning & Search
 
+* Learning : **model is unknown**, learn value function / policy from the experience
+* Planning : **model is known**, learn value function / policy from the model
+* Search : select the best action of current state by **lookahead**
 
 
 
