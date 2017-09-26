@@ -211,6 +211,11 @@ $$
 * Planning : **model is known**, learn value function / policy from the model
 * Search : select the best action of current state by **lookahead**
 
+**Search:** 另一种 Planning 的方法。
+
+* 不用求解整个 MDP， 只需求解 sub-MDP（from now on）
+* ​
+
 
 
 

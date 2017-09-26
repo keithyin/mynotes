@@ -1,5 +1,12 @@
 # MCTS summaries
 
+solve sub-MDP
+
+**key point**
+
+* forward search
+* sampling
+
 
 
 ## UCT
