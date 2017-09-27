@@ -2,7 +2,7 @@
 
 This repo is used to store my notes.
 
-## Deep Learning Taxonomy Summary
+## Machine Learning Taxonomy Summary
 
 [1]. [Deep Meta-Learning](https://medium.com/intuitionmachine/machines-that-search-for-deep-learning-architectures-c88ae0afb6c8)
 
