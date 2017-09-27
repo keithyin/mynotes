@@ -11,6 +11,16 @@ solve sub-MDP
 
 
 
+
+## MCTS 的优势在哪
+
+* 除了 search 算法，都是根据当前状态来 判断现在应该怎么办
+* search 从当前状态开始 search，看 哪个action 获得的 reward，就做哪个动作
+* 从未来获得的信息，总比过去积累的信息靠谱，毕竟这个世界很随机
+
+
+
+
 ## UCT
 
 **roll-out based Monte-Carlo planning algorithm**
@@ -48,6 +58,8 @@ solve sub-MDP
 
 * 每次到达一个 state ，都要执行一遍 Monte-Carlo tree search 吗
 * 之前 tree search 的保存的状态对 下一次的 tree search 有影响吗
+
+
 
 
 
