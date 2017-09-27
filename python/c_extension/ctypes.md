@@ -194,3 +194,9 @@ print(res)
 
 
 * **指定 argtypes 和 restype 只是为了 python 在传入C 代码时对参数进行一下预处理，当然也可以不指定 argtypes 和 restype**
+
+
+
+
+**ctypes 实现了一系列的类型转换方法，Python的数据类型会包装或直接推算为C类型，作为函数的调用参数；函数的返回值也经过一系列的包装成为Python类型。也就是说，PyObject* <-> C types的转换是由ctypes内部完成的。**
+
