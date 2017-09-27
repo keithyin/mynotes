@@ -17,8 +17,20 @@ solve sub-MDP
 
 * builds its lookahead tree by **repeatedly** sampling episodes from the initial state.
 * 每个 episode is a sequence of **state-action-reward** triplets that are obtained using the domains generative model.
-* The tree is built by adding the information gathered during an episode to it in an incremental manner.
+  * domains generative model ??????
+* The tree is built by adding the information gathered during an episode to it **in an incremental manner**.
 * ​
+
+**过程基本上是：采到底，然后给经历过的 state-action 赋值**
+
+
+
+**为什么用roll-out based algorithms**
+
+> allow us to **keep track of estimates of the action values** at the sampled states encountered in earlier episodes.
+
+
+
 
 
 
