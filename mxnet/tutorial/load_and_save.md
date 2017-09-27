@@ -14,7 +14,7 @@ c = a+b
 print(c.tojson()) # 打印出来 json 文件，看看里面是啥
 c.save('symbol-c.json') # 保存文件
 
-c2 = mx.sym.loas('symbol-c.json') # 夹在 json 文件，此时 c2 就代表一个 symbol
+c2 = mx.sym.loads('symbol-c.json') # 加载 json 文件，此时 c2 就代表一个 symbol
 ```
 
 ```json
