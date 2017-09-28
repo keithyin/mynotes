@@ -80,10 +80,10 @@ for epoch in range(5):
     train_iter.reset()
     metric.reset()
     for batch in train_iter:
-        mod.forward(batch, is_train=True)       # compute predictions
+        mod.forward(batch, is_train=True)       # 前向计算
         mod.update_metric(metric, batch.label)  # accumulate prediction accuracy
-        mod.backward()                          # compute gradients
-        mod.update()                            # update parameters
+        mod.backward()                          # 反向传导
+        mod.update()                            # 更新参数
     print('Epoch %d, Training %s' % (epoch, metric.get()))
 ```
 
