@@ -98,4 +98,6 @@ for epoch in range(5):
 关于 `forward`的参数
 
 * `data_batch` : 一个 `mx.io.DataBatch`-like 对象，只要一个对象，可以 `.data`返回 mini-batch 训练数据， `.label` 返回相应的标签，就可以作为 `data_batch` 的实参 。
+* 关于 `DataBatch`对象：`.data` 返回的是 list of NDArray（网络可能有多个输入数据），`.label` 也一样。
+
 
