@@ -23,6 +23,12 @@ solve sub-MDP
 
 ## UCT
 
+> Monte-Carlo planning is one of the few viable approaches to find near-optimal solutions.
+>
+> UCT : apply bandit ideas to guide Monte-Carlo planning.
+
+
+
 **roll-out based Monte-Carlo planning algorithm**
 
 * builds its lookahead tree by **repeatedly** sampling episodes from the initial state.
