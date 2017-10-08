@@ -151,6 +151,7 @@ def save_checkpoint(epoch, module, callback):
 sym, arg_params, aux_params = mx.model.load_checkpoint(model_prefix, 3)
 assert sym.tojson() == net.tojson()
 
+# 然后创建一个 module
 # assign the loaded parameters to the module
 mod.set_params(arg_params, aux_params)
 ```
