@@ -104,9 +104,41 @@ mod = mx.mod.Module(symbol=net)
 mod.fit(train_iter, num_epoch=5, epoch_end_callback=checkpoint)
 ```
 
-问题？：
+**如果不用 fit 的话，如何保存呢？**
 
-* 不用 fit 的话，怎么保存？
+先看下fit部分的代码
+
+```python
+# sync aux params across devices
+arg_params, aux_params = self.get_params()
+self.set_params(arg_params, aux_params)
+
+if epoch_end_callback is not None:
+    for callback in _as_list(epoch_end_callback):
+        callback(epoch, self.symbol, arg_params, aux_params)
+```
+
+我们只需要模拟这部分代码，手动调用 `callback` 就可以了
+
+```python
+# construct a callback function to save checkpoints
+model_prefix = 'mx_mlp'
+checkpoint = mx.callback.do_checkpoint(model_prefix)
+
+mod = mx.mod.Module(symbol=net)
+
+# ...
+mod.bind(...)
+
+# 调用这个函数来 保存参数就可以了
+def save_checkpoint(epoch, module, callback):
+    arg_params, aux_params = module.get_params()
+    module.set_params(arg_params, aux_params)
+    callback(epoch, module.symbol, arg_params, aux_params)
+```
+
+
+
 
 
 
@@ -122,4 +154,14 @@ assert sym.tojson() == net.tojson()
 # assign the loaded parameters to the module
 mod.set_params(arg_params, aux_params)
 ```
+
+
+
+## 参考资料
+
+[https://mxnet.incubator.apache.org/tutorials/basic/module.html#save-and-load](https://mxnet.incubator.apache.org/tutorials/basic/module.html#save-and-load)
+
+[https://mxnet.incubator.apache.org/tutorials/basic/ndarray.html#serialize-from-to-distributed-filesystems](https://mxnet.incubator.apache.org/tutorials/basic/ndarray.html#serialize-from-to-distributed-filesystems)
+
+[https://mxnet.incubator.apache.org/tutorials/basic/symbol.html#load-and-save](https://mxnet.incubator.apache.org/tutorials/basic/symbol.html#load-and-save)
 
