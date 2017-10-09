@@ -88,3 +88,9 @@ int MXNDArrayCreateEx(const mx_uint *shape,
 }
 ```
 
+
+
+## 参考资料
+
+[https://github.com/apache/incubator-mxnet/blob/53c6fa058d942f08e7e0134b55d26ab981f236aa/src/c_api/c_api.cc#L165](https://github.com/apache/incubator-mxnet/blob/53c6fa058d942f08e7e0134b55d26ab981f236aa/src/c_api/c_api.cc#L165)
+
