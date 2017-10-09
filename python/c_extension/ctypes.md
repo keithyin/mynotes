@@ -200,3 +200,13 @@ print(res)
 
 **ctypes 实现了一系列的类型转换方法，Python的数据类型会包装或直接推算为C类型，作为函数的调用参数；函数的返回值也经过一系列的包装成为Python类型。也就是说，PyObject* <-> C types的转换是由ctypes内部完成的。**
 
+
+
+## 参考资料
+
+[http://www.cnblogs.com/wuchang/archive/2010/04/04/1704456.html](http://www.cnblogs.com/wuchang/archive/2010/04/04/1704456.html)
+
+[https://zhuanlan.zhihu.com/p/23372572](https://zhuanlan.zhihu.com/p/23372572)
+
+[https://www.zhihu.com/question/23003213](https://www.zhihu.com/question/23003213)
+
