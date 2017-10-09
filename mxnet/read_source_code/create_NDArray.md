@@ -67,3 +67,24 @@ def _new_alloc_handle(shape, ctx, delay_alloc, dtype=mx_real_t):
     return hdl
 ```
 
+
+
+```c++
+// C++ 端
+int MXNDArrayCreateEx(const mx_uint *shape,
+                    mx_uint ndim,
+                    int dev_type,
+                    int dev_id,
+                    int delay_alloc,
+                    int dtype,
+                    NDArrayHandle *out) {
+  API_BEGIN();
+  *out = new NDArray(
+      TShape(shape, shape + ndim),
+      Context::Create(static_cast<Context::DeviceType>(dev_type), dev_id),
+      delay_alloc != 0,
+      dtype);
+  API_END();
+}
+```
+
