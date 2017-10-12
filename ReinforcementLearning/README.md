@@ -134,7 +134,7 @@ Policy 有两种属性：
 
 ## Value Function
 
-Value Function 有两种：
+Value Function 有两种： **目的是求 bellman equation**
 
 * state-value Function
 * action-value Function
