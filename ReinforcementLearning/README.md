@@ -241,6 +241,10 @@ $$
 * [path-wise derivative](http://www.mathfinance.cn/pathwise-derivative-vs-finite-difference-for-greeks-computation/)
 * ​stationary environment : 
 * changing environment :
+* episode: 从开始到结束一个的 trajectory
+* trajectory：轨迹，任意连续时刻都可以构成 trajectory
+
+
 
 
 
