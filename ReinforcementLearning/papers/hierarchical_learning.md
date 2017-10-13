@@ -55,6 +55,36 @@ $$
 
 
 
+
+
+## Hierarchical Deep RL: Integrating Temporal Abstraction and Intrinsic Motivation
+
+
+
+**abstract**
+
+> Learning goal-directed behavior in environment with sparse feedback is a major challenge for reinforcement learning algorithms.
+>
+> The primary difficulty arises due to **insufficient exploration**, result in an agent being unable to learn **robust value functions**.
+>
+> **Intrinsic motivated** agents can explore new behavior for its own sake rather than to directly solve problems.
+>
+> hierarchical-DQN, a framework to integrate 
+>
+> * hierarchical value functions, operating at different time-scales, 
+> * with intrinsically motivated deep reinforcement learning.
+>
+> 
+>
+> * a Top-level value function learns a policy over intrinsic goals, and
+> * a lower-level function learns a policy over atomic actions to satisfy the given goals
+>
+> 适用环境：
+>
+> * vary sparse, delayed feedback
+
+
+
 ## Questions
 
 * ​
@@ -65,3 +95,4 @@ $$
 
 * state occupancy
 * enable exploration at different time-scales
+* goal-directed behavior 
