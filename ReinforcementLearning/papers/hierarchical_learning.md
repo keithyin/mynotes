@@ -94,6 +94,41 @@ $$
 
 
 
+> Recently, value functions have also been generalized as $V(s,g)$ in order to represent the utility of state $s$ for achieving a given goal $g\in G$ .
+
+* $V(s,g)$ 用来表示，g 作为目标的值函数， 而不是基本的，$V(s)$ 代表到达终止状态的值函数
+* 也可以表述为：$g$ 作为 $V(s,g)$ 的终止状态，作为我们的目标
+
+
+
+> When the environment provides delayed rewards, we adopt a strategy to first learn ways to achieve intrinsically generated goals and subsequently learn an optimal policy to chain them together.
+
+* 就像，直接告诉你，你去变成一个成功人士，这很难，因为你要从广大的空间中去搜索成为成功人士所必须经过的路径。
+* 但是，这时候，有些人告诉你成功人士修炼路径上的几个 关键点，让你先达到这些关键点，然后在成为成功人士，这就简单的多了。可选的路径瞬间就下降了好几个数量级。
+* 问题在于：如何获得中间这几个关键点
+
+
+
+> a collection of these polices can be hierarchically arranged with temporal dynamics for learning or planning within the framework semi-Markov decision process.
+
+
+
+> We propose a framework with hierarchically organized deep reinforcement learning modules working **at different time-scales.** The model takes decisions over TWO levels of hierarchy:
+>
+> * top level module (*meta-controller*) takes in the state and picks a new goal
+> * the lower level module (*controller*) uses both the state and the chosen goal to select actions either until the goal is reached or the episode is terminated.
+
+* at different time-scales 指的是啥
+
+
+
+## 关于 Long-Range 的问题解决方法
+
+* 给 agent 先设定一个小目标
+* 用 tree-search 方法
+
+
+
 ## Questions
 
 * ​
