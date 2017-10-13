@@ -35,6 +35,26 @@ SR's appealing properties:
 
 
 
+
+
+
+**关于这篇文章的问题：**
+
+* $m_{sa}\cdot \mathbf w$ 用来表示 $Q(s,a)$ , $\phi_s\cdot \mathbf w$ 来表示 $R(s)$ , 至少也得是表示  $R(s,a)$ 吧！！！！
+
+
+$$
+Q^\pi(s,a) = \sum_{s'\in S}M(s,s',a)R(s') \tag1
+$$
+
+* 感觉 (1) 式是有问题的，MDP 的reward 是 $R(s,a)$ 啊，咋就变成了 $R(s)$
+
+![](../imgs/dsr.png)
+
+* 用 $R(s,a)$ 来表示 $R(s')$ ??????
+
+
+
 ## Questions
 
 * ​
@@ -44,4 +64,4 @@ SR's appealing properties:
 ## Glossary
 
 * state occupancy
-* ​
+* enable exploration at different time-scales
