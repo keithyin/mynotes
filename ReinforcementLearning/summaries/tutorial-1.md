@@ -244,7 +244,7 @@ $$
 
 ## Policy Gradient
 
-
+![](../imgs/pg_1.png)
 
 
 
@@ -281,11 +281,11 @@ $$
 
 [https://github.com/KeithYin/mynotes/blob/90731ba9895273e3d408bb7816c58572da14a292/ReinforcementLearning/papers/playingAtariWithDeepReinforcementLearning.md](https://github.com/KeithYin/mynotes/blob/90731ba9895273e3d408bb7816c58572da14a292/ReinforcementLearning/papers/playingAtariWithDeepReinforcementLearning.md)
 
-### DDPG
 
 
+### REINFORCE
 
-### alpha-go
+![](../imgs/reinforce.png)
 
 
 
@@ -297,3 +297,4 @@ $$
 
 [https://www.quora.com/What-is-the-difference-between-reinforcement-learning-and-planning](https://www.quora.com/What-is-the-difference-between-reinforcement-learning-and-planning)
 
+ 
