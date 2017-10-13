@@ -83,6 +83,15 @@ $$
 >
 > * vary sparse, delayed feedback
 
+**Introduction**
+
+> we propose  a framework that integrates 
+>
+> * deep reinforcement learning with 
+> * hierarchical value functions.
+>
+> where the agent is motivated to solve intrinsic goals (via learning options) to aid exploration.
+
 
 
 ## Questions
@@ -96,3 +105,4 @@ $$
 * state occupancy
 * enable exploration at different time-scales
 * goal-directed behavior 
+* multiple-level spatial-temporal abstraction 
