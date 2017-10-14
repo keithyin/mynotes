@@ -141,3 +141,5 @@ $$
 * enable exploration at different time-scales
 * goal-directed behavior 
 * multiple-level spatial-temporal abstraction 
+* intrinsic reward
+* extrinsic reward : 
