@@ -79,6 +79,18 @@ class HybridBlock(Block):
 * Block 设计目的就是 命令式。
 
 
+**看hybrid_forward的参数**
+
+```python
+def hybrid_forward(self, F, x, *args, **kwargs)
+```
+
+* `F` 用来表示 是 命令式运算符 还是 符号运算符
+  * `F=mx.nd` 或者 `F=mx.sym`
+* ​
+
+
+
 
 ## Block 与 HybridBlock
 
@@ -86,6 +98,9 @@ class HybridBlock(Block):
 
 * Block : 主要重写 `__init__` 和 `forward` 方法
 * HybridBlock ： 主要重写 `__init__` 和 `hybrid_forward` 方法
+
+
+
 
 
 
