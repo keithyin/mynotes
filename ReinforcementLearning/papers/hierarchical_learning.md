@@ -74,7 +74,7 @@ $$
 > * hierarchical value functions, operating at different time-scales, 
 > * with intrinsically motivated deep reinforcement learning.
 >
-> 
+>
 >
 > * a Top-level value function learns a policy over intrinsic goals, and
 > * a lower-level function learns a policy over atomic actions to satisfy the given goals
@@ -119,6 +119,51 @@ $$
 > * the lower level module (*controller*) uses both the state and the chosen goal to select actions either until the goal is reached or the episode is terminated.
 
 * at different time-scales 指的是啥
+  * meta-controller 和 controller 作用的时间范围不同
+
+
+
+
+**Literature Review**
+
+* semi-MDP
+
+> Using a notion of "salient events" as sub-goals.
+
+
+
+> DQNs have been successfully applied to various domains including Atari games and GO, but still perform poorly on environments with **sparse, delayed reward signals.** 
+>
+> Strategies such as **prioritized experience replay and bootstrapping** have been proposed to alleviate the problem of learning from sparse rewards.
+
+* sparse reward 用这两个算法还是没啥用
+* prioritized experience 怎么解决 sparse reward 问题的？？？？
+
+> Core knowledge
+
+
+
+**Model**
+
+> we utilize a notion of *goals* $g\in \mathcal G$, which provide intrinsic motivation for the agent.
+>
+> The agent focuses on setting and achieving sequences of goals in order to maximize cumulative extrinsic reward.
+
+
+
+* controller：给定 goal ，他去最大化 intrinsic cumulative reward
+* meta-controller : 选择 goal
+
+
+
+
+
+## Option Discovery in Hierarchical Reinforcement Learning using Spatial-Temporal Clustering
+
+
+
+
+
 
 
 

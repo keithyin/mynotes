@@ -9,4 +9,6 @@
   * the way in which something is regarded, understood, or interpreted.方法
 * cognition：认知
   * the **mental action** or process of acquiring knowledge and understanding through thought, experience, and the senses. 是个 大脑活动。有思考在里面的。
+* curse of dimensionality : [https://www.zhihu.com/question/27836140](https://www.zhihu.com/question/27836140)
+* ​
 
