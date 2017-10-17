@@ -160,6 +160,58 @@ $$
 
 ## Option Discovery in Hierarchical Reinforcement Learning using Spatial-Temporal Clustering
 
+**Skill Acquisition Framework**
+
+
+
+
+
+**Abstract**
+
+> Identifying a hierarchical description of the given task in terms of abstract states and extended actions between abstract states.
+
+
+
+> We use ideas from dynamic systems to find 
+>
+> * metastable regions in the state space and 
+> * associate them with abstract states.
+
+* 将系统中 相对稳定的状态 与 抽象的状态关联上
+
+
+
+> The spectral clustering algorithm **PCAA+** is used to identify suitable abstractions aligned to the underlying structure.
+
+* PCAA+ 用来学习 将 合适的抽象与底层的结构对齐
+
+
+
+> Skills are defined in terms of the sequence of actions that lead to transitions between such abstract states.
+
+* Skills 定义在 抽象状态之间, 
+* 抽象状态之间的 transition 才叫 Skill
+
+
+
+> The connectivity information from PCAA+ is used to **generate these skills or options.**
+
+* PCAA+ 是用来生成 Skill 的
+
+
+
+**Introduction**
+
+> The core idea of hierarchical reinforcement learning is to break down the reinforcement learning problem into **subtasks** through a **hierarchical of abstractions**.
+
+
+
+> 如果我们一直关注细粒度的 action 的话，那么我们很难对整体有个把握。
+
+
+
+
+
 
 
 
@@ -182,9 +234,10 @@ $$
 
 ## Glossary
 
-* state occupancy
-* enable exploration at different time-scales
-* goal-directed behavior 
-* multiple-level spatial-temporal abstraction 
-* intrinsic reward
-* extrinsic reward : 
+* state occupancy：
+* enable exploration at different time-scales：时间粒度不同
+* goal-directed behavior ：有小目标
+* multiple-level spatial-temporal abstraction ：时间粒度不同
+* intrinsic reward: 学习到的reward
+* extrinsic reward :  环境提供的 reward
+* state aggregation: 
