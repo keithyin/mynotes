@@ -2,7 +2,8 @@
 
 **需要注意的几点**
 
-* 类中定义的方法，调用不用方法的先后顺序。
+* 类中定义的方法，调用不用考虑方法的先后顺序。
+* 这是因为 C++ 标准。
 
 ```c++
 class LinkStack{
@@ -59,6 +60,23 @@ cout << stack << endl;
 delete stack;
 // stack 保存的指针还是有的
 cout << stack << endl;
+```
+
+
+
+
+
+```c++
+class Age {
+public:
+    Base *b = new Base;
+    int i = 0; // 这里可以给初始值
+    const int age = 10; //这里可以给初始值
+
+    Age() {
+        cout << "Age Constructor" << endl;
+    }
+};
 ```
 
 
