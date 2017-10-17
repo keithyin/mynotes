@@ -14,3 +14,27 @@
 ## tf.QueueRunner
 `The QueueRunner class is used to create a number of threads cooperating to enqueue tensors in the same queue.`
 `The QueueRunner class creates a number of threads that repeatedly run an enqueue op. These threads can use a coordinator to stop together.` 
+
+
+
+## 如何使用 tf 中 Queue 来保存 更复杂的数据
+
+当查看 tensorflow 中提供的 `Queue` 的类的时候，会发现有个 `dtypes` 参数，这个参数代表 `Queue` 中元素是什么类型的，如果 `dtypes=[tf.string, tf.int64]` ，这个表示，`Queue` 中每个元素是 `(string, int)` 。
+
+```python
+import tensorflow as tf
+
+queue = tf.FIFOQueue(capacity=100, dtypes=[tf.string, tf.int64])
+
+# enqueue_many 的写法，两个元素放在连个列表里。
+en_m = queue.enqueue_many([['hello', 'world'], [1, 2]])
+
+# enqueue 的写法
+en = queue.enqueue(['hello', 1])
+deq = queue.dequeue()
+
+with tf.Session() as sess:
+    sess.run(en_m)
+    print(sess.run(deq))
+```
+
