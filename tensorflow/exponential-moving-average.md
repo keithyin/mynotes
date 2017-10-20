@@ -102,3 +102,6 @@ saver = tf.train.Saver(variables_to_restore)
 ```
 # 参考资料
 [https://www.tensorflow.org/versions/master/api_docs/python/train/moving_averages](https://www.tensorflow.org/versions/master/api_docs/python/train/moving_averages)
+
+[https://en.wikipedia.org/wiki/Moving_average](https://en.wikipedia.org/wiki/Moving_average)
+
