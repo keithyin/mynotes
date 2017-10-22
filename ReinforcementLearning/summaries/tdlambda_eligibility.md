@@ -5,7 +5,7 @@
 
 
 * eligibility trace 方法是介于 TD(0) 和 MC 方法之间的方法
-* eligibility trace 方法提供了一个 使得 MC 方法可以用于 非 episode 问题的 实现
+* eligibility trace 方法提供了一个 使得 MC 方法可以用于 非 episode 问题
 
 
 
@@ -17,4 +17,9 @@
 
 
 
-eligibility traces 的机制就是一个 `short-term memory vector` $\mathbb e_t \in \mathbb R^n$ 
+eligibility traces 的机制就是一个 `short-term memory vector` $\mathbb e_t \in \mathbb R^n$ (`eligibility trace`)  that parallels the long term weight vector $\theta_t \in \mathbb R^n$ .
+
+
+
+> The rough idea is that when a component of $θ_t$ participates in producing an estimated value, then the corresponding component of $e_t$ is bumped up and then begins to fade away.
+

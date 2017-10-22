@@ -232,9 +232,11 @@ $$
 * Planning：根据 model 构建一个 value function 或者 policy。（model已知哦）
 * on-policy： evaluate or improve the behavior policy
 * off-policy ：从 behavior policy 形成的 traces 中学习 自己的最优 policy
-* model-free： agent 直接从 experience 中学习，model未知（不知道 状态转移矩阵）
 * on-line mode：training algorithms are executed on data acquired in sequence。
-* off-line mode：也叫 batch mode，并不是看到一个样本就训练。
+* off-line mode：也叫 batch mode，并不是看到一个样本就训练。完成一个 epoch 再更新也叫 off-line
+* model-free： agent 直接从 experience 中学习，model未知（不知道 状态转移矩阵）
+
+
 * episodic：环境有个终止状态（而且一定会到达这个终止状态）
 * non-episodic： 环境没有终止状态（或者不会到达一个终止状态）（MC的方法歇菜）
 * reparameterization trick : [https://www.quora.com/What-is-the-reparameterization-trick-in-variational-autoencoders](https://www.quora.com/What-is-the-reparameterization-trick-in-variational-autoencoders)
