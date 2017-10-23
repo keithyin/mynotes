@@ -253,7 +253,7 @@ $$
 
 * 对期望求导时，将期望改成 求和形式
 * score function
-* 。。。
+* 将对 trajectory 的操作变成对 state-action 的操作。 
 
 
 
