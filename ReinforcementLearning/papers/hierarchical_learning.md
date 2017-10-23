@@ -217,8 +217,6 @@ $$
 
 
 
-
-
 ## 关于 Long-Range 的问题解决方法
 
 * 给 agent 先设定一个小目标
@@ -228,7 +226,15 @@ $$
 
 ## Questions
 
-* ​
+
+
+## 总结
+
+层次强化学习的两个问题：
+
+* 如何获取 sub-goal
+* sub-goal 内如何操作
+
 
 
 
@@ -241,3 +247,4 @@ $$
 * intrinsic reward: 学习到的reward
 * extrinsic reward :  环境提供的 reward
 * state aggregation: 
+* skill：一个 序列，在抽象状态之间 转移的序列。
