@@ -21,6 +21,8 @@ torch.cat(seq, dim=0, out=None) -> Tensor
 
 
 
+
+
 ```python
 torch.chunk(tensor, chunks, dim=0) -> list of Tensor
 # 将tensor 沿着给定的 dim 分割成 chunks 块
@@ -35,13 +37,14 @@ torch.chunk(tensor, chunks, dim=0) -> list of Tensor
 ```python
 torch.gather(input, dim, index, out=None) -> Tensor
 # Gathers values along an axis specified by dim.
-# 通过 index 和 dim 从 input 中挑值
+# 通过 index 和 dim 从 input 中挑值，!! 挑的是标量
+# index 的维度 与 input 的维度要一致
+# 返回值的 shape 与 index 的 shape 一致
+# ！！此接口应该是 通过遍历 index 来进行的赋值操作！！
 # 官网中一个 3-D input 的例子
 out[i][j][k] = input[index[i][j][k]][j][k]  # if dim == 0
 out[i][j][k] = input[i][index[i][j][k]][k]  # if dim == 1
 out[i][j][k] = input[i][j][index[i][j][k]]  # if dim == 2
-# 注意：index 和 input 的维度一定要一致，但 shape 不需要一致，
-# index 的 shape 和输出 tensor 的 shape 是一致的
 ```
 
 
@@ -52,5 +55,46 @@ torch.index_select(input, dim, index, out=None) -> Tensor
 # input：要被挑值的 tensor
 # dim：int 指定维度
 # index：1D LongTensor 包含要挑的索引
+# ！！此接口应该是 通过遍历 index 来进行的赋值操作！！
+out[i, :, :] = input[index[i], :, :]  # if dim == 0
+out[:, i,: ] = input[:, index[i], :]  # if dim == 1
+out[:, :, i] = input[:, :, index[i]]  # if dim == 2
 ```
 
+
+
+```python
+Tensor.masked_scatter_(mask, source)
+# copies element from source into this tensor at positions where the mask is one
+# mask : ByteTensor
+# source : Tensor
+```
+
+
+
+```python
+Tensor.scatter_(dim, index, src)
+# writes ALL values from src into self at indices specified in the index
+# index，self，src 的维度是一致的。
+# ！！此接口应该是 通过遍历 index 来进行的赋值操作！！
+out[index[i, j]][j] = src[i][j]  # if dim == 0
+out[i][index[i, j]] = src[i][j]  # if dim == 1
+```
+
+
+
+
+
+
+
+## 对比
+
+**`torch.gather` 与 `torch.index_select`**
+
+* `torch.gather` 提供更加细粒度的操作
+
+
+
+**`torch.gather` 与 `Tensor.scatter_`**
+
+* `index` 参数 影响的 位置不同。
