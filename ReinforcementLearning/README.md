@@ -245,6 +245,9 @@ $$
 * changing environment :
 * episode: 从开始到结束一个的 trajectory
 * trajectory：轨迹，任意连续时刻都可以构成 trajectory
+* revealed information :  揭露的信息
+* side information ：(additional variables that are not predicted, but are related to variables that are predicted)
+* ​
 
 
 
