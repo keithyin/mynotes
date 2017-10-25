@@ -20,3 +20,12 @@ $\mathbb p=(p_1, ..., p_m)\in \mathbb R^{m*f}$ : 输入序列的 绝对位置 em
 
 $\mathbb e = (w_1+p_1, ..., w_m+p_m)$ : 表示终极版
 
+$\mathbb z^l = (z^l_1, ..., z^l_m)$ : encoder 第 $l$ 层的输出
+
+$\mathbb h^l = (h^l_1, ..., h^l_n)$ : decoder 第 $l$ 层的 输出
+
+
+
+**Block**
+
+* one dimensional convolution followed by a non-linearity
