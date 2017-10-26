@@ -29,3 +29,11 @@ $\mathbb h^l = (h^l_1, ..., h^l_n)$ : decoder 第 $l$ 层的 输出
 **Block**
 
 * one dimensional convolution followed by a non-linearity
+
+
+
+## 问题：
+
+* 为什么会加速
+* position embedding 有什么意义
+
