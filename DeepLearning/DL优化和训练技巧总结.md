@@ -38,5 +38,13 @@
 * 大规模数据
 
 
-
 本文认为ReLU在模型精度的增长过程中也扮演这非常重要的角色。
+
+
+
+## 3. Momentum
+
+用到了， moving average。重点是 $\frac{1}{1-\gamma}$ , 这个决定是对于过去的多少个 step 做 **ema**. 越大越平滑！
+$$
+s^t = (1-\gamma)s^t + \gamma s^{t-1}
+$$
