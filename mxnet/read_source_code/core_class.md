@@ -12,7 +12,11 @@
 
 > 计算的基本数据类型
 
-* ​
+* [`NDArray`](https://github.com/apache/incubator-mxnet/blob/master/include/mxnet/ndarray.h#L69)
+
+
+> TBlob 的 要给 wrapper？？？？
+
 
 
 
