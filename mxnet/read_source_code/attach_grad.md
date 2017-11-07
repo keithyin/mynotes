@@ -42,6 +42,7 @@ _GRAD_REQ_MAP = {
 
 
 ```c
+// 给 NDArray 搞上了梯度？？？
 int MXAutogradMarkVariables(mx_uint num_var,
                             NDArrayHandle *var_handles,
                             mx_uint *reqs_array,
@@ -49,6 +50,7 @@ int MXAutogradMarkVariables(mx_uint num_var,
   API_BEGIN();
   std::vector<NDArray*> variables, gradients;
   std::vector<mx_uint> grad_reqs;
+  // Requests that the vector capacity be at least enough to contain n elements.
   variables.reserve(num_var);
   gradients.reserve(num_var);
   grad_reqs.reserve(num_var);
@@ -61,4 +63,16 @@ int MXAutogradMarkVariables(mx_uint num_var,
   API_END();
 }
 ```
+
+
+
+
+
+
+
+## 参考资料
+
+[https://github.com/apache/incubator-mxnet/blob/master/include/mxnet/imperative.h#L1](https://github.com/apache/incubator-mxnet/blob/master/include/mxnet/imperative.h#L1)
+
+[https://github.com/apache/incubator-mxnet/blob/master/src/imperative/imperative.cc](https://github.com/apache/incubator-mxnet/blob/master/src/imperative/imperative.cc)
 
