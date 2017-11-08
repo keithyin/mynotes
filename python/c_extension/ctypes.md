@@ -24,6 +24,7 @@ import sys
 
 _file = '_example.so'
 _path = os.path.join(sys.path[0], _file)
+# 加载动态库
 _mod = ctypes.cdll.LoadLibrary(_path)
 ```
 
@@ -31,7 +32,7 @@ _mod = ctypes.cdll.LoadLibrary(_path)
 
 ## 要考虑的问题 
 
-* 参数类型的对应
+* python 与 c 的数据类型的转换
 * 函数如何对应起来
 * python 对象和 C 的哪个部分对应起来
 
@@ -42,7 +43,62 @@ _mod = ctypes.cdll.LoadLibrary(_path)
 * ​
 
 
-## 例子
+## python与C数据类型转换
+
+因为涉及到了两个语言，所以涉及到不同语言之间类型 映射的问题， `ctypes` 采用 "中间类型" 的方式为 `python` 和 `C` 搭建起了桥梁。
+
+![](../imgs/python_c_ctypes.jpg)
+
+> `ctypes.c_bool, .....` 在 `python` 中是个类。
+
+
+
+**python 类型的值 到 ctype 类型的值**
+
+```python
+# 10 本来是 python.int, 经过这一句之后，就变成了 ctypes.c_int, 然后就可以给 C 函数了
+val = ctypes.c_int(10)
+```
+
+
+
+**C类型的值 到 ctype 类型的值**
+
+```python
+# c_function() 返回的值本来是 C int, 但是通过包装之后，就变成了 ctypes.c_int, python中可以直接操作。
+val = ctypes.c_int(_LIB.c_function())
+```
+
+
+
+**上面的列表中，仅仅罗列了一些 基本的数据类型，那么对于指针类型，应该怎么操作呢？**
+
+```python
+# 如果想要一个 int* 形式的中间类型。
+# python 中是不包含指针这个概念的，只有 C 中才有指针这个概念，如果 C 的形参有个指针类型，应该怎么操作呢？
+# 用 ctypes.POINTER() 创建一个指针类型。c_int_p 是一个崭新的类型
+c_int_p = ctypes.POINTER(ctypes.c_int) 
+```
+
+
+
+**如何操作数组呢？？？？**
+
+```python
+# 如何创建一个 ctypes 的中间类型用来表示数组
+array=ctypes.c_double * len(param)
+
+# 如何给这个数组赋值
+val = array(*list_val), # 这个传给 C 就可以操作了。
+```
+
+
+
+
+
+
+
+
 
 **int 类型** `int ---> ctypes.c_int`
 
@@ -131,7 +187,7 @@ class DoubleArrayType(object):
             raise ValueError('Type Error')
 
     def from_list(self, param):
-        # ((ctypes.c_double * len(param)) 创建了个类，然后实例化了一个对象
+        # ctypes.c_double * len(param) 创建了个新的类，然后实例化了一个对象
         val = ((ctypes.c_double * len(param))(*param))
         return val
 
