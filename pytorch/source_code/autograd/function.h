@@ -51,6 +51,7 @@ struct FunctionFlags {
   bool is_volatile = false;
   // What functions take the output of this function as input.
   // There is one function per output of this function.
+  // 没搞懂这玩意是用来干嘛的？？？ 用来 前向传导， 还是反向的时候？？？？
   function_list next_functions;
 };
 
