@@ -102,11 +102,14 @@ struct Function : std::enable_shared_from_this<Function> {
 
   // Computes is_executable, is_volatile, and next_functions from a list
   // of input variables
+  // 通过 输入的 Variables 计算 函数 is_executable, is_volatile, next_functions
+  // 输入的 Variables 怎么计算 next_functions, 奥奥，是计算产生 inputs Variables 的 函数的 next_functions 
   static FunctionFlags flags(const variable_list& inputs);
   static FunctionFlags flags(const std::initializer_list<Variable>& inputs);
   static FunctionFlags flags(at::TensorList inputs);
 
   // Releases saved variables if the operation won't be reused
+  // 用于释放 变量的 存储空间
   virtual inline void releaseVariables() {}
 
   // Function name for debugging
@@ -125,7 +128,8 @@ struct Function : std::enable_shared_from_this<Function> {
     }
     return false;
   }
-
+  
+  // 这个是用来 干嘛的 ？？？
   inline bool should_compute_output(std::initializer_list<int> idxs) const {
     return std::any_of(idxs.begin(), idxs.end(), [this](int i) {
       return should_compute_output(i);
@@ -161,7 +165,9 @@ struct Function : std::enable_shared_from_this<Function> {
 
   static void setUpContextEdge(jit::Node* this_node, int ctx_output_nr,
                                const variable_list& inputs, const variable_list& outputs);
+  
 
+  // 属性的声明
   int num_inputs;
   function_list next_functions;
   bool is_executable;
@@ -177,6 +183,7 @@ struct Function : std::enable_shared_from_this<Function> {
 // Actually what is a ForwardFunction here applies to all functions that are
 // applied only in forward OR are backward closures that don't save any Variables.
 // I chose this name, because the second situation is quite rare.
+// 不需要保存 变量 用于 反向传导的函数。
 template<bool transparent_state = false>
 struct ForwardFunction : public Function {
   using Function::Function;
