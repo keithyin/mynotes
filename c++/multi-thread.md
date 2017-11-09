@@ -170,6 +170,99 @@ int main(){
 
 
 
+**condition_variable**
+
+> A *condition variable* is an object able to block the calling thread until *notified* to resume.
+>
+> 当 cv的 wait 方法被调用时，它使用 `unique_lock (over mutex)` 来锁住线程。直到其它线程 调用 `notification method` 来将其唤醒。
+
+```c++
+// condition_variable example
+#include <iostream>           // std::cout
+#include <thread>             // std::thread
+#include <mutex>              // std::mutex, std::unique_lock
+#include <condition_variable> // std::condition_variable
+
+std::mutex mtx;
+std::condition_variable cv;
+bool ready = false;
+
+void print_id (int id) {
+  std::unique_lock<std::mutex> lck(mtx);
+  while (!ready) cv.wait(lck); // 使用 unique_lock (over mutex) 来将其锁住
+  // ...
+  std::cout << "thread " << id << '\n';
+}
+
+void go() {
+  std::unique_lock<std::mutex> lck(mtx);
+  ready = true;
+  cv.notify_all();
+}
+
+int main ()
+{
+  std::thread threads[10];
+  // spawn 10 threads:
+  for (int i=0; i<10; ++i)
+    threads[i] = std::thread(print_id,i);
+
+  std::cout << "10 threads ready to race...\n";
+  go();                       // go!
+
+  for (auto& th : threads) th.join();
+
+  return 0;
+}
+```
+
+**unique_lock**
+
+>  unique_lock内部持有mutex的状态：locked,unlocked。unique_lock比lock_guard占用空间和速度慢一些，因为其要维护mutex的状态。
+>
+> 构造函数中加锁，
+>
+> 析构函数中解锁。 当然也可以灵活操作。
+
+```c++
+// unique_lock example
+#include <iostream>       // std::cout
+#include <thread>         // std::thread
+#include <mutex>          // std::mutex, std::unique_lock
+
+std::mutex mtx;           // mutex for critical section
+
+void print_block (int n, char c) {
+  // critical section (exclusive access to std::cout signaled by lifetime of lck):
+  std::unique_lock<std::mutex> lck (mtx);
+  for (int i=0; i<n; ++i) { std::cout << c; }
+  std::cout << '\n';
+}
+
+int main ()
+{
+  std::thread th1 (print_block,50,'*');
+  std::thread th2 (print_block,50,'$');
+
+  th1.join();
+  th2.join();
+
+  return 0;
+}
+```
+
+```
+Possible output (order of lines may vary, but characters are never mixed):
+**************************************************
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+```
+
+
+
+
+
+
+
 ## join detach
 
 一旦线程启动，我们可以通过 `join` 让代码知道我们是想 等待这个线程执行完，或者通过 `detach` 告诉代码让这个线程自己玩。如果没有显式的做 `join` 或 `detach` 工作的话，`std::thread` 对象会随着 主线程的执行完毕而被销毁（这时 `std::thread` 代表的线程可能还没有执行完，会报错）。
@@ -215,6 +308,14 @@ int main()
 [http://www.bogotobogo.com/cplusplus/multithreaded4_cplusplus11.php](http://www.bogotobogo.com/cplusplus/multithreaded4_cplusplus11.php)
 
 [http://www.bogotobogo.com/cplusplus/C11/7_C11_Thread_Sharing_Memory.php](http://www.bogotobogo.com/cplusplus/C11/7_C11_Thread_Sharing_Memory.php)
+
+[http://www.cplusplus.com/reference/condition_variable/condition_variable/](http://www.cplusplus.com/reference/condition_variable/condition_variable/)
+
+[http://www.cplusplus.com/reference/mutex/unique_lock/](http://www.cplusplus.com/reference/mutex/unique_lock/)
+
+[http://blog.csdn.net/liuxuejiang158blog/article/details/17263353](http://blog.csdn.net/liuxuejiang158blog/article/details/17263353)
+
+
 
 
 
