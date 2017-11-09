@@ -172,6 +172,8 @@ int main(){
 
 **condition_variable**
 
+[https://www.cnblogs.com/haippy/p/3252041.html](https://www.cnblogs.com/haippy/p/3252041.html)
+
 > A *condition variable* is an object able to block the calling thread until *notified* to resume.
 >
 > 当 cv的 wait 方法被调用时，它使用 `unique_lock (over mutex)` 来锁住线程。直到其它线程 调用 `notification method` 来将其唤醒。
@@ -188,9 +190,11 @@ std::condition_variable cv;
 bool ready = false;
 
 void print_id (int id) {
-  std::unique_lock<std::mutex> lck(mtx);
-  while (!ready) cv.wait(lck); // 使用 unique_lock (over mutex) 来将其锁住
-  // ...
+  // unique_lock 这个创建对象的时候，就已经调用了 mtx.lock() 
+  std::unique_lock<std::mutex> lck(mtx); 
+  while (!ready)  // 如果标志位不为 true ，则等待！！！ 由 cv.wait(lck) 阻塞
+    cv.wait(lck); // 当 mtx locked 时， 该函数会 调用 lck.unlock() 释放锁。
+    // 在被唤醒时， lck 被设置为 进入 wait 之前的 状态！！！
   std::cout << "thread " << id << '\n';
 }
 
@@ -216,13 +220,15 @@ int main ()
 }
 ```
 
+
+
 **unique_lock**
 
 >  unique_lock内部持有mutex的状态：locked,unlocked。unique_lock比lock_guard占用空间和速度慢一些，因为其要维护mutex的状态。
 >
-> 构造函数中加锁，
+>  构造函数中加锁，
 >
-> 析构函数中解锁。 当然也可以灵活操作。
+>  析构函数中解锁。 当然也可以灵活操作。
 
 ```c++
 // unique_lock example
