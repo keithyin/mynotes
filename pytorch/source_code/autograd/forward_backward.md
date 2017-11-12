@@ -116,7 +116,7 @@ res = c+d
 
 **等到 ready_queue 中没有 FunctionTask 了，backward过程也就完成了**
 
-[详细代码](https://github.com/pytorch/pytorch/tree/v0.2.0/torch/csrc/autograd)
+[详细代码](https://github.com/KeithYin/pytorch/tree/master/torch/csrc/autograd)
 
 `backward` 过程用到的一些 数据结构
 
