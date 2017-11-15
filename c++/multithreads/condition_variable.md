@@ -58,7 +58,7 @@ int main ()
 
 
 
-**wait(lck)**
+**wait(lck)** : 这个 lck 的意义就是，如果 wait 开始向下执行，就将 lck 设置成 lock 状态
 
 * 调用时，如果 `lck` 为 `locked` 则， 执行`lck.unlock()`
 * 被 notify 时： 会调用 `lck.lock()` 使得 `lck` 回到 调用 `wait` 之前的状态
@@ -126,4 +126,16 @@ int main ()
 }
 
 ```
+
+
+
+
+
+
+
+## 参考资料
+
+[https://www.cnblogs.com/haippy/p/3237213.html](https://www.cnblogs.com/haippy/p/3237213.html)
+
+
 
