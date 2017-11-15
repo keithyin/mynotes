@@ -351,7 +351,9 @@ def default_collate(batch):
         if _use_shared_memory:
             # If we're in a background process, concatenate directly into a
             # shared memory tensor to avoid an extra copy
+            # 计算 batch 中所有 元素的个数 
             numel = sum([x.numel() for x in batch])
+            # 没有找到对应的 api 。。。。。。
             storage = batch[0].storage()._new_shared(numel)
             out = batch[0].new(storage)
         return torch.stack(batch, 0, out=out)
@@ -386,7 +388,7 @@ def default_collate(batch):
 
 ## 总结
 
-* 内存中最多有 `2*num_worker` 个 `batch`
+* `data_queue` 中最多有 `2*num_worker` 个 `batch`
 * ​
 
 
