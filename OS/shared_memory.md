@@ -22,6 +22,13 @@
 
 [https://www.ibm.com/developerworks/cn/linux/l-ipc/part5/index2.html?ca=drs-](https://www.ibm.com/developerworks/cn/linux/l-ipc/part5/index2.html?ca=drs-)
 
+## Linux 共享内存
+
+* 通过 mmap 映射普通文件 来共享内存
+* ​
+
+
+
 ## linux mmap
 
 > mmap()系统调用 使得进程之间通过映射同一个普通文件实现共享内存。普通文件被映射到进程地址空间后，进程可以向**访问普通内存**一样对文件进行访问，不必再调用read()，write（）等操作。
@@ -34,6 +41,7 @@
 
 * `fd`：  为即将映射到进程空间的文件描述字，一般由open()返回。fd也可以指定为-1，此时须指定flags参数中的MAP_ANON，表明进行的是匿名映射（不涉及具体的文件名，避免了文件的创建及打开，很显然只能用于具有亲缘关系的进程间通信）。
 * `len`： 是映射到调用进程地址空间的字节数，它从被映射文件开头offset个字节开始算起。
+  * 这个值有什么约束吗？随便吧，应该是
 * `prot`：  参数指定共享内存的访问权限。可取如下几个值的或：PROT_READ（可读） , PROT_WRITE （可写）, PROT_EXEC （可执行）, PROT_NONE（不可访问）。
 * `flags`： 由以下几个常值指定：MAP_SHARED , MAP_PRIVATE , MAP_FIXED，其中，MAP_SHARED , MAP_PRIVATE必选其一，而MAP_FIXED则不推荐使用。
 * `offset`： 参数一般设为0，表示从文件头开始映射。
@@ -107,7 +115,98 @@ void *ptr=mmap(NULL, len , PROT_READ|PROT_WRITE, MAP_SHARED , fd , 0);
 * 这样，两个进程通过命令行参数指定同一个文件来实现共享内存方式的进程间通信。
 
 
+```c
+// file1.c
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+typedef struct{
+  char name[4];
+  int  age;
+}people;
+main(int argc, char** argv) // map a normal file as shared mem:
+{
+  int fd,i;
+  people *p_map;
+  char temp;
+   
+  fd=open(argv[1],O_CREAT|O_RDWR|O_TRUNC,00777);
+  // 系统调用 lseek， 有增加文件大小的功能。通过移动当前指针和 写一个值。
+  lseek(fd,sizeof(people)*5-1,SEEK_SET);
+  write(fd,"",1);
+  
+  p_map = (people*) mmap( NULL,sizeof(people)*10,PROT_READ|PROT_WRITE,
+        MAP_SHARED,fd,0 );
+  // 映射了之后，就可以关闭文件了， 什么原理？
+  close( fd );
+  temp = 'a';
+  for(i=0; i<10; i++)
+  {
+    temp += 1;
+    memcpy( ( *(p_map+i) ).name, &temp,2 );
+    ( *(p_map+i) ).age = 20+i;
+  }
+  printf(" initialize over \n ")；
+  sleep(10);
+  munmap( p_map, sizeof(people)*10 );
+  printf( "umap ok \n" );
+}
+```
 
+[http://blog.csdn.net/huangshanchun/article/details/46731401](http://blog.csdn.net/huangshanchun/article/details/46731401)
+
+```c
+// file2.c
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+typedef struct{
+  char name[4];
+  int  age;
+}people;
+main(int argc, char** argv)  // map a normal file as shared mem:
+{
+  int fd,i;
+  people *p_map;
+  fd=open( argv[1],O_CREAT|O_RDWR,00777 );
+  p_map = (people*)mmap(NULL,sizeof(people)*10,PROT_READ|PROT_WRITE,
+       MAP_SHARED,fd,0);
+  for(i = 0;i<10;i++)
+  {
+  printf( "name: %s age %d;\n",(*(p_map+i)).name, (*(p_map+i)).age );
+  }
+  munmap( p_map,sizeof(people)*10 );
+}
+```
+
+
+
+## shm....
+
+[为什么使用 shm_open 而不是 open](https://stackoverflow.com/questions/24875257/why-use-shm-open)
+
+```c
+int shm_open(const char *name, int oflag, mode_t mode);
+```
+
+* 创建和打开一个新的 ， 或者打开一个已经存在的 **POSIX shared memory object**
+* POSIX shared memory object 实际上就是一个 句柄， 可以被 `mmap` 使用。
+* a shared memory object should be identified by a name of the form `/somename`;
+
+
+```c
+int shm_unlink(const char *name);
+```
+
+* 移除 `POSIX shared memory object`
+
+[编译出错请看](https://stackoverflow.com/questions/9923495/undefined-reference-shm-open-already-add-lrt-flag-here)
+
+[一些 demo](http://www.cse.psu.edu/~deh25/cmpsc473/notes/OSC/Processes/shm.html)
+
+[http://www.justskins.com/forums/shm_open-vs-open-253314.html](http://www.justskins.com/forums/shm_open-vs-open-253314.html)
 
 
 
