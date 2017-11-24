@@ -1,12 +1,18 @@
 # C++11 特性总结
 
-* `lambda` 表达式
+* [lambda](#lambda)
+* [function class](#function)
+* [enum class](#enum class)
+
+## lambda
 
 > 当我们编写了一个 `lambda` 后，编译器将该 表达式 翻译成一个 未命名类的未命名对象。
 
 
 
-* `function` 类 ，在 `functional` 头文件中
+## function
+
+头文件 `functional` 中
 
 > C++ 中的可调用对象：
 >
@@ -40,7 +46,6 @@ struct divide{
     return denominator / divisor;
   }
 }
-
 ```
 
 > 上面这些函数对象 的类型各不相同， 但是它们共享一种调用形式：`int(int, int)`
@@ -71,3 +76,18 @@ int (*fp1)(int, int) = add;
 function<int(int, int)> f = fp1;
 ```
 
+
+
+## enum class
+
+[http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2347.pdf](http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2007/n2347.pdf)
+
+enum 的问题：
+
+* 容易隐式转换成 int 值
+* 。。。
+* 。。。
+
+`enum class` ：
+
+* 强类型的，不会隐式转换了。
