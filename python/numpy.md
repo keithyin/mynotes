@@ -81,3 +81,5 @@ indiced_val = val[1:-1:3]  # [begin:end:step]
 
   生成一个 shape 为 `[2, height, width]` 的 `ndarray`，`height` 由第一个参数决定，`width` 由第二个参数决定。 第一个参数按列排，第二个参数按行排。
 
+* np.meshgrid
+
