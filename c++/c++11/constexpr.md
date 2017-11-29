@@ -114,7 +114,7 @@ private:
 int main(){
   constexpr Debug d{true, true}; // 是 constexpr 变量
   bool flag = true;
-  constexpr Debug d2{flag}; // 不是 constexpr 变量，会报错。
+  constexpr Debug d2{flag}; // 不是 constexpr 变量，会报错。git
 }
 ```
 
