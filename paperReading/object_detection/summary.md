@@ -173,6 +173,28 @@ $$
 
 
 
+
+
+## R-FCN
+
+**key contribution:**
+
+* 减小了 Faster-RCNN 第二个 stage 的开销。将 ROIpooling 层尽量的延后
+* 提出了 `potition-sensitive score maps` , 这个的核心思想是，当前 `feature map` 预测 上个 `feature map` 各 `cell` 的类别信息。感觉像是 位置 回溯。 **这个回溯能不能再往前一点呢？ 类比一下 RL 的 take n step look ahead**
+
+
+
+**阅读过程中思考的几个问题**
+
+* 既然，`position-sensitive score map` 预测 之前一个 `feature-map` 各个 `cell` 的类别，那为什么 不直接 用前一个 `feature-map` 来预测 各个 `cell` 的类别呢？
+  * 考虑结果：  用前一个 `feature-map` 预测 `cell` 类别，和 用 `position-sensitive score map` 预测类别相比，等于 管中窥豹。
+
+**一些困惑：**
+
+* 对 `Position-sensitive RoI pooling` 实现方式很不解，感觉不该像原文那么操作。
+
+
+
 ## NMS (Non-Maximum Suppression)
 
 [代码来自](http://www.pyimagesearch.com/2014/11/17/non-maximum-suppression-object-detection-python/)
