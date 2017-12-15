@@ -128,3 +128,97 @@ class Block(object):
 
 
 
+## `_BlockScope`
+
+`_BlockScope` 相当于 tf 的 `VariableScope`， `NameManager` 等价于 tf 的 `NameScope`。
+
+上下文管理器。
+
+```python
+class _BlockScope(object):
+    """Scope for collecting child `Block` s."""
+    # 用来保存当前 的 Scope
+    _current = None
+
+    def __init__(self, block):
+        self._block = block
+        self._counter = {}
+        self._old_scope = None
+        self._name_scope = None
+
+    @staticmethod
+    def create(prefix, params, hint):
+        """Creates prefix and params for new `Block`."""
+        current = _BlockScope._current
+        if current is None:
+            if prefix is None:
+                prefix = _name.NameManager.current.get(None, hint) + '_'
+            if params is None:
+                # 这里可以看出，参数是在 BlockScope 下创建的。
+                params = ParameterDict(prefix)
+            else:
+                params = ParameterDict(params.prefix, params)
+            return prefix, params
+
+        if prefix is None:
+            count = current._counter.get(hint, 0)
+            prefix = '%s%d_'%(hint, count)
+            current._counter[hint] = count + 1
+        if params is None:
+            parent = current._block.params
+            params = ParameterDict(parent.prefix+prefix, parent._shared)
+        else:
+            params = ParameterDict(params.prefix, params)
+        return current._block.prefix+prefix, params
+    # 执行 enter 的时候，_current 替换
+    def __enter__(self):
+        if self._block._empty_prefix:
+            return
+        self._old_scope = _BlockScope._current
+        _BlockScope._current = self
+        self._name_scope = _name.Prefix(self._block.prefix)
+        # name scope 手动进入。
+        self._name_scope.__enter__()
+        return self
+	# 执行 exit 的时候，_current 换回
+    def __exit__(self, ptype, value, trace):
+        if self._block._empty_prefix:
+            return
+        # 退出 name_scope
+        self._name_scope.__exit__(ptype, value, trace)
+        self._name_scope = None
+        _BlockScope._current = self._old_scope
+```
+
+
+
+## ParameterDict
+
+用来存放 参数的 类。用 `OrderedDict()` 保存着 `Block` 下的 `Parameter`。
+
+
+
+```python
+class ParameterDict(object):
+    """A dictionary managing a set of parameters.
+
+    Parameters
+    ----------
+    prefix : str, default ``''``
+        The prefix to be prepended to all Parameters' names created by this dict.
+    shared : ParameterDict or None
+        If not ``None``, when this dict's :py:meth:`get` method creates a new parameter,
+        will first try to retrieve it from "shared" dict. Usually used for sharing
+        parameters with another Block.
+        用来共享 Parameter 的。
+    """
+    def __init__(self, prefix='', shared=None):
+        self._prefix = prefix
+        self._params = OrderedDict()
+        self._shared = shared
+```
+
+
+
+
+
