@@ -102,5 +102,29 @@ def hybrid_forward(self, F, x, *args, **kwargs)
 
 
 
+## Block 细节
+
+**name_scope是干嘛的？**
+
+[http://zh.gluon.ai/chapter_gluon-basics/block.html#%E4%BD%BF%E7%94%A8-nn.Block-%E6%9D%A5%E5%AE%9A%E4%B9%89](http://zh.gluon.ai/chapter_gluon-basics/block.html#%E4%BD%BF%E7%94%A8-nn.Block-%E6%9D%A5%E5%AE%9A%E4%B9%89)
+
+看一下 `nn.Block` 源码
+
+```python
+class Block(object):
+    def __init__(self, prefix=None, params=None):
+        self._empty_prefix = prefix == ''
+        self._prefix, self._params = _BlockScope.create(prefix, params, self._alias())
+        self._name = self._prefix[:-1] if self._prefix.endswith('_') else self._prefix
+        self._scope = _BlockScope(self)
+        self._children = []
+    
+    def name_scope(self):
+        return self._scope
+    
+```
+
+可见， `with self.name_scope()` 仅仅是 将 `Block` 初始化时候 创建的 `_BlockScope` 拿出来用而已。 对于如何使用 `name_scope` ，在 创建模型块之前 `with` 一下即可。
+
 
 
