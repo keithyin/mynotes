@@ -47,17 +47,22 @@ mxnet 的 contrib 中有一些目标检测可用的 API, 用这些 API 可以大
 
 `mxnet.ndarray.contrib.MultiBoxTarget(anchor=None, label=None, cls_pred=None, overlap_threshold=_Null, ignore_label=_Null, negative_mining_ratio=_Null, negative_mining_thresh=_Null, minimum_negative_samples=_Null, variances=_Null, out=None, name=None, **kwargs)`
 
-* `anchor` : 就是用 `MultiBoxPrior` 生成出来的 anchor.
+* `anchor` : 就是用 `MultiBoxPrior` 生成出来的 `anchor`.
   * 需要 **reshape 一下**  ，
   * 一个 `3-D` ndarray, `(1, height*width*num_anchors_per_cell, 4)`。
-  *  `anchor`的信息是需要用来计算 target 的。
+  * `anchor`的信息是需要用来计算 `target` 的。
 * `label` :  `是一个 3-D ndarray` . `[bs, num_gt, 5]` : `5` 代表 `[gt_label, xmin, ymin, xmax, ymax]` , `num_gt`  表示这张图中 `gt_bbox` 的数量。注意，这个参数是用来 传入 `gt` 的。
+  * 这里的 `gt_label` 还是不用考虑 `background` 的。
+  * 当然，一个 `batch` 内，每个样本的 的 `num_gt` 是不一样的， 需要填充成 一样的，怎么填充呢？`[-1., -1., -1., -1., -1.]` 用 `-1` 来填充。
 * `cls_pred` : 神经网络对 `anchor` 对应类型的预测输出   `3-D` ndarray,
   *  `[bs, num_class+1, num_anchors]`。
-  * 这个参数 的目的是获取 **`bbox`**  类别的个数。`+1` 是包括了 `background`。
-* `overlap_threshold` : 
-* `ignore_label` : 如果一个 anchor 被 ignore 了，这个 anchor 的标签就是 这个 ignore_label.
-* `negative_mining_ratio`: 
+  *  这个参数 的目的是获取 **`bbox`**  类别的个数。`+1` 是包括了 `background`。
+* `overlap_threshold` (默认 .5):  iou overlap 超过此值才被看作 positive 样本。 
+* `ignore_label` : 如果一个 `anchor` 被 `ignore` 了，这个 `anchor` 的标签就是 这个 `ignore_label`.
+  * `ignore` : positive samples ， negative samples，ignored samples。
+* `negative_mining_ratio`: 默认值是 -1, 不开启 negative mining。这个参数表示 Max negative to positive samples ratio。如果是 3, 那么采的 negative samples 的数量是 positive samples 的 3 倍。
+* `negative_mining_thresh` ：默认 0.5, 低于这个 thresh，才看作 negative 样本。 
+*  
 
 
 
@@ -66,11 +71,13 @@ mxnet 的 contrib 中有一些目标检测可用的 API, 用这些 API 可以大
 * 是一个 list，里面有三个元素
   * `anchor` 与其所预测的 的 bbox 的偏移 。`shape`  是 `[bs, num_anchors*4]` ? 是 x,y 坐标，还是 `center h，w` 坐标。经过看源码，是 中心点加  `h,w` 坐标。
   * `mask` ，用来遮掩 **不需要的负例 anchor** 。`shape` 是 `[bs, num_anchors*4]` . 要遮挡的部分设置成 0 就 ok 了。
-  * `anchor`  的   `gt_label` ， `shape` 是 `[bs, num_anchors]`
-
+  * `anchor`  的   `gt_label` ， `shape` 是 `[bs, num_anchors]`，
+    *  这个值 `0` 代表 `background`，`ignore_lable` 表示 `ignored` 的 `anchor`。`>0` 的代表 前景 类别。
 
 
 ## MultiBoxDetection
+
+这里面会执行 `NMS`。
 
 **关于返回值**
 
@@ -81,14 +88,15 @@ mxnet 的 contrib 中有一些目标检测可用的 API, 用这些 API 可以大
 `mxnet.ndarray.contrib.MultiBoxDetection(cls_prob=None, loc_pred=None, anchor=None, clip=_Null, threshold=_Null, background_id=_Null, nms_threshold=_Null, force_suppress=_Null, variances=_Null, nms_topk=_Null, out=None, name=None, **kwargs)`
 
 * `cls_prob` : 网络预测的类别输出，shape 为`[bs, num_class+1, num_anchors]` , `+1` 是添加了 `background` 类别，作为 `label 0`.
+  * 注意，这里是 `prob`， 不是 `logits`
 * `loc_pred` : 预测出来的 `anchor` 偏移： `[bs, num_anchors*4]`
 * `anchor` :  `MultiBoxPrior` 的返回值 `[1, num_anchors, 4]` 
 * `clip` :  `clip` 出界的 bbox。
-* `threshold` :  
+* `threshold` :  `cls_prob` 的 `threshold`， 低于这个 `threshold` 的是不会输出的
 * `background_id` : 用来指定 `backgound_id` ，默认是 `0`。
-* `nms_threshold` : 
-* `force_suppress` :
-* `variances` : 
+* `nms_threshold` : `nms` 的 `iou threshold`
+* `force_suppress` : 
+* `variances` :  和 `target` 的对应上就可以了吧。
 * `num_topk` : 
 * `out` :
 
