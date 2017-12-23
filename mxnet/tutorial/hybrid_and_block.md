@@ -106,6 +106,8 @@ def hybrid_forward(self, F, x, *args, **kwargs)
 
 **name_scope是干嘛的？**
 
+* 给 **Block** 和 **Parameter** 的名字前面**加前缀**
+
 [http://zh.gluon.ai/chapter_gluon-basics/block.html#%E4%BD%BF%E7%94%A8-nn.Block-%E6%9D%A5%E5%AE%9A%E4%B9%89](http://zh.gluon.ai/chapter_gluon-basics/block.html#%E4%BD%BF%E7%94%A8-nn.Block-%E6%9D%A5%E5%AE%9A%E4%B9%89)
 
 看一下 `nn.Block` 源码
@@ -114,8 +116,12 @@ def hybrid_forward(self, F, x, *args, **kwargs)
 class Block(object):
     def __init__(self, prefix=None, params=None):
         self._empty_prefix = prefix == ''
+        # _prefix 是个 string， _params 是个 ParameterDict
         self._prefix, self._params = _BlockScope.create(prefix, params, self._alias())
+        
+        # 设置 Block 的那么
         self._name = self._prefix[:-1] if self._prefix.endswith('_') else self._prefix
+        # 创建一个 BlockScope 对象
         self._scope = _BlockScope(self)
         self._children = []
     
