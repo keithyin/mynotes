@@ -1,4 +1,4 @@
-# 如何写 makefile
+# 如何写 makefile与 CMakeLists
 
 makefile 是一个组织代码编译的工具
 
@@ -6,15 +6,13 @@ makefile 是一个组织代码编译的工具
 
 **关于程序的编译与链接**
 
-----
-
 在此，我想多说关于程序编译的一些规范和方法，一般来说，无论是C、C++、还是pas，首先要把源文件编译成中间代码文件，在Windows下也就是 .obj 文件，UNIX下是 .o 文件，即 Object File，这个动作叫做编译（compile）。然后再把大量的Object File合成执行文件，这个动作叫作链接（link）。
 
 链接时，主要是**链接函数和全局变量**，所以，我们可以使用这些中间目标文件（O文件或是OBJ文件）来链接我们的应用程序。链接器并不管函数所在的源文件，只管函数的中间目标文件（Object File），在大多数时候，由于源文件太多，编译生成的中间目标文件太多，而在链接时需要明显地指出中间目标文件名，这对于编译很不方便，所以，我们要给中间目标文件打个包，在Windows下这种包叫“库文件”（Library File)，也就是 .lib 文件，在UNIX下，是Archive File，也就是 .a 文件。
 
 
 
-## 一个简单的例子
+## Makefile
 
 假设现在我们有三个文件，`hellomake.c`（主函数文件）， `hellofunc.c`（函数文件）， `hellomake.h`（头文件）。
 
@@ -170,8 +168,99 @@ make命令执行时，需要一个 Makefile 文件，以告诉make命令需要�
 
 这里要说明一点的是，clean不是一个文件，它只不过是一个动作名字，有点像[C语言](http://lib.csdn.net/base/c)中的lable一样，其冒号后什么也没有，那么，make就不会自动去找文件的依赖性，也就不会自动执行其后所定义的命令。要执行其后的命令，就要在make命令后明显得指出这个lable的名字。这样的方法非常有用，我们可以在一个makefile中定义不用的编译或是和编译无关的命令，比如程序的打包，程序的备份，等等。
 
+
+
+
+
+## CMakeLists
+
+**CMake:** 用来生成 Makefile。
+
+```shell
+set(VarName value) # 用于设置变量值
+
+add_executable(exe_name source_files) # 创建可执行文件
+
+add_library
+
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
+```
+
+[https://cmake.org/cmake/help/v3.10/command/target_link_libraries.html?highlight=target_link_#command:target_link_libraries](https://cmake.org/cmake/help/v3.10/command/target_link_libraries.html?highlight=target_link_#command:target_link_libraries)
+
+
+
+* library :
+* package : 
+* ​
+
+
+
+**step1**
+
+> 源码编译可执行文件
+
+```shell
+cmake_minimum_required (VERSION 2.6)
+project (Tutorial)
+add_executable(Tutorial tutorial.cxx)
+```
+
+**step2**
+
+> 添加版本号 和 用于配置的头文件
+
+```shell
+cmake_minimum_required (VERSION 2.6)
+project (Tutorial)
+# The version number. set， 设置变量和值。
+set (Tutorial_VERSION_MAJOR 1)
+set (Tutorial_VERSION_MINOR 0)
+
+# 配置一个头文件，将 CmakeList 中的一些配置 植入到 源码中
+# configure a header file to pass some of the CMake settings
+# to the source code
+configure_file (
+  "${PROJECT_SOURCE_DIR}/TutorialConfig.h.in"
+  "${PROJECT_BINARY_DIR}/TutorialConfig.h"
+  )
+ 
+# add the binary tree to the search path for include files
+# so that we will find TutorialConfig.h
+include_directories("${PROJECT_BINARY_DIR}")
+ 
+# add the executable
+add_executable(Tutorial tutorial.cxx)
+```
+
+
+
+
+
+```shell
+project(AtenDemo1)
+
+# set , 设置变量名对应的值。之后可以用 ${param_name} 来获取值
+set(CMAKE_CXX_STANDARD 11) 
+set(EXT_DIR /home/keith/Programs/aten_install/)
+
+find_library(LIB libATen.so ${EXT_DIR}/lib)
+
+include_directories(${EXT_DIR}/include)
+
+link_libraries(${LIB})
+
+set(SOURCE_FILES main.cpp maskrcnn/maskrcnn.h maskrcnn/maskrcnn.c.cpp roi/roi.h roi_align/roi_align.h roi_align/cuda/roi_align_kernel.h)
+add_executable(AtenDemo1 ${SOURCE_FILES})
+```
+
+
+
 ## 参考资料
 
 [http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/](http://www.cs.colby.edu/maxwell/courses/tutorials/maketutor/)
 
 [https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html](https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html) 
+
+[https://cmake.org/cmake-tutorial/](https://cmake.org/cmake-tutorial/)
