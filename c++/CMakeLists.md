@@ -85,7 +85,12 @@ bring packagers into the development process?
 
 ## CMake 的编译系统
 
+**编译器设置**
 
+```shell
+CMAKE_C_FLAGS  
+CMAKE_CXX_FLAGS 
+```
 
 
 
@@ -96,4 +101,8 @@ bring packagers into the development process?
 [http://kfe.fjfi.cvut.cz/~holec/DATA/CMake-tutorial.pdf](http://kfe.fjfi.cvut.cz/~holec/DATA/CMake-tutorial.pdf)
 
 [https://www.johnlamp.net/files/CMakeTutorial.pdf](https://www.johnlamp.net/files/CMakeTutorial.pdf)
+
+[http://www.mi.fu-berlin.de/wiki/pub/ABI/PMSB_OpenMS_2011/Introduction_to_CMake.pdf](http://www.mi.fu-berlin.de/wiki/pub/ABI/PMSB_OpenMS_2011/Introduction_to_CMake.pdf)
+
+[http://ilcsoft.desy.de/portal/e279/e346/infoboxContent560/CMake_Tutorial.pdf](http://ilcsoft.desy.de/portal/e279/e346/infoboxContent560/CMake_Tutorial.pdf)
 
