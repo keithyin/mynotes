@@ -55,11 +55,11 @@ int main(){
 **lambda:**
 
 * `capture list:` 捕获列表，是一个 lambda **所在函数中定义的局部变量** 的 列表，通常为空。
-  * 一个 lambda 只有在其捕获列表中捕获一个它所在 函数中的局部变量，才能在其函数体内使用。
-* `parameter list: ` 
-* `return type`
-* `function body` 
-* lambda 不能有默认参数
+  * 一个 lambda 只有在 **其捕获列表中捕获一个它所在 函数中的局部变量**，才能在其函数体内使用。
+* `parameter list: `  参数列表
+* `return type`： 返回值类型
+* `function body` ： 函数体
+* **lambda 不能有默认参数**
 
 ```c++
 [capture_list](parameter_list)->return_type{function_body}
@@ -81,7 +81,7 @@ f();
 void test_lambda(){
     int i = 1;
     cout<<"before lambda, the value of i is "<< i <<endl; // 1
-    auto lam = [&i]{ i = 2;}; //引用捕获，函数体内部的 i 就是引用。
+    auto lam = [&i]{ i = 2;}; //引用捕获，函数体内部的 i 就是引用。在 lambda 中改变 i 会引起外面的改变。
     lam();
     cout<<"after lambda, the value of i is "<<i<<endl; // 2
 }
@@ -90,7 +90,7 @@ void test_lambda(){
 // 所在函数的值。
 void test_mutable(){
   int v1 = 2;
-  auto f = [v1]() mutable{return ++vl;};
+  auto f = [v1]() mutable{return ++v1;};
 }
 ```
 
