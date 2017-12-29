@@ -96,6 +96,33 @@ void test_mutable(){
 
 
 
+* 值捕获 **不会更改 lambda 所在函数的局部变量**, 
+* **用 mutable** 仅仅是将 read-only 的值捕获过来的变量 变得可写！！
+
+```c++
+void lambda_demo() {
+    using namespace std;
+    int a = 1;
+    int b = 1;
+    int &c = b;
+
+    auto func = [a, c]() mutable -> void { // 只有设置 mutable 才能在值捕获的时候 改变捕获变量 
+        a = a + 1;
+        c = c+1;
+        cout << "a in the lambda " << a << endl; // 2
+        cout << "c in the lambda " << c << endl; // 2
+    };
+    func();
+    cout << "a out the lambda " << a << endl; // 1
+    cout << "c out the lambda " << c << endl; // 1
+}
+
+```
+
+
+
+
+
 **初探原理：**
 
 当定义一个 `lambda` 的时候，编译器生成一个与 `lambda` 对应的新的（未命名的类类型）。然后 返回的就是这个类类型的对象。这个类对 `operator()` 进行了重载。
