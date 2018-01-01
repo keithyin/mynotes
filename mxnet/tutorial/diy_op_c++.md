@@ -1,4 +1,4 @@
-# mxnet : 自定义 op
+# mxnet : 自定义 op （C++）
 
 创建一个 `op` ，一般情况下需要创建 三个文件：
 
@@ -410,3 +410,8 @@ Operator *CreateOp<gpu>(LeakyReLUParam param) {
 ## Property
 
 属性部分主要是用来**推断** `op` 的输出 `shape` 和 `dtype`。 **推断** 发生在 计算 `op` 的结果之前，因为 需要推断的`shape` 和 `dtype` 来为 `op` 的计算结果分配存储空间。
+
+
+
+
+
