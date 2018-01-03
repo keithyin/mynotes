@@ -11,6 +11,15 @@
 * `template` 这个关键字会告诉编译器，**随后的类定义 将操作一个或更多未指明的类型。**
 * 当用这个模板产生实际类代码是，必须指定这些类型以使 编译器能够替换他们。
 
+
+
+**模板编译：**
+
+* 为了生成一个实例版本，编译器需要 **掌握函数模板或类成员函数模板的定义** 。因此，与非模板代码不同，模板的头文件中 通常既包含 声明，也包含 模板定义。
+* 这个对于 控制实例化 来说是个例外： **如果使用 控制实例化， 头文件可以不包含 模板的定义**
+
+
+
 ## 函数模板
 
 
@@ -91,6 +100,22 @@ template <typename T>
 
 * 疑问： 那之前 C++ 是怎么解决 重定义问题的？？？？
 
+
+
+**用法：**
+
+* `template_demo.h` 中 写 模板的 声明或定义
+
+  * 头文件中，可以写模板的 声明和定义， 也可以只写 声明
+* `template_demo.cc` 中 写 模板的定义 和 实例化语句, `#include "template_demo.h"`
+  * 如果 `.h` 中模板定义的话， 这里就不用写 定义了。 就直接 写 实例化语句就可以了
+  * 如果 `.h` 中没有模板定义的话， 就先 写定义， 然后写 实例化语句
+* 对于其它要用 此 模板的 代码 
+  * 包含其头文件 `#include "template_demo.h"` (此头文件有无 模板定义都可) 
+  * 然后 想用 模板的 那个实例就  `extern template declaration` 
+  * 这句话 告诉编译器， **不要在这里 实例化一个 模板实例**，其它地方已经 有这个实例化了， 留给链接搞定剩余的问题就可以了。
+
+
 ```c++
 extern template declaration; //实例化 声明语句，不会实例化模板， 意思是模板已经在其它地方被实例化
 template declaration; // 实例化定义语句， 实例化 模板。
@@ -99,12 +124,38 @@ template declaration; // 实例化定义语句， 实例化 模板。
 
 
 ```c++
-extern template class Blob<string>; // 实例化 声明
-template class Blob<string>; // 实例化 定义
-
-// 如何用呢？
-Blob<string> blob; // 这里不会再执行 实例化定义操作。
+// template_demo.h
+template <typename T>
+  bool compare (T a, T b);
 ```
+
+```c++
+// template_demo.cc
+#include "template_demo.h"
+template <typename T>
+  bool compare (T a, T b){
+    // do something.
+  }
+
+template bool compare(int a, int b); // 模板实例化语句
+```
+
+
+
+```c++
+// main.cc
+#include "template_demo.h"
+extern template bool compare(int a, int b); // 实例化声明， 说明模板在其他地方已经实例化。
+
+int main(){
+  int i=2;
+  int j=3;
+  bool res = compate<int>(i, j);
+  return 0;
+}
+```
+
+
 
 
 
@@ -125,9 +176,8 @@ template <typename T> // 通用模板定义
   }
 
 // 特例化, 这是上面模板的一个特例
-template<> bool compare(const T* a1, const T* a2){
+template<> bool compare(const int* a1, const int* a2){
   // do something.
 }
-
 ```
 
