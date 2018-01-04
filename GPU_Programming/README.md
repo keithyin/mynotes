@@ -170,4 +170,10 @@ __global__ void use_shared_memory(float *array){
 * block 内: **barrier** : points in the program where threads stop and wait, when all threads have reached the barrier, they can proceed.
   * `__syncthreads()`
   * 如何确定是不是应该放 `barrier`， 应该看看`write， read` 操作。
-* ​	`cudaDeviceSynchronize();` 
+* `cudaDeviceSynchronize();` 
+* **内存原子操作**
+  * `atomicAdd(&v, 1)`: 原子操作。
+  * 原子操作有一系列的 劣势：
+    * 只有 **部分** 操作 和 类型支持 .
+    * 没有 顺序 保证
+    * 慢 **slow**
