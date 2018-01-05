@@ -154,12 +154,7 @@ __global__ void use_shared_memory(float *array){
   	__syncthreads();
   
 }
-
 ```
-
-
-
-
 
 
 
@@ -177,3 +172,16 @@ __global__ void use_shared_memory(float *array){
     * 只有 **部分** 操作 和 类型支持 .
     * 没有 顺序 保证
     * 慢 **slow**
+    * ​
+
+
+
+## 算法复杂度分析
+
+* step complexity
+  * 需要分成几步 来完成一项工作。
+  * step 越小越好
+* work complexity
+  * 做完一个工作 一共需要 几个 operation。(总共所需线程数量？)
+  * work 越少 越好
+

@@ -34,4 +34,14 @@ $$
 
 **Avoid thread divergence**
 
-> 不同的 thread 做了不同的事情， 例如 if-else 分支(有些走 if 分支，有些 走 else 分支)， loop(不同的 thread 可能循环的次数不同。)
+> 不同的 thread 做了不同的事情， 例如 if-else 分支(有些走 if 分支，有些 走 else 分支)， loop(不同的 thread 可能循环的次数不同。
+
+
+
+## 使用 shared memory
+
+**什么情况下使用 shared memory**
+
+* 因为 shared memory 是 对于 block 而言的，所以通过 block 来分析比较靠谱
+* 如果 `访问global memory次数 per block` ，大于 block 中的线程数，    就可以考虑使用 `shared memory`
+
