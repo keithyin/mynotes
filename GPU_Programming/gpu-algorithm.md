@@ -147,3 +147,74 @@ addresses = [0, 1, 1, 1, 2, 3, 3, 4] # do scan operation on the predicate
 
 ## Segmented Scan
 
+$$
+\begin{aligned}
+(1, 2, 3, 4, 5) &--> (0,1,3,6,10) \\
+(1,2,|3,4,|5) &--> (0,1,|0,3,|0)
+\end{aligned}
+$$
+
+
+
+```python
+a = [1, 2, 3, 4, 5]
+segmented_head = [1, 0, 1, 0, 1] # mask where the segment begains
+```
+
+
+
+
+
+## spMV (sparse matrix vector multiplication)
+
+* dense matrix : 保存所有的元素
+* sparse matrix ： 不保存 0 元素
+  * compressed sparse row
+
+使用三个 数组来保存 稀疏矩阵：called CSR representation
+
+* value : 用来保存 非 0 值
+* column： 用来 保存 value 中各个值 所处的 列
+* row_ptr ： 用来 指明， value 中哪些值是 一个新行的开头, （表示分割的开始位置）
+
+```python
+"""
+| a | 0 | b |
+| c | d | e |
+| 0 | 0 | f |
+
+value = [a b c d e f]
+column = [0	2 0 1 2 2]
+row_ptr = [0 2 5]
+"""
+```
+
+**如何计算 spMV**
+
+* 创建 segmented representation 通过 value 和 row_ptr
+* gather vector 中的值， 使用 column
+* pair-wise 相乘。
+
+
+
+```python
+"""
+|a b |c d e |f
+ x z  x y z  z
+|ax+bz |cx+dy+ez| fz 
+do segmented scan / segmented reduce
+"""
+```
+
+
+
+## Sort
+
+* 大多数是 序列算法， 少数可以并行
+* 如何找到 效率高的并行算法
+  * keep hardware busy （lots of threads）
+  * limit branch divergence
+  * prefer coalesced memory access
+
+
+

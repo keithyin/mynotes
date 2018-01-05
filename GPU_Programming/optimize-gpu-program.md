@@ -28,6 +28,7 @@ $$
   * 当 GPU read/write global memory 的时候，它会一次性 **访问 一大块  存储空间**，
   * 所以当 相邻的线程 read/write 相邻的 global memory 的话，速度就会很快。
   * 疑问？ 访问一大块存储空间是什么意思，放到 cache 里面吗？ 
+  * 为什么 coalesce 好，如果 线程的调度不是 相邻的线程一起跑的呢？实际上是 一个 warp 一起 搞的，所以 coalesce 有用。
 
 
 
