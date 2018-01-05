@@ -38,6 +38,10 @@ $$
 
 
 
+**减少原子操作 和 同步操作**
+
+
+
 ## 使用 shared memory
 
 **什么情况下使用 shared memory**
