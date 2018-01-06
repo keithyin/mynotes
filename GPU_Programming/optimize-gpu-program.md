@@ -12,10 +12,10 @@
 
 ## High Level Strategies
 
-* maximize arithmetic intensity
-  * 访问了一次 内存， 做 更多的 操作。
-  * maximize work **(useful compute operations)**  per thread
-  * minimize **time spent on** memory per thread
+**maximize arithmetic intensity**
+* 访问了一次 内存， 做 更多的 操作。
+* maximize work **(useful compute operations)**  per thread
+* minimize **time spent on** memory per thread
 
 $$
 arithmetic\_internsity = \frac{math}{memory}
@@ -43,10 +43,50 @@ $$
 
 
 
+**减少 访问 global memory 的次数：使用 shared memory**
+
+
+
+**将一个问题 划分成多个 独立的子问题，使其并行化**
+
+**减少 线程间的通信**
+
+- 这里有和 线程数 有一个 trade-off,  线程间的通信 慢于 线程内  local memory 的操作。
+
+> 进程间的通信： 得到最终的结果 需要其它线程的结果。
+
+
+
 ## 使用 shared memory
 
 **什么情况下使用 shared memory**
 
 * 因为 shared memory 是 对于 block 而言的，所以通过 block 来分析比较靠谱
 * 如果 `访问global memory次数 per block` ，大于 block 中的线程数，    就可以考虑使用 `shared memory`
+
+
+
+
+
+
+
+
+## Demos
+
+**N-Body**
+
+> n 个元素，每个元素对其它元素都有力， 计算每个元素身上受的合力
+
+**如何加速呢？**
+
+* 减少 访 global memory 次数： 使用 `shared memory`
+* ​
+
+**spMV**
+
+* keep your threads busy
+* manage communication is important. 
+  * communicating through registers is faster than communicating through shared memory.
+
+
 

@@ -151,9 +151,19 @@ __global__ void use_shared_memory(float *array){
 	int i = threadIdx.x;
     __shared__ float sh_arr[128]; // 分配 shared memory, block 内的线程都可以访问
     sh_arr[i] = array[i];
-  	__syncthreads();
-  
+  	__syncthreads();  
 }
+
+// 第二种
+__global__ void use_shared_memory_2(float* array){
+  // 使用 <<<gradDim, blockDim, shared_bytes>>> 来分配 共享内存空间
+  int i = threadIdx.x;
+  extern __shared__ float sh_arr[];
+  // do something with shared memory
+}
+
+// 第三种
+
 ```
 
 
@@ -184,4 +194,15 @@ __global__ void use_shared_memory(float *array){
 * work complexity
   * 做完一个工作 一共需要 几个 operation。(总共所需线程数量？)
   * work 越少 越好
+
+
+
+
+## 如何设置 blockDim 和 gridDim
+
+**几个原则**， priority 由高到低
+
+* thread blocks 的个数 尽量大于 GPU 上 SM 的个数， 不然，会有很多 idle SM
+  * 如果 stream 多的话，这个问题就不用考虑了吧。
+* ​
 

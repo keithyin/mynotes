@@ -219,3 +219,31 @@ do segmented scan / segmented reduce
 
 
 
+
+**odd-even sort**
+
+
+
+**merge sort**
+
+
+
+**parallel merge**
+
+> merge two array into the one array
+
+* 先计算  input 的 输出 addresses， 然后 scatter
+
+```python
+"""
+input list 1: 1 3  12 28
+input list 2: 2 10 15 21
+每个元素一个线程， 上例来说就是 8 个线程
+每个线程 用来计算 输出address， 然后将负责的 元素 scatter 过去
+"""
+```
+
+* 如何计算  `输出address`
+  * 当前 list 的 id + 在另一个  list 的 id
+  * 在另一个 list 的 id， binary search
+
