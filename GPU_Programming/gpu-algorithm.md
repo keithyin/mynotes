@@ -212,7 +212,8 @@ do segmented scan / segmented reduce
 
 * 大多数是 序列算法， 少数可以并行
 * 如何找到 效率高的并行算法
-  * keep hardware busy （lots of threads）
+  * keep hardware busy （lots of threads, keep a lot of thread busy at the same time.） 
+    * 减少 idle 线程的数量
   * limit branch divergence
   * prefer coalesced memory access
 
