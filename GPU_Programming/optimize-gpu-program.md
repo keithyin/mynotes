@@ -10,6 +10,19 @@
 
 
 
+## 如何分析一个算法
+
+* 并行化做的怎么样，是不是有大量 idle 线程
+* 访问内存的行为 怎么样， 需不需要用 `shared memory`
+* thread divergence 如何？？
+* 算法的复杂度如何？ step complexity， work complexity
+  * 希望和 serial algorithm 有相同的 work complexity，但是更少的 step complexity
+  * 如果 work complexity 多，step complexity 少也是可以。
+
+
+
+
+
 ## High Level Strategies
 
 **maximize arithmetic intensity**
