@@ -123,6 +123,8 @@ class Block(object):
         self._name = self._prefix[:-1] if self._prefix.endswith('_') else self._prefix
         # 创建一个 BlockScope 对象
         self._scope = _BlockScope(self)
+        
+        # 用于存放 子 !!Block!! 的
         self._children = []
     
     def name_scope(self):
@@ -222,7 +224,57 @@ class ParameterDict(object):
         self._prefix = prefix
         self._params = OrderedDict()
         self._shared = shared
+    def get(self, name, **kwargs):
+    """
+    先找 当前 ParameterDict 有没有，如果有，返回，没有，去shared 中找，还没有，创建一个。
+    Parameters
+    ----------
+    name : str
+        Name of the desired Parameter. It will be prepended with this dictionary's
+        prefix.
+    **kwargs : dict
+        The rest of key-word arguments for the created :py:class:`Parameter`.
+
+    Returns
+    -------
+    Parameter
+        The created or retrieved :py:class:`Parameter`.
+    """
+      name = self.prefix + name
+      param = self._get_impl(name)
+      if param is None:
+          param = Parameter(name, **kwargs)
+          self._params[name] = param
+      else:
+          for k, v in kwargs.items():
+              if hasattr(param, k) and getattr(param, k) is not None:
+                  assert v is None or v == getattr(param, k), \
+                      "Cannot retrieve Parameter %s because desired attribute " \
+                      "does not match with stored for attribute %s: " \
+                      "desired %s vs stored %s." % (
+                          name, k, str(v), str(getattr(param, k)))
+              else:
+                  setattr(param, k, v)
+      return param
 ```
+
+
+
+## 总结
+
+**Block**
+
+*  都有自己独立的 `ParameterDict` 对象。
+* 子 `Block` 保存在 `self._children` 中。 
+* 参数保存 `ParameterDict` 中。
+
+
+
+**参数加载**
+
+* Block 中有个 参数加载的入口，但是实际上参数加载是由 `ParameterDict` 负责的。
+
+
 
 
 
