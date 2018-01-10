@@ -55,6 +55,116 @@ def initialize(self, init=initializer.Uniform(), ctx=None, verbose=False,
 
 * 对每一个参数应用 `Initializer`， 然后根据 参数的名字来确定自己该怎么搞。
 
+
+
+```python
+# Parameter 成员方法
+def initialize(self, init=None, ctx=None, default_init=initializer.Uniform(),
+               force_reinit=False):
+    """Initializes parameter and gradient arrays. Only used for :py:class:`NDArray` API.
+
+    Parameters
+    ----------
+    init : Initializer
+        The initializer to use. Overrides :py:meth:`Parameter.init` and default_init.
+    ctx : Context or list of Context, defaults to :py:meth:`context.current_context()`.
+        Initialize Parameter on given context. If ctx is a list of Context, a
+        copy will be made for each context.
+
+        .. note::
+            Copies are independent arrays. User is responsible for keeping
+            their values consistent when updating.
+            Normally :py:class:`gluon.Trainer` does this for you.
+
+    default_init : Initializer
+        Default initializer is used when both :py:func:`init`
+        and :py:meth:`Parameter.init` are ``None``.
+    force_reinit : bool, default False
+        Whether to force re-initialization if parameter is already initialized.
+
+    Examples
+    --------
+    >>> weight = mx.gluon.Parameter('weight', shape=(2, 2))
+    >>> weight.initialize(ctx=mx.cpu(0))
+    >>> weight.data()
+    [[-0.01068833  0.01729892]
+     [ 0.02042518 -0.01618656]]
+    <NDArray 2x2 @cpu(0)>
+    >>> weight.grad()
+    [[ 0.  0.]
+     [ 0.  0.]]
+    <NDArray 2x2 @cpu(0)>
+    >>> weight.initialize(ctx=[mx.gpu(0), mx.gpu(1)])
+    >>> weight.data(mx.gpu(0))
+    [[-0.00873779 -0.02834515]
+     [ 0.05484822 -0.06206018]]
+    <NDArray 2x2 @gpu(0)>
+    >>> weight.data(mx.gpu(1))
+    [[-0.00873779 -0.02834515]
+     [ 0.05484822 -0.06206018]]
+    <NDArray 2x2 @gpu(1)>
+    """
+    if self._data is not None and not force_reinit:
+        warnings.warn("Parameter %s is already initialized, ignoring. " \
+                      "Set force_reinit=True to re-initialize."%self.name)
+        return
+    self._data = self._grad = None
+
+    if ctx is None:
+        ctx = [context.current_context()]
+    if isinstance(ctx, Context):
+        ctx = [ctx]
+    if init is None:
+        init = default_init if self.init is None else self.init
+    # 如果初始化信息不足，就延时初始化
+    # 估计在第一次前向的时候， Parameter 的 shape 会 修改。
+    # 然后就可以 初始化了。
+    if not self.shape or np.prod(self.shape) <= 0:
+        if self._allow_deferred_init:
+            self._deferred_init = (init, ctx, default_init, None)
+            return
+        raise ValueError("Cannot initialize Parameter %s because it has " \
+                         "invalid shape: %s."%(self.name, str(self.shape)))
+
+    self._deferred_init = (init, ctx, default_init, None)
+    self._finish_deferred_init()
+```
+
+
+
+```python
+# Parameter 成员方法， 执行初始化
+def _finish_deferred_init(self):
+    """Finishes deferred initialization."""
+    if not self._deferred_init:
+        return
+    init, ctx, default_init, data = self._deferred_init
+    self._deferred_init = ()
+    assert self.shape is not None and np.prod(self.shape) > 0, \
+        "Cannot initialize Parameter %s because it has " \
+        "invalid shape: %s. Please specify in_units, " \
+        "in_channels, etc for `Block`s." % (
+            self.name, str(self.shape))
+
+    with autograd.pause():
+        if data is None:
+            # shape 已经有了，所以可以操作。
+            data = ndarray.zeros(shape=self.shape, dtype=self.dtype,
+                                 ctx=context.cpu())
+            # 
+            initializer.create(default_init)(
+                initializer.InitDesc(self.name, {'__init__': init}), data)
+
+        self._init_impl(data, ctx)
+
+```
+
+
+
+
+
+
+
 **initializer.Initializer**
 
 ```python
