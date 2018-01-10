@@ -151,15 +151,13 @@ def _finish_deferred_init(self):
             # shape 已经有了，所以可以操作。
             data = ndarray.zeros(shape=self.shape, dtype=self.dtype,
                                  ctx=context.cpu())
+            # 这儿是什么鬼
             # 
             initializer.create(default_init)(
                 initializer.InitDesc(self.name, {'__init__': init}), data)
 
         self._init_impl(data, ctx)
-
 ```
-
-
 
 
 
@@ -195,6 +193,7 @@ class Initializer(object):
 
         if init:
             # when calling Variable initializer
+            # 创建 Initializer 对象，然后调用其 _init_weight 方法
             create(init)._init_weight(desc, arr)
             self._verbose_print(desc, init, arr)
         else:
@@ -214,39 +213,38 @@ class Initializer(object):
                 self._verbose_print(desc, 'beta', arr)
             else:
                 self._init_default(desc, arr)
-    def _init_bilinear(self, _, arr):
-        weight = np.zeros(np.prod(arr.shape), dtype='float32')
-        shape = arr.shape
-        f = np.ceil(shape[3] / 2.)
-        c = (2 * f - 1 - f % 2) / (2. * f)
-        for i in range(np.prod(shape)):
-            x = i % shape[3]
-            y = (i / shape[3]) % shape[2]
-            weight[i] = (1 - abs(x / f - c)) * (1 - abs(y / f - c))
-        arr[:] = weight.reshape(shape)
-
-    def _init_loc_bias(self, _, arr):
-        shape = arr.shape
-        assert(shape[0] == 6)
-        arr[:] = np.array([1.0, 0, 0, 0, 1.0, 0])
-
-    def _init_zero(self, _, arr):
-        arr[:] = 0.0
-
-    def _init_one(self, _, arr):
-        arr[:] = 1.0
-
-    def _init_bias(self, _, arr):
-        arr[:] = 0.0
-
-    def _init_gamma(self, _, arr):
-        arr[:] = 1.0
-
-    def _init_beta(self, _, arr):
-        arr[:] = 0.0
-
     def _init_weight(self, name, arr):
         """Abstract method to Initialize weight."""
         raise NotImplementedError("Must override it")
 ```
 
+
+
+## 如何自定义初始化方法
+
+* 继承 `initializer.Initializer` 
+* 重写 `_init_weight(self, name, arr)` 方法
+
+```python
+class MyInit(initializer.Initializer):
+    # def __init__(self):
+    #     super(MyInit, self).__init__()
+    def _init_weight(self, name, arr):
+        nd.random.uniform(low=7, high=10, out=arr)
+```
+
+
+
+
+
+
+
+## 总结
+
+**初始化方法的优先级**
+
+* 指定的 > 全局的 > 默认的。
+
+
+
+**可以在创建 Parameter 的时候就指定初始化 方法。**
