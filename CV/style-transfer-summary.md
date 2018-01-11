@@ -3,8 +3,8 @@
 三个阶段：
 
 * 迭代优化
-* feedforward ，但是 一个网络只能代表一个 style
-* feedforward，一个网络，任意 style
+* feed-forward ，但是 一个网络只能代表一个 style
+* feed-forward，一个网络，任意 style
 
 
 
