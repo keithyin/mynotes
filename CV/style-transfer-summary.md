@@ -8,7 +8,7 @@
 
 
 
-## A Neural Algorithm of Artistic Style (2015)
+## Image Style Transfer Using Convolutional Neural Networks (2016) CVPR 
 
 * 迭代优化
 
@@ -63,7 +63,7 @@ s_loss = torch.mean((style_pred-style_target)**2)
 
 
 
-## Texture Networks: Feed-forward Synthesis of Textures and Stylized Images (2016)
+## Texture Networks: Feed-forward Synthesis of Textures and Stylized Images (2016) ICML
 
 * 一个网络，一个 style， `feed-forward` 的方式 进行 style-transfer
 
@@ -85,5 +85,44 @@ s_loss = torch.mean((style_pred-style_target)**2)
 
 
 
-## Perceptual Losses for Real-Time Style Transfer and Super-Resolution (2016)
+## Perceptual Losses for Real-Time Style Transfer and Super-Resolution (2016) ECCV
+
+* 一个网络，一个 style
+
+**没有用 GAN， 直接训练出一个 transfer 网络**
+
+![](imgs/perceptual-loss-1.png)
+
+
+
+**loss 函数**
+
+![](imgs/perceptual-loss-2.png)
+
+
+
+## Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization (2017) ICCV
+
+* feed-forward 
+
+**能够表示 style 不仅仅是 gram 矩阵，还可以是 feature map 的均值和方差。。。。**
+
+**通过改变 feature map 的均值和方差，也可以改变 style**
+
+
+
+![](imgs/arbitrary-style-real-time-1.png)
+
+![](imgs/arbitrary-style-real-time-2.png)
+
+![](imgs/arbitrary-style-real-time-3.png)
+
+
+
+
+
+## 疑问？
+
+* 为什么 style 那么表示是可行的？
+* style transfer 貌似都没有用 bn。
 
