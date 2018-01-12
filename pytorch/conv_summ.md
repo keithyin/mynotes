@@ -83,6 +83,10 @@ res = conv1d(input, weight, bias=None, stride=1, padding=0, dilation=1, groups=1
   - 正向的`dilation`
 
 
+**什么样的 shape 通过 解卷积中的参数 执行正向卷积操作，可以得到 解卷积的 输入 shape，就是 解卷积合法的输出 shape**
+
+
+
 ## 卷积后的feature map的大小的计算
 
 **先考虑 dilation=1 的情况， 就是我们最常用的情况**
