@@ -101,6 +101,34 @@ s_loss = torch.mean((style_pred-style_target)**2)
 
 
 
+## StyleBank: An explicit Representation for Neural Image Style Transfer (CVPR 2017)
+
+* arbitrary style transfer
+
+搞出了一个 `StyleBank`， 里面有很多 `Style`， 风格迁移的时候 从 `StyleBank` 中挑出 特定的 `Style`与 图片的 隐层表示卷积就 `OK` 咯。
+
+
+
+**贡献有：**
+
+* 显式的 style representation
+* region-based style transfer : 如何做到的？
+
+
+
+**方法**
+
+* `StyleBank` 由 多个 `FilterBank` 构成
+* 一个`FilterBank` 代表一种风格
+
+
+
+**和 Perceptual 那篇文章很像**
+
+
+
+
+
 ## Arbitrary Style Transfer in Real-time with Adaptive Instance Normalization (2017) ICCV
 
 * feed-forward 
@@ -116,6 +144,36 @@ s_loss = torch.mean((style_pred-style_target)**2)
 ![](imgs/arbitrary-style-real-time-2.png)
 
 ![](imgs/arbitrary-style-real-time-3.png)
+
+
+
+## Controlling Perceptual Factors in Neural Style Transfer (CVPR 2017)
+
+![](imgs/control-style.png)
+
+**以前方法存在的问题**
+
+* 将 地面的 纹理 用在了 天空上。。
+
+**统计信息中可能包含啥**
+
+* 不同区域的不同的 style，例如，天空和 地面的 style 是不一样的
+* 调色板
+* 细粒度的 空间结构 ： 比如 brush stroke shape（笔触效果）
+* 粗粒度的 空间结构：比如 arrangements of stroke。
+
+**作者将 style 分解成了以下部分**
+
+* style in different spatial regions
+* color
+* luminance
+* across spatial scales
+
+
+
+**spatial control**
+
+* control which region of style image is used to stylize each region in the content image.
 
 
 
