@@ -26,7 +26,7 @@ $$
 
 **最大似然估计**
 
-假设 $P(Y=c_k)= u_k$
+假设 $P(Y=c_k)= u_k, s.t. \sum_ku_k=1, u_k>=0$
 $$
 \begin{aligned}
 likelihood &= \prod_k u_k^{N_k} \\
