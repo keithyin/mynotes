@@ -6,8 +6,6 @@
 $$
 L(x,y,\lambda) = f(x,y)+\lambda \phi(x,y)
 $$
-
-
 仔细看一下这个式子：
 
 * 当$x,y$ 满足约束条件时，得到的就是 $L(x,y,\lambda)=f(x,y)$
