@@ -63,12 +63,32 @@ $ x=x_0-\frac{f(x_0)}{f'(x_0)}$ 只是一个近似解，但是通过不停的迭
 
 **最优化**
 
-方程的根的问题是 求 $f(x)=0$ 的问题，最优化的问题是求 $f'(x)=0$ 的问题。为了求解 $f'(x)=0$, 需要泰勒展开到二阶：
+方程的根的问题是 求 $f(x)=0$ 的问题，最优化的问题是求 $f'(x)=0$ 的问题,即：$f'(x)$ 的根。其中
 $$
 \begin{aligned}
-f(x) &\approx f(x_0)+f'(x_0)*(x-x_0) + f''(x_0)\frac{(x-x_0)^2}{2!} \\
+f'(x) &\approx f’(x_0)+f''(x_0)*(x-x_0) \\
+f'(x)=0 &\Leftarrow\Rightarrow  f'(x_0)+f''(x_0)*(x-x_0) \\
+&\Rightarrow x=x_0-\frac{f'(x_0)}{f''(x_0)}
 \end{aligned}
 $$
+
+不停的迭代这个式子$ x_{t+1}=x_t-\frac{f'(x_t)}{f''(x_t)}$，最终会收敛 !!!
+
+在高维情况下，牛顿迭代公式是：
+$$
+x_{t+1} = x_t - \Bigr[Hf(x_t)\Bigr]^{-1}f'(x_t)
+$$
+![](../imgs/hessian-mmatrix.png)
+
+由于 hessian-matrix 的逆很难求，所以很多情况下都是估计hessian矩阵的逆，然后再用牛顿法求解最优值。
+
+
+
+## 雅克比矩阵
+
+
+
+![](../imgs/jacobian-matrix.png)
 
 
 
