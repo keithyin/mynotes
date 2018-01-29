@@ -20,7 +20,7 @@ f_y(x,y)+\lambda\phi_y(x,y)=0\\
 \phi(x,y) = 0
 \end{cases}
 $$
-求解这个方程组，就可以得到约束条件下的最优解，仔细看一下，这个方程组是由两个部分构成的：
+通过求解这个方程组，就可以得到约束条件下的最优解，仔细看一下，这个方程组是由两个部分构成的：
 
 * 辅助函数 对 x 和 y 分别求偏导。
 * 约束条件。
@@ -42,22 +42,36 @@ h_j(x) = 0, j=1,2,3,4,...l
 \end{aligned}
 $$
 
-上面这个带有不等式约束条件的式子应该搞成什么样的非约束形式呢？如下所示
+上面这个式子搞成拉格朗日辅助函数会是啥样呢？如下所示
 $$
-L(x,\alpha,\beta) = \max_{\alpha\ge0,\beta} \Biggr[f(x)+\sum_{i=1}^k\alpha_ic_i(x)+\sum_{j=1}^l\beta_jh_j(x)\Biggr]
+L(x,\alpha,\beta) = f(x)+\sum_{i=1}^k\alpha_ic_i(x)+\sum_{j=1}^l\beta_jh_j(x)
 $$
+考虑下面这个式子：
+$$
+\max_{\alpha\ge0, \beta} \Biggr[f(x)+\sum_{i=1}^k\alpha_ic_i(x)+\sum_{j=1}^l\beta_jh_j(x)\Biggr]
+$$
+
+
 观察上式：
 
 * 如果条件不满足的话，$L(x,\alpha, \beta)=+\infty$
 * 如果约束条件满足的话，$L(x,\alpha, \beta)=f(x)$
 * 所以 $\min_xL(x,\alpha,\beta)$ 会更加喜欢 满足条件的 $x$
+* 所以，原始的 不等式约束问题就可以等价的写为下面所示的 无约束问题：
 
-然后应该如何求的最优解呢？类比上面的等式约束，可以得到
 $$
-\begin{cases}
-f'(x)+\sum_{i=1}^k\alpha_ic'_i(x)+\sum_{j=1}^l\beta_jh'_j(x) = 0 \\
-c_i(x)<=0, i=1,2,3,4,...,k \\
-h_j(x) = 0, j=1,2,3,4,...l
-\end{cases}
+\min_x\max_{\alpha\ge0, \beta} \Biggr[f(x)+\sum_{i=1}^k\alpha_ic_i(x)+\sum_{j=1}^l\beta_jh_j(x)\Biggr]
 $$
-求解这三个式子来求得约束条件下的最优解。
+
+先求 max，再求 min， 就可以得到结果咯。
+
+
+
+## 拉格朗日对偶
+
+
+
+**问题**
+
+* 有约束问题都已经转化成无约束问题了，那为啥 KKT 条件里还有 原问题的约束条件呢？
+* ​
