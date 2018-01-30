@@ -94,9 +94,26 @@ $$
 
 ## quasi-newton
 
-由于牛顿法中的 hessian 矩阵的逆不好计算，所以拟牛顿法的基本思想就是，用一个 N-阶矩阵 $G(x^t)$ 近似代替 $H(x^t)^{-1}$ .
+由于牛顿法中的 hessian 矩阵的逆不好计算，所以拟牛顿法的基本思想就是，用一个 N-阶矩阵 $G(x_t)$ 近似代替 $H(x_t)^{-1}$ . $\mathbf h_t$ 代表更新方向：
+$$
+\mathbf h_t = -\mathbf H^{-1}(x_t) f'(x_t) \Rightarrow -\mathbf G(x_t)f'(x_t)
+$$
+基本的步骤可以总结如下：
+
+1. 对最优值点进行一个初始化假设 $\mathbf x_0$ , 初始化 $\mathbf G_0=\mathbf I$ 
+2. 计算 $f'(x_t)$ ，然后选择 search direction $\mathbf h_t=-\mathbf G_tf'(x^t)$
+3. 以 $\mathbf h_t$ 为方向，对 $\mathbf x_t$ 进行 line search，即： $\min_t f(x_t+k*h_t)$ , 然后进行更新，计算 $x_{t+1}$
+4. 通过合适的修改 $\mathbf G_t$ 得到 $\mathbf G_{t+1}$ , 然后设置 $t=t+1$ ,转到 step 2 继续执行。
 
 
+
+
+**quasi-newton condition**
+$$
+\mathbf x_{i+1} - \mathbf x_i = \mathbf G_{i+1} \Bigr(f'(\mathbf x_{i+1})-f'(\mathbf x_i)\Bigr)
+$$
+
+> 可以看出，求解还是$f'(x)$ 泰勒一阶展开的最优值, 估计的值。
 
 
 
