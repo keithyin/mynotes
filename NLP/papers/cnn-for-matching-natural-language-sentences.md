@@ -12,6 +12,20 @@ language：
 
 
 
+## 文章中的一些表示
+
+![](../imgs/conv-1.png)
+
+* type-$f$ 表示第几个 channel
+* $\mathcal l$ 表示第几层
+* $z_i^{(l,f)}$ 表示第 $l$ 层 $f$ feature-map 第 $i$ 个位置的值，  $\mathbb z_i^{(l)}$  表示第 $i$ 个位置的特征（across all feature map）。
+
+
+
+
+
+
+
 ## 两种结构做 sentence matching
 
 **siamese**
@@ -36,6 +50,14 @@ language：
 
 
 
+> In view of the drawback of Architecture-I, we propose Architecture-II (A RC -II) that is built directly on the **interaction space** between two sentences.
+>
+> 这句话的重点就是，建立一个 **interaction space**
+
+
+
+
+
 
 
 ## 重要句子摘录
@@ -49,3 +71,10 @@ language：
 
 
 > A successful sentence-matching algorithm therefore needs to capture not only the internal structures of sentences but also the rich patterns in their interactions
+
+
+
+## 疑问
+
+* 代码怎么写？？？？？
+
