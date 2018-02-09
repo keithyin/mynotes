@@ -9,3 +9,11 @@
 * textual entailment
 * retrieval
 
+
+
+
+
+## 如何建模 句子对
+
+* siamese network
+* convolutional matching model : 
