@@ -8,8 +8,16 @@
 * **Paraphrase(释义) identification** aims to determine whether two sentences have the same meaning.
 * textual entailment
 * retrieval
+* semantic parsing
+* sentence modeling
 
 
+
+**classification tasks**
+
+* sentiment
+* subjectivity
+* question-type classification
 
 
 
@@ -17,3 +25,11 @@
 
 * siamese network
 * convolutional matching model : 
+
+
+
+## Terminology
+
+* syntactic : 语法
+* semantic：语义
+
