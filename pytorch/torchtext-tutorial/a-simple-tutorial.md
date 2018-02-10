@@ -136,5 +136,3 @@ self.embed.weight.data.copy_(vocab.vectors)
 
 
 
-
-
