@@ -21,6 +21,18 @@
 
 
 
+
+* sentiment analysis (情感分析)
+* paraphrase detection
+* entailment recognition
+* summarization
+* discourse analysis
+* machine translation
+* grounded language learning
+* image retrieval
+
+
+
 ## 如何建模 句子对
 
 * siamese network
