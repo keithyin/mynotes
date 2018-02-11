@@ -167,3 +167,18 @@ self.embed.weight.data.copy_(vocab.vectors)
 
 
 
+## Field, Vocab, Vectors
+
+* `Field`: 定义对应字段的处理操作
+* `Vocab`: 定义了 词汇表
+* `Vectors`: 用来保存预训练好的 `word vectors`
+
+
+
+所以，
+
+```python
+TEXT.build_vocab(train, vectors="glove.6B.100d")
+```
+
+的解释为： 从预训练的 `vectors` 中，将当前 `corpus` 词汇表的词汇向量抽取出来，构成当前 `corpus` 的 `Vocab`（词汇表）
