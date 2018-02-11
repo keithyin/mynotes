@@ -6,18 +6,18 @@
 
 **torchtext.data**
 
-* `data.Example`
-* `data.Field`
-* `data.Iterator`
-* `data.Pipeline`
-* `data.Datasets`
-* `torchtext.vocab.Vocab`
+* `torchtext.data.Example` : 用来表示一个样本，数据+标签
+* `torchtext.vocab.Vocab`: 词汇表
+* `torchtext.data.Datasets`: 数据集类，`__getitem__` 返回 `Example`实例
+* `torchtext.data.Field` : 用来定义如何处理样本
+  * 创建 `Example`时的 预处理
+  * `batch` 时的一些处理操作。
+* `torchtext.data.Iterator`: 迭代器，用来生成 `batch`
+
 
 
 
 **torchtext.datasets**: 包含了常见的数据集.
-
-
 
 
 
@@ -27,22 +27,23 @@
 
 下面是 text 预处理的工作列表，打勾的代表 **torchtext** 已经支持的工作：
 
-- [x] **File Loading**: load in the corpus from various formats
-- [x] **Tokenization**: break sentences into list of words
-- [x] **Vocab**: generate a vocabulary list
-- [x] **Numericalize/Indexify**: Map words into integer numbers for the entire corpus
-- [x] **Word Vector**: either initialize vocabulary randomly or load in from a pretrained embedding, this embedding must be “trimmed”, meaning we only store words in our vocabulary into memory.
+- [x] **File Loading**: 加载不同文件格式的 `corpus`
+- [x] **Tokenization**: 将句子 分解成 词
+- [x] **Vocab**: 生成 词汇表
+- [x] **Numericalize/Indexify**: 将 词 映射成 index
+- [x] **Word Vector**: 词向量
 - [x] **Batching**: generate batches of training sample (padding is normally happening here)
 - [ ] **Train/Val/Test Split**: seperate your data into a fixed train/val/test set (not used for k-fold validation)（这个需要手动划分）
 - [ ] **Embedding Lookup**: map each sentence (which contains word indices) to fixed dimension word vectors（这个可以使用 pytorch 的 Embedding Layer解决）
 
 
 
+
 下面是对以上任务一个直观的表述：
 
-```R
+```python
 "The quick fox jumped over a lazy dog."
--> (tokenization)
+-> (tokenization) 
 ["The", "quick", "fox", "jumped", "over", "a", "lazy", "dog", "."]
 
 -> (vocab)
@@ -63,6 +64,38 @@
 ```
 
 这些过程非常容易搞砸，特别是 `tokenization`。研究者们经常花费大量的时间编写代码来处理这些问题。**Torchtext** 将这些常用的预处理操作整理起来，使得更加好用。
+
+
+
+
+
+
+
+## 一个简单例子
+
+NLP 的一般数据预处理流程为：
+
+1. 定义样本的处理操作。---> `torchtext.data.Field`
+2. 加载 corpus  （都是 string）---> `torchtext.data.Datasets` 
+   * 在`Datasets` 中，`torchtext` 将 `corpus ` 处理成一个个的 `torchtext.data.Example` 实例
+   * 创建 `torchtext.data.Example` 的时候，会调用 `field.preprocess` 方法
+3. 创建词汇表， 用来将 `string token` 转成 `index`  ---> `field.build_vocab()`
+   * 词汇表负责：`string token ---> index`,  `index ---> string token` ，`string token  ---> word vector`
+4. 将处理后的数据 进行 batch 操作。---> `torchtext.data.Iterator`
+   * 将 `Datasets` 中的数据 `batch` 化
+   * 其中会包含一些 `pad` 操作，保证一个 `batch` 中的 `example` 长度一致
+   * 在这里将 `string token` `index`化。
+
+
+
+`tokenization，vocab， numericalize， embedding lookup` 和数据预处理阶段的对应关系是：
+
+* `tokenization` ---> `Dataset ` 的构造函数中，由 `Field` 的 `tokenize` 操作
+* `vocab` ---> `field.build_vocab` 时，由 `Field` 保存 映射关系
+* `numericalize` ---> 发生在 `iterator` 准备 `batch` 的时候，由 `Field` 执行 `numericalize` 操作
+* `embedding lookup` ---> 由 `pytorch Embedding Layer` 提供此功能。 
+
+
 
 
 
@@ -95,7 +128,7 @@ train, val, test = data.TabularDataset.splits(
 
 
 
-然后加载预训练的 word-embedding
+然后加载预训练的 `word-embedding`
 
 ```python
 TEXT.build_vocab(train, vectors="glove.6B.100d")
