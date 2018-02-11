@@ -1,13 +1,13 @@
 # torchtext 教程
 
-[翻译，原文链接](http://anie.me/On-Torchtext/)
+文章部分翻译自[http://anie.me/On-Torchtext/](http://anie.me/On-Torchtext/)
 
-## 概览
+## API一览
 
 **torchtext.data**
 
 * `torchtext.data.Example` : 用来表示一个样本，数据+标签
-* `torchtext.vocab.Vocab`: 词汇表
+* `torchtext.vocab.Vocab`: 词汇表相关
 * `torchtext.data.Datasets`: 数据集类，`__getitem__` 返回 `Example`实例
 * `torchtext.data.Field` : 用来定义如何处理样本
   * 创建 `Example`时的 预处理
@@ -21,7 +21,7 @@
 
 
 
-## 基础
+## 前言
 
 **Torchtext** 是一个非常强有力的库，她可以帮助我们解决 文本的预处理问题。为了能够更好的利用这个工具，我们需要知道她可以做什么，不可以做什么，也要将每个API和其我们想要的做的事情联系起来。另外一个值得夸赞的一点是，**Torchtext** 不仅可以和 **pytorch** 一起用，还可以和其它深度学习框架(tf,mxnet,...)。
 
@@ -69,35 +69,33 @@
 
 
 
-
-
-## 一个简单例子
+## 概览
 
 NLP 的一般数据预处理流程为：
 
 1. 定义样本的处理操作。---> `torchtext.data.Field`
 2. 加载 corpus  （都是 string）---> `torchtext.data.Datasets` 
-   * 在`Datasets` 中，`torchtext` 将 `corpus ` 处理成一个个的 `torchtext.data.Example` 实例
-   * 创建 `torchtext.data.Example` 的时候，会调用 `field.preprocess` 方法
+   - 在`Datasets` 中，`torchtext` 将 `corpus ` 处理成一个个的 `torchtext.data.Example` 实例
+   - 创建 `torchtext.data.Example` 的时候，会调用 `field.preprocess` 方法
 3. 创建词汇表， 用来将 `string token` 转成 `index`  ---> `field.build_vocab()`
-   * 词汇表负责：`string token ---> index`,  `index ---> string token` ，`string token  ---> word vector`
+   - 词汇表负责：`string token ---> index`,  `index ---> string token` ，`string token  ---> word vector`
 4. 将处理后的数据 进行 batch 操作。---> `torchtext.data.Iterator`
-   * 将 `Datasets` 中的数据 `batch` 化
-   * 其中会包含一些 `pad` 操作，保证一个 `batch` 中的 `example` 长度一致
-   * 在这里将 `string token` `index`化。
+   - 将 `Datasets` 中的数据 `batch` 化
+   - 其中会包含一些 `pad` 操作，保证一个 `batch` 中的 `example` 长度一致
+   - 在这里将 `string token` `index`化。
 
 
 
 `tokenization，vocab， numericalize， embedding lookup` 和数据预处理阶段的对应关系是：
 
-* `tokenization` ---> `Dataset ` 的构造函数中，由 `Field` 的 `tokenize` 操作
-* `vocab` ---> `field.build_vocab` 时，由 `Field` 保存 映射关系
-* `numericalize` ---> 发生在 `iterator` 准备 `batch` 的时候，由 `Field` 执行 `numericalize` 操作
-* `embedding lookup` ---> 由 `pytorch Embedding Layer` 提供此功能。 
+- `tokenization` ---> `Dataset ` 的构造函数中，由 `Field` 的 `tokenize` 操作
+- `vocab` ---> `field.build_vocab` 时，由 `Field` 保存 映射关系
+- `numericalize` ---> 发生在 `iterator` 准备 `batch` 的时候，由 `Field` 执行 `numericalize` 操作
+- `embedding lookup` ---> 由 `pytorch Embedding Layer` 提供此功能。 
 
 
 
-
+## 一个简单例子
 
 **首先，我们要创建 Field 对象：** 这个对象包含了我们打算如何预处理文本数据的信息。 她就像一个说明书。下面定义了两个 **Field** 对象。
 
