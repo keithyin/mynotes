@@ -158,7 +158,17 @@ class Iterator(object):
 
 
 
+**Iterator 的调用关系如下**
 
+```python
+"""
+Iterator.iter() --> Iterator.create_batches() --> Iterator.data()
+"""
+```
+
+* `Iterator.iter()` : 拿到 `Interator.create_batches()` 返回的 `mini-batch` ，然后可能进行一些 `mini-batch` 内的排序操作，然后丢给 `Batch` 用来创建 `Batch` 实例， 返回。
+* `Iterator.create_batches()  `: 一个迭代器，每次返回一个 `mini-batch` 。
+* `Iterator.data()`: 可能会对 `dataset` 中的 `examples` 中执行 重新排序工作。
 
 
 
