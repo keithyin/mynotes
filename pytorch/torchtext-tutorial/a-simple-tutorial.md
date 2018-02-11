@@ -9,7 +9,7 @@
 * `torchtext.data.Example` : 用来表示一个样本，数据+标签
 * `torchtext.vocab.Vocab`: 词汇表相关
 * `torchtext.data.Datasets`: 数据集类，`__getitem__` 返回 `Example`实例
-* `torchtext.data.Field` : 用来定义如何处理样本
+* `torchtext.data.Field` : 用来定义字段的处理方法
   * 创建 `Example`时的 预处理
   * `batch` 时的一些处理操作。
 * `torchtext.data.Iterator`: 迭代器，用来生成 `batch`
