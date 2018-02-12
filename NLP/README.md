@@ -20,10 +20,14 @@
 * question-type classification
 
 
-
-
 * sentiment analysis (情感分析)
-* paraphrase detection
+* paraphrase identification/detection : 
+  * It is usually formalized as a binary classification task: for two sentences (S1 , S2 ), determine whether they roughly have the same meaning.
+  * 即：看看两个句子是不是同一个意思
+  * 可以看作 二分类 问题， yes/no
+* semantic similarity :语义相似性
+  * 两个句子的相似程度
+  * 多分类或者回归问题
 * entailment recognition
 * summarization
 * discourse analysis
@@ -44,4 +48,7 @@
 
 * syntactic : 语法
 * semantic：语义
+* part-of-speech tagging : 词性标注
+  * 动词/名词/副词.... 
+* ​
 
