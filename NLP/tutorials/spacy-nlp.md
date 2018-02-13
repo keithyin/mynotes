@@ -258,12 +258,6 @@ for np in doc.noun_chunks:
 
 ![](../imgs/spacy-nltk-corenlp.png)
 
-
-
-
-
-
-
 ## 参考资料
 
 [https://github.com/pytorch/text](https://github.com/pytorch/text)
