@@ -160,7 +160,7 @@ def cleanup(token, lower = True):
 from collections import Counter
 cleaned_list = [cleanup(word.string) for word in document if not isNoise(word)]
 Counter(cleaned_list) .most_common(5)
->> [( u'hotel', 683), (u'room', 652), (u'great', 300),  (u'sheraton', 285), (u'location', 271)]
+>> [('hotel', 683), ('room', 652), ('great', 300),  ('sheraton', 285), ('location', 271)]
 ```
 
  

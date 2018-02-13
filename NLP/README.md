@@ -44,6 +44,26 @@
 
 
 
+
+## 词性标注 (Part-of-speech tagging)
+
+```python
+noun ： 名词
+verb ： 动词
+adjective ： 形容词
+adverb ： 副词
+pronoun ： 代词
+preposition ： 介词
+conjunction ： 连词
+interjection ： 感叹词
+article or (more recently) determiner ： 冠词
+```
+
+
+
+
+
+
 ## Terminology
 
 * syntactic : 语法
