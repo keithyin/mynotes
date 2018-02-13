@@ -76,7 +76,7 @@ nlp = spacy.load(“en”)
 `nlp` 对象将要被用来创建文档，访问语言注释和不同的 nlp 属性。**我们通过加载一个 文本文件 来创建一个 document** 。这里使用的是从 `tripadvisor's` 网站上下载下来的 [旅馆评论]((https://s3-ap-south-1.amazonaws.com/av-blog-media/wp-content/uploads/2017/04/04080929/Tripadvisor_hotelreviews_Shivambansal.txt))。
 
 ```python
-document = str(open(filename).read().encode('utf8'))
+document = open(filename).read()
 document = nlp(document)
 ```
 
