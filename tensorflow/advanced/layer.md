@@ -6,7 +6,7 @@
 
 * 重写 `build()` 方法： `__call__` 方法会调用这个方法
 
-  * 里面应该调用 `add_variable` 
+  * 里面应该调用 `add_variable` ， 添加变量
   * 然后调用 `super's build()` 方法，它会设置 `self.built=True`
 * 重写 `call()` 方法： 执行 前向计算操作。
 
