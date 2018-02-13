@@ -18,8 +18,8 @@
 *  `text classification`,
 *  `entity detection`,
 *  `machine translation`, 
-* `question answering`, 
-* `concept identification`. 
+*  `question answering`, 
+*  `concept identification`. 
 
 在本文中，将介绍一个高级的 NLP 库 - spaCy 
 
@@ -33,10 +33,8 @@
    2. Pos Tagging
    3. Entity Detection
    4. Dependency Parsing
-3. 名词短语
-4. 词向量
-5. 集成 Spacy 和 Machine Learning
-6. 与 NLTK 和 coreNLP 的对比
+   5. 名词短语
+3. 与 NLTK 和 coreNLP 的对比
 
 
 
@@ -54,10 +52,10 @@ Spacy 是由 `cython` 编写。因此它是一个非常快的库。 `spaCy` 提�
 pip install spacy
 ```
 
-下载所有的数据和模型
+下载数据和模型
 
 ```
-python -m spacy.en.download all
+python -m spacy download en
 ```
 
 现在，您可以使用 `Spacy` 了。
@@ -99,9 +97,7 @@ dir(document)
 >> ['this', 'is', 'a', 'sentence', '.']
 ```
 
-
-
-Every spaCy document is tokenized into sentences and further into tokens which can be accessed by iterating the document:
+`Spacy` 会先将文档 分解成句子，然后再 `tokenize` 。我们可以使用迭代来遍历整个文档。
 
 ```python
 # first token of the doc 
@@ -138,11 +134,11 @@ for word in list(document.sents)[0]:
 
 ```
 
-Let’s explore some top unigrams of the document. I have created a basic preprocessing and text cleaning function.
+下面代码创建一个 文本处理 操作，去掉噪声词。
 
 ```python
 #define some parameters  
-noisy_pos_tags = [“PROP”]
+noisy_pos_tags = ["PROP"]
 min_token_length = 2
 
 #Function to check if the token is a noise or not  
@@ -169,13 +165,13 @@ Counter(cleaned_list) .most_common(5)
 
  
 
-### 2.3 Entity Detection
+### 2.3 Entity Detection （实体检测）
 
 `Spacy` 包含了一个快速的 实体识别模型，它可以识别出文档中的 实体短语。有多种类型的实体，例如 - 人物，地点，组织，日期，数字。可以通过 `document` 的 `ents` 属性来访问这些实体。 
 
-下面代码用来 找出 当前文档中的所有 命名实体。Let’s find all the types of named entities from present in our document.
+下面代码用来 找出 当前文档中的所有 命名实体。
 
-```
+```python
 labels = set([w.label_ for w in document.ents]) 
 for label in labels: 
     entities = [cleanup(e.string, lower=False) for e in document.ents if label==e.label_] 
@@ -187,71 +183,80 @@ for label in labels:
 
 ### 2.4 Dependency Parsing
 
-One of the most powerful feature of spacy is the extremely fast and accurate syntactic dependency parser which can be accessed via lightweight API. The parser can also be used for sentence boundary detection and phrase chunking. The relations can be accessed by the properties “.children” , “.root”, “.ancestor” etc.
+`spacy` 一个非常强大的特性就是 十分快速和准确的语法解析树的构建，通过一个简单的 API 即可完成。这个 `parser` 也可以用作句子边界检测和短语切分。通过 “.children” , “.root”, “.ancestor” 即可访问。
 
-```
+```python
 # extract all review sentences that contains the term - hotel
 hotel = [sent for sent in document.sents if 'hotel' in sent.string.lower()]
 
 # create dependency tree
-sentence = hotel[2] for word in sentence:
-print word, ': ', str(list(word.children))
->> A :  []  cab :  [A, from] 
+sentence = hotel[2] 
+for word in sentence:
+	print(word, ': ', str(list(word.children)))
+>> A :  []  
+cab :  [A, from] 
 from :  [airport, to]
 the :  [] 
 airport :  [the] 
 to :  [hotel] 
-the :  [] hotel :  
-[the] can :  []
+the :  [] 
+hotel :  [the] 
+can :  []
 be :  [cab, can, cheaper, .] 
-cheaper :  [than] than :  
-[shuttles]
+cheaper :  [than]
+than :  [shuttles] 
 the :  []
 shuttles :  [the, depending] 
-depending :  [time] what :  [] 
-time :  [what, of] of :  [day]
-the :  [] day :  
-[the, go] you :  
-[]
+depending :  [time] 
+what :  [] 
+time :  [what, of] 
+of :  [day]
+the :  [] 
+day :  [the, go] 
+you :  []
 go :  [you]
 . :  []
 ```
 
-Let’s parse the dependency tree of all the sentences which contains the term hotel and check what are the adjectival tokens used for hotel. I have created a custom function that parses a dependency tree and extracts relevant pos tag.
+下面代码所作的工作是：解析所有 包含 "hotel" 句子的依赖树，看看都用了什么样的形容词来描述 "hotel"。下面创建了一个自定义函数来解析依赖树和抽取相关的词性标签。
 
-```
+```python
 # check all adjectives used with a word 
-def pos_words (sentence, token, ptag):
-    sentences = [sent for sent in sentence.sents if token in sent.string]     
+def pos_words (document, token, pos_tag):
+    sentences = [sent for sent in document.sents if token in sent.string]     
     pwrds = []
     for sent in sentences:
         for word in sent:
-            if character in word.string: 
+            if token in word.string: 
                    pwrds.extend([child.string.strip() for child in word.children
-                                                      if child.pos_ == ptag] )
+                                                      if child.pos_ == pos_tag] )
     return Counter(pwrds).most_common(10)
 
-pos_words(document, 'hotel', “ADJ”)
+pos_words(document, 'hotel', "ADJ")
 >> [(u'other', 20), (u'great', 10), (u'good', 7), (u'better', 6), (u'nice', 6), (u'different', 5), (u'many', 5), (u'best', 4), (u'my', 4), (u'wonderful', 3)]
 ```
 
  
 
-### 2.5 Noun Phrases
+### 2.5 Noun Phrases （名词短语）
 
-Dependency trees can also be used to generate noun phrases:
+`Dependency trees` 也可以用来生成名词短语。 
 
-```
+```python
 # Generate Noun Phrases 
 doc = nlp(u'I love data science on analytics vidhya') 
 for np in doc.noun_chunks:
-    print np.text, np.root.dep_, np.root.head.text
+    print(np.text, np.root.dep_, np.root.head.text)
 >> I nsubj love
    data science dobj love
    analytics pobj on
 ```
 
 
+
+## 3.与CNTK和core NLP 的对比
+
+![](../imgs/spacy-nltk-corenlp.png)
 
 
 
