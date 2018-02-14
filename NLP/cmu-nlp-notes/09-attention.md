@@ -76,7 +76,7 @@ $$
 
 **本文提出来的模型就是为了解决，内存表示能力不足和 LSTM 无法处理 输入序列的 结构化信息 这两个问题**
 
-* 将 `memory cell` 替换成 `memory network` 
+* 将 `memory cell` 替换成 `memory network` , 使用 `memory network` 计算 `lstm` 的输入 $h_{t-1}, c_{t-1}$
 * The resulting Long Short-Term Memory-Network (LSTMN) stores the **contextual representation of each input token** with a unique memory slot and the size of the memory grows with time until an upper bound of the memory span is reached.
 
 **LSTMN**
