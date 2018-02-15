@@ -4,7 +4,6 @@ import time
 import random
 import dynet as dy
 import numpy as np
-
 from tree import Tree
 
 def read_dataset(filename):
