@@ -10,9 +10,6 @@ class Dataset(torch.utils.data.Dataset):
         sort_key (callable): A key to use for sorting dataset examples for batching
             together examples with similar lengths to minimize padding.
         examples (list(Example)): The examples in this dataset.
-            fields: A dictionary containing the name of each column together with
-            its corresponding Field object. Two columns with the same Field
-            object will share a vocabulary.
         fields (dict[str, Field]): Contains the name of each column or field, together
             with the corresponding Field object. Two fields with the same Field object
             will have a shared vocabulary.
@@ -21,7 +18,6 @@ class Dataset(torch.utils.data.Dataset):
 
     def __init__(self, examples, fields, filter_pred=None):
         """Create a dataset from a list of Examples and Fields.
-
         Arguments:
             examples: List of Examples.
             fields (List(tuple(str, Field))): The Fields to use in this tuple. The
@@ -43,7 +39,8 @@ class Dataset(torch.utils.data.Dataset):
     @classmethod
     def splits(cls, path=None, root='.data', train=None, validation=None,
                test=None, **kwargs):
-        """Create Dataset objects for multiple splits of a dataset.
+        """工具函数，用来一次创建多个 Dataset。因为在数据集方面，一般分为 训练集，验证集，测试集，
+        有这么一个简单的函数来一次性创建三个 Dataset 实例，那是十分方便的。
 
         Arguments:
             path (str): Common prefix of the splits' file paths, or None to use
@@ -105,8 +102,7 @@ class Dataset(torch.utils.data.Dataset):
 ```python
 class Example(object):
     """Defines a single training or test example.
-
-    Stores each column of the example as an attribute.
+	将样本的每列(field) 保存成属性，从 cls.fromlist 代码中可以看出端倪
     """
 
     @classmethod
