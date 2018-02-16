@@ -201,6 +201,7 @@ for ITER in range(100):
     start = time.time()
     for i, tree in enumerate(train, 1):
         sents += 1
+
         d = tlm.expr_for_tree(tree, True)
         nodes = tree.nonterms()
         losses = [F.softmax_cross_entropy(tlm.classify(nt._e), makevar(l2i[nt.label])) for nt in nodes]
