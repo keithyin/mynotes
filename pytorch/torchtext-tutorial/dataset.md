@@ -172,3 +172,10 @@ class Example(object):
         return cls.fromlist([' '.join(tree.leaves()), tree.label()], fields)
 ```
 
+
+
+## 自定义 Dataset
+
+要做的事情就是：
+
+准备好 `Example list` 就可以了。。。。
