@@ -6,7 +6,9 @@
 
 * sentences matching (两个句子是否匹配)
 * **Paraphrase(释义) identification** aims to determine whether two sentences have the same meaning.
-* textual entailment
+* textual entailment：
+  * entailment： 蕴含，包含的意思
+  * 这歌文字不长，却蕴含着丰富的内容
 * retrieval
 * semantic parsing
 * sentence modeling
@@ -15,9 +17,8 @@
 
 **classification tasks**
 
-* sentiment
 * subjectivity
-* question-type classification
+* question-type classification: 问题类型分类。
 
 
 * sentiment analysis (情感分析)
@@ -29,10 +30,10 @@
   * 两个句子的相似程度
   * 多分类或者回归问题
 * entailment recognition
-* summarization
-* discourse analysis
-* machine translation
-* grounded language learning
+* summarization：文本摘要
+* discourse analysis : [http://www.english.ugent.be/da](http://www.english.ugent.be/da)
+* machine translation : 
+* grounded language learning : 
 * image retrieval
 
 
@@ -70,5 +71,5 @@ article or (more recently) determiner ： 冠词
 * semantic：语义
 * part-of-speech tagging : 词性标注
   * 动词/名词/副词.... 
-* ​
+* ​Noun Phrase ： 名词性短语
 
