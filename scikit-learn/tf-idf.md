@@ -60,5 +60,9 @@ vect = TfidfVectorizer(min_df=0, max_df=0.7,
 
 [https://nlp.stanford.edu/IR-book/html/htmledition/tf-idf-weighting-1.html](https://nlp.stanford.edu/IR-book/html/htmledition/tf-idf-weighting-1.html)
 
+[http://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction](http://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction)
+
+[http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html](http://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.TfidfVectorizer.html)
+
 
 
