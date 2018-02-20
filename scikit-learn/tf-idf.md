@@ -31,6 +31,24 @@ $$
 \text{Score}(q,d) = \sum_{t \in q} \text{tf-idf}_{t,d}
 $$
 
+## sklearn 与 tf-idf
+
+`scikit-learn` 工具包也包含了处理 `tf-idf` 的工具包，
+
+```python
+vect = TfidfVectorizer(min_df=0, max_df=0.7,
+                       analyzer='word',
+                       ngram_range=(1, 2),
+                       strip_accents='unicode',
+                       smooth_idf=True,
+                       sublinear_tf=True,
+                       max_features=10
+                      )
+# max_features : 计算 corpus 的 term frequency，从大到小排，取前 max_features个。
+```
+
+
+
 
 
 
