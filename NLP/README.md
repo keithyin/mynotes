@@ -62,6 +62,34 @@ article or (more recently) determiner ： 冠词
 
 
 
+## Evaluation
+
+**perplexity**
+
+* e 的 交叉熵损失次方
+
+
+
+**BLEU**
+
+* 比较 n-gram 的重叠。 用来衡量 系统输出的结果和 真实目标的匹配度。
+
+```python
+# reference : Taro visited Hanako
+# system : the Taro visited the Hanako
+
+# 1-gram : 3/5
+# 2-gram: 1/4
+# brevity = min(1.0, |system|/|reference|)
+# BLEU-2 = (3/5*1/4)^(1/2) * brevity
+```
+
+
+
+
+
+
+
 
 
 
