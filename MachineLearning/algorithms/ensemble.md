@@ -97,7 +97,7 @@ $$
 f_M(x) = \sum_{m=1}^M T(x;\Theta_m)
 $$
 
-* 每一步的 decision tree 是在拟合的 參差。
+* 每一步的 decision tree 是在拟合的 残差。即： $c_{m,j}$ 来拟合当前的残差 $r_{m,i}$ ， 残差残差加起来，就是完整的值咯。
 
 
 
@@ -138,6 +138,37 @@ $$
 
 
 
+
+## BDT 与 GBDT
+
+**这里应该区分两个 loss**
+
+* 决策树如何拟合的 loss。
+* 模型的 loss。
+
+
+
+**BDT** ： 每次使用 残差来划分区域，把残差相近的搞在一起。
+
+* 认为残差相近的放在一起，整体 loss 就会降低。 这个是当然，值一样的放在一起，然后求个平均，loss 当然低。
+
+**GBDT** ： 每次使用 梯度 划分 区域，梯度相近的放在一起。梯度相近意味着它们的值可能很相近。
+
+* GBDT 中的决策树是用来拟合 梯度的。
+* 为什么要拟合梯度 ??????????????????
+* 难道 GBDT 认为，**梯度相似，代表着步长相似** ，假设两个样本的损失为 $(y^{(1)}-h(x^{(1)}))^2$ ，$(y^{(2)}-h(x^{(2)}))^2$ ，画出这两个 二次曲线，会发现，梯度相同的地方，它们到达最优点的步长是相同的！！！！
+* 当 loss 为 平方损失函数的时候，GBDT == BDT。
+
+
+
+**用 L1 loss 来看 GBDT**
+
+*  GBDT 拟合梯度的方式的话：如果预测值比 target  大，就放在 `-1` 那堆， 如果预测值比 target 小，就放在 `1` 那堆。然后这两堆计算 $c_1, c_2$
+* 如果使用残差拟合的话： 那他们估计要放到很多个堆里去咯。
+
+
+
+
 ## 遗留问题
 
 * adaboost 的证明。
@@ -148,3 +179,5 @@ $$
 ## 参考资料
 
 [https://www.csie.ntu.edu.tw/~htlin/course/mltech18spring/](https://www.csie.ntu.edu.tw/~htlin/course/mltech18spring/)
+
+[https://www.quora.com/What-is-an-intuitive-explanation-of-Gradient-Boosting](https://www.quora.com/What-is-an-intuitive-explanation-of-Gradient-Boosting)
