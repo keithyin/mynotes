@@ -165,12 +165,24 @@ array([[ -5.207e+02,  -4.898e+02, ...,  -5.207e+02,  -5.207e+02],
 * 功率之比
 
 $$
-1db = 10\log_{10}\Bigr(\frac{W}{W_o}\Bigr)
+1dB = 10\log_{10}\Bigr(\frac{W}{W_0}\Bigr)
 $$
 
-**waveform**
+* 幅值之比
 
+$$
+1dB = 10\log_{10}\Bigr(\frac{X}{X_0}\Bigr)^2 = 20\log_{10}\Bigr(\frac{X}{X_0}\Bigr)
+$$
 
+## STFT
+
+The **short-time Fourier transform** (**STFT**), is a [Fourier-related transform](https://en.wikipedia.org/wiki/List_of_Fourier-related_transforms) used to determine the sinusoidal frequency and phase content of local sections of a signal as it changes over time.[[1\]](https://en.wikipedia.org/wiki/Short-time_Fourier_transform#cite_note-1) 
+
+In practice, the procedure for computing STFTs is to divide a longer time signal into shorter segments of equal length and then compute the Fourier transform separately on each shorter segment.
+
+* 将一整段音频分割成长度相同的多个部分, 然后对每个分割后的部分计算傅立叶变换.
+
+ This reveals the **Fourier spectrum on each shorter segment**. One then usually plots the changing spectra as a function of time.
 
 
 
