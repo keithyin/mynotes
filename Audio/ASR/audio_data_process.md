@@ -73,6 +73,91 @@ torchaudio.load(filepath, out=None, normalization=None)
 
 
 
+## 信号处理
+
+**傅立叶频谱**
+
+```python
+scipy.signal.spectrogram(x, fs=1.0, window=('tukey', 0.25), nperseg=None, noverlap=None, nfft=None, detrend='constant', return_onesided=True, scaling='density', axis=-1, mode='psd')
+# 使用傅立叶变换计算频谱
+# fs: x数据的采样频率
+# nperseg: n-per-segment
+# noverlap: 两个 segment 之间的重叠
+# nfft: 如果为None, FFT的长度=nperseg, 如果有值, 则表示FFT的长度
+```
+
+
+
+```python
+sample_rate, samples = wav.read(first_audio)
+freqs, times, spec = signal.spectrogram(samples, sample_rate, window="hann", nperseg=int(20 / 1e3 * sample_rate),noverlap=int(10 / 1e3 * sample_rate), detrend=False)
+# freqs : 表示每个值所代表的频率, shape (n,)
+# times: 表示每个 timestep 的时间, shape (m,)
+# spec: 频率的幅值, shape (n,m)
+# 可视化的时候,一般都是求 log(spec)
+```
+
+
+
+**Mel power spectrogram**
+
+> 使用 librosa 库
+
+```python
+# 这里读取 .wav 文件就不能再用 scipy.io.wavfile, 得用 librosa.load, 它读出来的是归一化后的.
+# S: [num_mels, time], 
+S = feature.melspectrogram(samples, sr=sample_rate, n_mels=228)
+
+# log_S: shape [num_mels, time], (-80db, 0db)
+log_S = librosa.power_to_db(S, ref=np.max)
+```
+
+
+
+**计算 MFCC**
+
+```python
+librosa.feature.mfcc(y=None, sr=22050, S=None, n_mfcc=20, **kwargs)
+# 计算MFCC
+# y: ndarray (n,) 或者 None, 原始音频信号
+# sr: 采样频率, None的话使用文本的采样频率
+# S: log-power Mel spectrogram (d,t) 或者 None
+# n_mfcc: mfcc 数量
+```
+
+```python
+# 使用原始音频数据计算 MFCC
+y, sr = librosa.load(librosa.util.example_audio_file())
+librosa.feature.mfcc(y=y, sr=sr)
+"""
+array([[ -5.229e+02,  -4.944e+02, ...,  -5.229e+02,  -5.229e+02],
+       [  7.105e-15,   3.787e+01, ...,  -7.105e-15,  -7.105e-15],
+       ...,
+       [  1.066e-14,  -7.500e+00, ...,   1.421e-14,   1.421e-14],
+       [  3.109e-14,  -5.058e+00, ...,   2.931e-14,   2.931e-14]])
+"""
+```
+
+```python
+# 使用计算好的 Mel spectrogram 计算 MFCC
+S = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=128,
+                                    fmax=8000)
+librosa.feature.mfcc(S=librosa.power_to_db(S))
+"""
+array([[ -5.207e+02,  -4.898e+02, ...,  -5.207e+02,  -5.207e+02],
+       [ -2.576e-14,   4.054e+01, ...,  -3.997e-14,  -3.997e-14],
+       ...,
+       [  7.105e-15,  -3.534e+00, ...,   0.000e+00,   0.000e+00],
+       [  3.020e-14,  -2.613e+00, ...,   3.553e-14,   3.553e-14]])
+"""
+```
+
+
+
+
+
+
+
 
 
 
@@ -81,3 +166,6 @@ torchaudio.load(filepath, out=None, normalization=None)
 
 [https://medium.com/@ageitgey/machine-learning-is-fun-part-6-how-to-do-speech-recognition-with-deep-learning-28293c162f7a](https://medium.com/@ageitgey/machine-learning-is-fun-part-6-how-to-do-speech-recognition-with-deep-learning-28293c162f7a)
 
+[https://www.kaggle.com/davids1992/speech-representation-and-data-exploration](https://www.kaggle.com/davids1992/speech-representation-and-data-exploration)
+
+[https://librosa.github.io/librosa/index.html](https://librosa.github.io/librosa/index.html)
