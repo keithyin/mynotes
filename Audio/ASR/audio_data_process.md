@@ -186,7 +186,7 @@ In practice, the procedure for computing STFTs is to divide a longer time signal
 
 
 
-
+[http://blog.csdn.net/v_july_v/article/details/6196862](http://blog.csdn.net/v_july_v/article/details/6196862)
 
 
 
