@@ -4,6 +4,8 @@
 
 **Unsupervised Filterbank Learning Using Convolutional Restricted Boltzmann Machine for Environmental Sound Classification**
 
+
+
 > we propose to use Convolutional Restricted Boltzmann Machine (ConvRBM) to learn filterbank from the raw audio signals.
 
 
@@ -17,6 +19,38 @@
 * 用了 fusion 之后效果很好
 * 只用ConvRBM-BANK 效果会如何?
 * 提出的算法对 MFCC 特征有很好的补充作用.
+
+
+
+**Score-Level Fusion指的是什么?**
+
+总结:
+
+> 使用 ConvRBM 无监督训练出来的特征与 MFCC/Mel 特征进行融合, 然后会得到非常好的分类效果, 无监督训练出来的特征起到了非常好的特征补充作用.
+
+
+
+**LEARNING FROM BETWEEN CLASS EXAMPLES FOR Deep SOUND RECOGNITION**
+
+* 数据增强的一种方式
+* soft-label 的感觉
+* 数据mix可能出现的问题
+  * 声音的大小决定了输出的概率?
+* 两个声音混合变成了另一种声音?
+  * ​
+
+> Our strategy is to learn a discriminative feature space by **recognizing the between-class sounds as between-class sounds**.  We generate between-class sounds by mixing two sounds belonging to different classes with a random ratio. We then input the mixed sound to the model and train the model to output the mixing ratio.
+
+* **Fisher’s criterion**
+  * ​
+
+
+
+**ENVIRONMENTAL SOUND CLASSIFICATION WITH CNN**
+
+
+
+
 
 **Audio Event and Scene Recognition: A Unified Approach using Strongly and Weakly Labeled Data**
 
