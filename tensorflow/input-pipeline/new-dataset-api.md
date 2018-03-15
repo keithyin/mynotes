@@ -129,9 +129,11 @@ class Demo():
         val_dataset = val_dataset.batch(10)
         self.val_data_iter = val_dataset.make_initializable_iterator()
         self.next_val_batch = self.val_data_iter.get_next()
-
+		
+        # lock the tensorflow graph
+        tf.get_default_graph().finalize() 
         self.session = tf.Session()
-
+		
         # train flag
         self._train = True
 
