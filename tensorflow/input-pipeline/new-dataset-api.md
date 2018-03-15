@@ -68,6 +68,38 @@ def func(example_proto):
 > * reinitializable: ...
 > * feedable: ...
 
+```python
+# one-shot, 不支持参数化, 不能重新初始化, repeat, batch, shuffle 都可以用
+dataset = tf.data.Dataset.range(100)
+iterator = dataset.make_one_shot_iterator()
+next_element = iterator.get_next()
+for i in range(100):
+  value = sess.run(next_element)
+  assert i == value
+```
+
+```python
+# initializable, 可初始化的迭代器, 支持参数化.
+max_value = tf.placeholder(tf.int64, shape=[])
+dataset = tf.data.Dataset.range(max_value)
+iterator = dataset.make_initializable_iterator()
+next_element = iterator.get_next()
+
+# Initialize an iterator over a dataset with 10 elements.
+sess.run(iterator.initializer, feed_dict={max_value: 10})
+for i in range(10):
+  value = sess.run(next_element)
+  assert i == value
+
+# Initialize the same iterator over a dataset with 100 elements.
+sess.run(iterator.initializer, feed_dict={max_value: 100})
+for i in range(100):
+  value = sess.run(next_element)
+  assert i == value
+```
+
+
+
 
 
 
