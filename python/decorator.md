@@ -41,4 +41,7 @@ def log(text):
 @log("do something") #会调用 log(text) 返回 decorator, 然后 decorator 才作用到 func 上.
 def func():
     pass
+"""
+相当于执行了: func = log("do something")(func)
+"""
 ```
