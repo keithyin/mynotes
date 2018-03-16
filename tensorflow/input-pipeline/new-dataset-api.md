@@ -148,7 +148,7 @@ class DataIter():
 
 ```python
 import tensorflow as tf
-class Demo():
+class DataIter():
     def __init__(self):
         # prepare train  dataset
         train_dataset = tf.data.Dataset.range(97)
@@ -217,7 +217,7 @@ if __name__ == '__main__':
 
 ```python
 import tensorflow as tf
-class Demo():
+class DataIter():
     def __init__(self):
         """
         和上面一样
