@@ -24,3 +24,21 @@ def say():
   print('hello')
 ```
 将`@log`放到`say()`函数的定义之前,就等价于执行了`say = log(say)`
+
+
+
+**如果 decorator 需要传入参数**
+
+```python
+def log(text):
+    def decorator(func):
+        def wrapper(*args, **kw):
+            print('%s %s():' % (text, func.__name__))
+            return func(*args, **kw)
+        return wrapper
+    return decorator
+
+@log("do something") #会调用 log(text) 返回 decorator, 然后 decorator 才作用到 func 上.
+def func():
+    pass
+```
