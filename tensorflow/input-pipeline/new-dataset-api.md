@@ -199,7 +199,7 @@ class DataIter():
         self._train = False
 
 if __name__ == '__main__':
-    demo = Demo()
+    demo = DataIter()
     for i in range(10):
         demo.init_train_pipeline()
         for v in demo:
@@ -247,7 +247,7 @@ class DataIter():
         self._train = False
 
 if __name__ == '__main__':
-    demo = Demo()
+    demo = DataIter()
     for i in range(10):
         demo.init_pipeline()
         demo.train()
