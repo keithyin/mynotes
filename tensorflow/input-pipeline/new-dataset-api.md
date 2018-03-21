@@ -260,7 +260,98 @@ if __name__ == '__main__':
         print("**************************")
 ```
 
+```python
+# in action
+import tensorflow as tf
+import os
 
+
+class DataIter():
+    def __init__(self):
+        # prepare train  dataset
+        self.train_files = tf.placeholder(dtype=tf.string, shape=[None])
+        train_dataset = tf.data.TFRecordDataset(self.train_files)
+        train_dataset = train_dataset.map(DataIter.map_func)
+        train_dataset = train_dataset.shuffle(buffer_size=10000)
+        train_dataset = train_dataset.batch(100)
+        self.train_data_iter = train_dataset.make_initializable_iterator()
+        self.next_train_batch = self.train_data_iter.get_next()
+
+        # prepare val dataset
+        self.val_files = tf.placeholder(tf.string, shape=[None])
+        val_dataset = tf.data.TFRecordDataset(self.val_files)
+        val_dataset = val_dataset.map(DataIter.map_func)
+        val_dataset = val_dataset.batch(100)
+        self.val_data_iter = val_dataset.make_initializable_iterator()
+        self.next_val_batch = self.val_data_iter.get_next()
+
+        # lock the tensorflow graph
+        tf.get_default_graph().finalize()
+        self.session = tf.Session()
+
+        # train flag
+        self._train = True
+
+    def __iter__(self):
+        return self
+
+    def init_pipeline(self, filepathes, holdout_id=1):
+        trains = [file for i, file in enumerate(filepathes, start=1)
+                  if i != holdout_id]
+        vals = [file for i, file in enumerate(filepathes, start=1)
+                if i == holdout_id]
+        self.session.run(self.train_data_iter.initializer, feed_dict={
+            self.train_files: trains
+        })
+        self.session.run(self.val_data_iter.initializer, feed_dict={
+            self.val_files: vals
+        })
+
+    def __next__(self):
+        try:
+            if self._train:
+                return self.session.run(self.next_train_batch)
+            else:
+                return self.session.run(self.next_val_batch)
+        except tf.errors.OutOfRangeError:
+            raise StopIteration("out of range")
+
+    def train(self):
+        self._train = True
+
+    def eval(self):
+        self._train = False
+
+    @staticmethod
+    def map_func(example):
+        features = {"label": tf.FixedLenFeature(shape=[], dtype=tf.int64),
+                    "audio_raw": tf.FixedLenFeature(shape=[], dtype=tf.string)}
+        example = tf.parse_single_example(example, features)
+        label = example["label"]
+        audio = tf.reshape(tf.decode_raw(example["audio_raw"], out_type=tf.float32),
+                           shape=[2, 60, 101])
+        return audio, label
+
+
+if __name__ == '__main__':
+
+    root = "/media/fanyang/workspace/DataSet/ESC-50-master/tfrecords"
+    files = sorted(os.listdir(root))
+    filepaths = [os.path.join(root, file) for file in files]
+
+    data_iter = DataIter()
+    for i in range(10):
+        data_iter.init_pipeline(filepaths)
+        data_iter.train()
+        for batch in data_iter:
+            print(batch)
+        print("--------------------------")
+        data_iter.eval()
+        for batch in data_iter:
+            print(batch)
+        print("**************************")
+
+```
 
 
 
