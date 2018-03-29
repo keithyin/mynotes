@@ -30,13 +30,15 @@ exploration ，就是让 agent 什么都经历一下，他才知道什么是最�
 
 > 1. The majority of model-free reinforcement learning algorithms are based on generalized policy iteration:  i.e.   policy evaluation ---- policy improvement
 > 2. Policy Evaluation ： 估计 当前 policy 下， action-value 的值（MC，TD 方法都可以）
-> 3. Policy Improvement：通过 **估计的 action-value function** 来更新 policy $\pi^{k+1}(s)=\arg \max\limits_a Q^{\pi^k}(s,a)$ 
+> 3. Policy Improvement：通过 **估计的 action-value function** 来更新 policy $\pi^{k+1}(s)=\arg \max\limits_a Q^{\pi^k}(s,a)​$ 
 > 4. 可以看出， 这个 argmax  操作对于 连续的 action 来说还是挺恼火的。
 > 5. 将 argmax 操作变成： move the policy in the **direction of the gradient of $Q$ **
 > 6. the policy parameters $\theta^{k+1}$  are updated in proportion to the gradient $\nabla_\theta Q^{\pi^k}(s,\pi_\theta(s))$
 > 7. 每个 state 都建议了不同的 policy improvement 的方向。
 
 最终的更新公式为 
+
+
 $$
 \theta^{k+1} = \theta^k+\alpha \mathbb E_{s \sim \rho^{u^k}}\Biggr[\nabla_\theta\pi_\theta(s)\nabla_aQ^{\pi^k}(s,a)\Bigr|_{a=\pi_\theta(s)}\Biggr]
 $$
