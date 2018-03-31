@@ -47,19 +47,41 @@ Column names to use. If the passed data do not have names associated with them, 
 coerce_float : boolean, default False
 Attempt to convert values of non-string, non-numeric objects (like decimal.Decimal) to floating point, useful for SQL result sets
 """
+# 里面的每个元素是一行元素.
+data = [["hello", 2, 3], ["world", 2, 1]]
+
+df = pd.DataFrame.from_records(data)
+df.to_csv("from_records.csv", index=None)
+# 打开文件
+"""
+0,1,2   //这一行是列索引
+hello,2,3
+world,2,1
+"""
 ```
 
 ```python
 DataFrame.from_dict(data, orient='columns', dtype=None)
 """
 data : dict
-{field : array-like} or {field : dict}
+{field1 : array-like, field2: array-like} or {field : dict}
 
 orient : {‘columns’, ‘index’}, default ‘columns’
 The “orientation” of the data. If the keys of the passed dict should be the columns of the resulting DataFrame, pass ‘columns’ (default). Otherwise if the keys should be rows, pass ‘index’.
 
 dtype : dtype, default None
 Data type to force, otherwise infer
+"""
+
+data = {"col1": [1, 2, 3], "col2": [3, 2, 1]}
+df = pd.DataFrame.from_dict(data)
+df.to_csv("from_dict.csv", index=None)
+# 打开文件可以看到
+"""
+col1,col2
+1,3
+2,2
+3,1
 """
 ```
 
