@@ -23,17 +23,78 @@ $\text{idf}_t = \log \frac{N}{\text{df}_t}$  : 其中 N 表示 集合中 `docume
 ## tf-idf weighting
 
 tf-idf weighting 的公式如下：
+
+
 $$
 \text{tf-idf}_{t,d} = \text{tf}_{t,d} *\text{idf}_t
 $$
+
+
 在 Query 情况下，如何计算document 的 Score：
+
+
 $$
 \text{Score}(q,d) = \sum_{t \in q} \text{tf-idf}_{t,d}
 $$
 
 ## sklearn 与 tf-idf
 
-`scikit-learn` 工具包也包含了处理 `tf-idf` 的工具包，
+先看 **CountVectorizer**
+
+```python
+from sklearn.feature_extraction.text import CountVectorizer
+class CountVectorizer(input='content', 
+                      encoding='utf-8', 
+                      decode_error=’strict’, 
+                      strip_accents=None, 
+                      lowercase=True, 
+                      preprocessor=None, 
+                      tokenizer=None, 
+                      stop_words=None, 
+                      token_pattern='(?u)\b\w\w+\b',
+                      ngram_range=(1, 1), 
+                      analyzer='word', 
+                      max_df=1.0, 
+                      min_df=1, 
+                      max_features=None, 
+                      vocabulary=None, 
+                      binary=False, 
+                      dtype=<class ‘numpy.int64’>)
+# 构造函数中设置: 计数属性
+"""
+raw_documents = ["what a beautiful day", "what is your name"]
+"""
+fit(raw_documents) # 开始统计 corpus 中的 token 的数量, 然后确定特征 token 都有啥
+transform(raw_document) # 根据 fit 统计结果, 将 raw_documents 转成矩阵
+get_feature_names() # 获取特征的名字
+```
+
+
+
+再看 **TfidfTransformer**
+
+```python
+# 给定 Count, 将其转化成 TFidf 
+class TfidfTransformer(norm='l2', 
+                       use_idf=True, 
+                       smooth_idf=True, 
+                       sublinear_tf=False)
+"""
+Counts:
+[[3, 0, 1],
+ [2, 0, 0],
+ [3, 0, 0],
+ [4, 0, 0],
+ [3, 2, 0],
+ [3, 0, 2]]
+"""
+fit(X) # 看一下整个 corpus
+transform(X) # Counts 转成 tfidf 表示, 最终还会 Norm 一下.
+```
+
+
+
+最后看 **TfidfVectorizer**, **CountVectorizer与TfidfTransformer** 的结合体.
 
 ```python
 vect = TfidfVectorizer(min_df=0, max_df=0.7,
