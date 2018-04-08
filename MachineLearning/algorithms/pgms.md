@@ -24,7 +24,11 @@ $Z$ : 规范化因子，保证概率为 1
 $$
 Z = \sum_X \prod_{X_C} \Psi_C(X_C)
 $$
-$\Psi_C(X_C)$ 为 势函数（potential function）， 注意，势函数是定义在 最大团上的。一般情况下， 势函数是指数函数。
+$\Psi_C(X_C)$ 为 势函数（potential function）， 注意，**势函数** 是定义在 最大团上的。一般情况下， **势函数**是**指数函数**。 势函数里面又包含了**特征函数**.
+
+
+
+**可以看出, 无向图模型是使用 团上的势函数 定义概率**
 
 
 
@@ -32,9 +36,63 @@ $\Psi_C(X_C)$ 为 势函数（potential function）， 注意，势函数是定�
 $$
 P(y|x) = \frac{1}{Z(x)} \exp \Biggr(\sum_{i, k}\lambda_kt_k(y_{i-1}, y_i, x, i) + \sum_{i,l}\mu_ls_l(y_i, x, i)\Biggr)
 $$
+* $i$ : 表示第  $i$ 个 最大团
+* $k$ : 表示 第 $k$ 个特征, $l$ 也是一样
+
 写成最大团乘积的形式：
 $$
 P(y|x) = \frac{1}{Z(x)} \prod_{C_i}\exp \Biggr(\sum_{k}\lambda_kt_k(y_{i-1}, y_i, x, i) + \sum_{l}\mu_ls_l(y_i, x, i)\Biggr)
 $$
 其中，$t_k(), s_l()$ 是特征函数， $\lambda_k, \mu_l$ 是对应的权值。
+
+
+
+## 条件随机场的简化形式
+
+$$
+P(y|x) = \frac{1}{Z(x)} \exp \Biggr(\sum_{i, k}\lambda_kt_k(y_{i-1}, y_i, x, i) + \sum_{i,l}\mu_ls_l(y_i, x, i)\Biggr)
+$$
+
+由此式子可以看出, 条件随机场中的同一特征 $t_k(), s_l()$ 在各个最大团上都有定义, 所以可以对**同一个特征** 在各个位置求和, 将局部特征函数转化为一个全局特征函数.
+
+设有 $K_1$ 个转移特征, $K_2$ 个状态特征, $K=K_1+K_2$
+
+
+$$
+f_k(y_{i-1}, y_i, x,i) = 
+\begin{cases}
+t_k(y_{i-1}, y_i, x, i), & k=1,2,3,...,K_1 \\
+s_l(y_i, x,i), &k=K_1+l, l=1,2,3,..., K_2
+\end{cases}
+$$
+这样将 **转移特征** 和  **状态特征** 搞在了一起表达.
+
+
+
+然后对转移特征和状态特征在 各个位置 $i$ 求和
+$$
+f_k(y,x) = \sum_{i=1}^n f_k(y_{i-1}, y_i, x, i),  \\
+k = 1,2,3,...,K
+$$
+
+* $k$ 表示第 $k$ 个特征
+* $f_k(y,x)$ 现在表示全局的第 $k$ 个特征了.
+
+
+
+现在再用 $w_k$ 表示特征 $f_k(y,x)$ ,
+$$
+w_k = 
+\begin{cases}
+\lambda_k, &k=1,2,3,...,K_1 \\
+\mu_l, &k=K_1+l, l=1,2,3,...,K_2
+\end{cases}
+$$
+现在, 条件随机场的表达式可以改写成
+$$
+P(y|x) = \frac{1}{Z(x)} \exp\sum_{k=1}^K w_kf_k(y,x)
+$$
+清爽多了.
+
+再搞成矩阵形式
 
