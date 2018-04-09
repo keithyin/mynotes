@@ -11,7 +11,7 @@ L(x^{(1)},x^{(2)},x^{(3)},x^{(4)},x^{(5)},... ;\theta) &=  \prod_{n=1}^N p(x^{(n
 \log L(...) &= \sum_n\log\sum_zp(x^{(n)}, z;\theta)
 \end{aligned}
 $$
-这里为了将 `log-sum` 搞成 `sum-log` ， 使用了 `jason` 不等式
+这里为了将 `log-sum` 搞成 `sum-log` ， 引入另一个分布，接着使用了 `jason` 不等式
 $$
 \begin{aligned} 
 \log L(...) &= \sum_n\log\sum_zp(x^{(n)}, z;\theta) \\
@@ -34,4 +34,3 @@ q_n(z) = p(z|x^{(n)};\theta)
 \end{aligned}
 $$
 得到 $q_n(z)$ 的值之后，再使用梯度上升算法来更新 $\theta$
-
