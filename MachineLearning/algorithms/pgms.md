@@ -94,5 +94,36 @@ P(y|x) = \frac{1}{Z(x)} \exp\sum_{k=1}^K w_kf_k(y,x)
 $$
 清爽多了.
 
-再搞成矩阵形式
+再浓缩一下, 就可以写成下面这种形式, $K$ 为特征个数
+
+$$
+\begin{aligned}
+w &= (w_1, w_2, ..., w_K)^T  \\
+F(y,x)&=\Biggr(f_1(y,x), f_2(y,x), ..., f_K(y,x)\Bigr)^T
+\end{aligned}
+$$
+
+$$
+P_w(y|x) = \frac{1}{Z(x)} \exp w^TF(y,x)
+$$
+
+
+
+## 条件随机场的矩阵形式
+
+引入起点和终点状态标记, $y_0=start, y_{n+1} = end$
+
+对于观测序列的 $x$ 的每个位置 $i=1,2,3,..,n+1$ 定义一个 $m$ 阶矩阵, $m$ 是 $y_i$ 的取值个数
+$$
+\begin{aligned}
+M_i(x) &= \Bigr[M_i(y_{i-1}, y_i|x)\Bigr]\\
+M_i(y_{i-1}, y_i|x)&=\exp\Bigr(W_i(y_{i-1}, y_i|x)\Bigr)\\
+W_i(y_{i-1}, y_i|x)&=\sum_{k=1}^Kw_kf_k(y_{i-1}, y_i, x, i)
+\end{aligned}
+$$
+这时, 条件随机场又可以表示成, 这个是按照 最大团(时间步)表示
+$$
+P_w(y|x) = \frac{1}{Z(x)} \prod_{i=1}^{n+1}M_i(y_{i-1}, y_i|x)
+$$
+
 
