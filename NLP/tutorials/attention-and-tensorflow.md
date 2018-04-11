@@ -208,3 +208,8 @@ def _extract_argmax_and_embed(embedding,
   return loop_function
 ```
 
+
+
+## 存在的问题
+
+官方代码存在一个问题就是，由于 `attention_state` 中的每个样本并不一定是等长度的，在计算 `attn_softmax` 的时候没有进行 正确的 `mask`。
