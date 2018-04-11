@@ -24,7 +24,20 @@
 * `non-login-shell` :  登陆后打开的 `shell`，就像是 ubuntu 图形界面中 打开的 `terminal`
 
 
+
+
+**Interactive-shell 与 Non-Interactive-shell**
+
+* `interactive-shell` : 和用户存在交互的 `shell`
+* `non-interactive-shell` : 和用户不存在交互的 `shell`， 比如执行程序的 `shell` 就是 `non-interactive-shell`
+
+
+
 ## 参考资料
+
 [http://bencane.com/2013/09/16/understanding-a-little-more-about-etcprofile-and-etcbashrc/](http://bencane.com/2013/09/16/understanding-a-little-more-about-etcprofile-and-etcbashrc/)
 [http://stefaanlippens.net/bashrc_and_others/](http://stefaanlippens.net/bashrc_and_others/)
 [https://askubuntu.com/questions/939736/what-is-the-difference-between-etc-profile-and-bashrc](https://askubuntu.com/questions/939736/what-is-the-difference-between-etc-profile-and-bashrc)
+
+[https://www.tldp.org/LDP/abs/html/intandnonint.html](https://www.tldp.org/LDP/abs/html/intandnonint.html)
+
