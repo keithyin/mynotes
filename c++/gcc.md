@@ -8,7 +8,12 @@ gcc -o test test.cc -I/usr/local/include #-I 参数指定 include 文件夹, 为
 
 ```
 
+**上述的编译部分分四个阶段进行**
 
+* 预处理： `gcc -E test.c -o test.i`
+* 编译为汇编代码：`gcc -S test.i -o test.s`
+* 搞成机器码：`gcc -c test.s -o test.o`
+* 链接：`gcc test.o -o test`
 
 
 
