@@ -126,9 +126,21 @@ $$
 
 
 
-**思考**
+## 第三周
 
-重新思考一下 **word2vec** 算法，`CBOW` 和 `SKIP-gram`，一个是上下文相似度，一个根据当前词搞出上下文。
+**How can we get rid of these common words ?**
+
+* 使用两个 word distribution 生成文档， **Background Topic**
+* 由于 word 是由两个分布合作生成的，如果 **Background Topic** 中某个 word 的概率比较高，那么在 Topic Model 中的概率就比较低。
+
+----
+
+**Probabilistic Latent Semantic Analysis (PLSA)**
+
+* document as a sample of mixed Topics
+* ​
+
+## 第四周
 
 
 
@@ -144,6 +156,15 @@ $$
 
 * TF：
 * IDF：
+
+
+
+## 思考
+
+* 重新思考一下 **word2vec** 算法，`CBOW` 和 `SKIP-gram`，一个是上下文相似度，一个根据当前词搞出上下文。
+* 生成模型的两个功能：
+  * 输出概率（else）
+  * 生成样本（GAN）
 
 
 
