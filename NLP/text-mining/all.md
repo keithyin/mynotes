@@ -140,6 +140,14 @@ $$
 * document as a sample of mixed Topics
 * ​
 
+----
+
+**疑问？？？？？？？？？？？？？？？？**
+
+* 为什么说 PLSA 不是生成模型
+* 生成模型，判别模型，监督学习，半监督学习，无监督学习
+* EM算法和VI算法的区别
+
 ## 第四周
 
 
@@ -165,6 +173,7 @@ $$
 * 生成模型的两个功能：
   * 输出概率（else）
   * 生成样本（GAN）
+* EM 算法与 变分推断：EM来求是似然函数或者后验概率最大时对应的参数，变分推断是用来求参数后验分布！！！
 
 
 
@@ -174,7 +183,7 @@ $$
 * `syntagmatically related` ：  语法上的相关
 * `lexical analysis` : 也叫 `part-of-speech tagging`（词性标注）, 名词，动词，介词标注。
 * `syntactic analysis (parsing)` : `parsing tree`，标注句子的结构，名词短语，介词短语。。 可以看出，比 `lexical analysis` 的抽象层级更高。
-*  `semantic analysis` : 文本变符号！！
+* `semantic analysis` : 文本变符号！！
   * 命名实体识别
   * 词意消歧
   * 情感分析
