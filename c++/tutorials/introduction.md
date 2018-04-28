@@ -30,7 +30,7 @@ void say_hello(){
 int main(){
   enum AGES {one, two, three};
   AGES ages = one;
-  // ....
+  // ...
 }
 ```
 
