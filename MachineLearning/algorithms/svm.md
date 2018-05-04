@@ -1,5 +1,13 @@
 # 支持向量机
 
+
+
+**不仅分的准，还要分的好！！！**
+
+* **在正确分类的条件下， 离分界线最近的点的距离最大化**
+
+
+
 * **二分类**
 * `label` 为 $\{1,-1\}$
 
@@ -17,16 +25,20 @@
 
 
 
+
+
+
+
 ## 线性可分支持向量机
 
-**SVM** 想要最大分隔超平面
+**SVM** 想要最大分隔超平面， **所有点的几何间隔都要大于某个值**
 $$
 \begin{aligned}
 &\max_{w,b} \gamma \\
 &s.t. ~~y^{(i)}(\frac{w}{||w||}\bullet x^{(i)}+\frac{b}{||w||})\ge\gamma, i=1,2,3..,N.
 \end{aligned}
 $$
-考虑到 函数间隔与几何间隔的关系式，此问题可以改写成：
+考虑到 函数间隔与几何间隔的关系式$\gamma = \frac{\hat \gamma}{||w||}$，此问题可以改写成：
 $$
 \begin{aligned}
 &\max_{w,b} \frac{\hat\gamma}{||w||} \\
@@ -59,6 +71,39 @@ $$
 原始问题的对偶问题为：
 $$
 \max_{\alpha\ge0} \min_{w,b} L(w,b,\alpha)
+$$
+
+## 为什么使用对偶形式
+
+* 对偶问题往往更容易求解
+* 可以引入核函数，推广到非线性分类问题上
+
+
+
+## KKT 条件
+
+**KKT条件有什么用？**
+
+* 如果求得 $\alpha$ 的值，可以使用 kkt 条件计算得到 w 和 b 的值
+
+$$
+\begin{aligned}
+ w^* - \sum_{i=1}^N\alpha^*_iy_ix_i &= 0 \\
+ \sum_{i=1}^N \alpha^*_iy_i & = 0\\
+ \alpha^*_i(y_i(w^*\bullet x_i + b^*)-1) &= 0\\
+ ... \\
+ ...
+\end{aligned}
+$$
+
+
+
+
+
+## 测试的时候
+
+$$
+res = \text{sign } \Bigr(w^*\bullet x + b\Bigr)
 $$
 
 
