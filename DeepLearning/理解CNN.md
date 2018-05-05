@@ -6,7 +6,7 @@
 
 * Location Invariance 
   * 如果想检测一头大象的话，拿一个大象的 filter 去卷就行了，不用关系大象在什么位置。
-*  Compositionality
+* Compositionality
   * 每个 filter 将低级的特征组合成高级的特征。
 
 
@@ -23,7 +23,72 @@
 
 
 
-## 参考资料
+**参考资料**
 
 [http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)
 
+
+
+## 卷积核
+
+**为什么使用 3×3 卷积核**
+
+* 同样要达到 5*5 的 receptive field，一个 5×5 的卷积核 无论参数还是计算量都比两个 3×3 卷积核的要高
+  * `5*5 filter` : 参数 ： 25,  计算量： 25×W×H
+  * `3×3 filter`： 参数： 2* 9, 计算量： 2×9×W×H 
+* 使用 两个 3×3 的还可以增强网络的表达能力，因为多了个非线性激活单元
+
+**为什么不使用 2×2 卷积核**
+
+* 2*2 卷积核的能力太弱，都不能表示简单的边缘检测器
+
+**为什么使用 1×1 卷积核**
+
+* 作用1：降低 channel 维度
+* 作用2：增加卷积运算的抽象能力，相当于把原始的单层感知机换成了多层感知机。（Network In Network）
+
+
+
+**参考资料**
+
+[https://www.quora.com/What-is-the-significance-of-a-3*3-conV-filter-and-a-1*1-conV-filter-in-CNN](https://www.quora.com/What-is-the-significance-of-a-3*3-conV-filter-and-a-1*1-conV-filter-in-CNN)
+
+
+
+## CNN 的几大经典结构
+
+**AlexNet**
+
+* 解决了啥问题： 手工特征分类精度低的问题
+* 怎么解决的：用 CNN，深度学习
+* 为什么能解决：深度学习牛逼
+
+**VGG**
+
+* 解决了啥问题：AlexNet 分类精度低
+* 怎么解决的：更好的网络结构，都是使用了 3×3 卷积核，结构更简单，更加模块化，写代码更友好
+* 为什么能解决：网络更深
+
+**GoogleNet v1**
+
+* 解决了啥问题：物体的多尺度问题
+* 怎么解决的：同一层中使用了 multi-scale 的filter
+* 为什么能解决： multi-scale 正好捕捉不同 scale 的信息
+
+**GoogleNet v3**
+
+
+
+**resnet V1**
+
+
+
+**resNext**
+
+
+
+**DenseNet**
+
+
+
+**SENet**
