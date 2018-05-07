@@ -228,3 +228,45 @@ $$
 
 模型： $P(Y|X)$, 学习的目标是给定数据集，使用最大熵原理选择最好的分类模型。
 
+
+
+
+
+
+
+## 偏差与方差
+
+[http://scott.fortmann-roe.com/docs/BiasVariance.html](http://scott.fortmann-roe.com/docs/BiasVariance.html)
+
+
+
+**偏差**
+
+*  difference between the **expected (or average) prediction of our model** and the correct value which we are trying to predict.
+* 模型预测的平均值 与 真实值之间的差距
+* 模型为啥会有平均值： 同一个模型，重复训练多次，会得到多组参数，每组参数看作一个模型
+* 另一种看法： 训练集的准确率
+
+
+
+**方差**
+
+* variability of a model prediction for a given data point
+* 一个模型训练多次，看它对同一个点的预测的 变化程度。
+* 另一种看法：dev set 的准确率
+
+
+
+**降低偏差：**
+
+* 增加模型复杂度
+* 换用更好的模型
+
+
+
+**降低方差：**
+
+* 增加数据量
+* 降低模型复杂度
+* ​
+
