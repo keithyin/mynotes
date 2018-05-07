@@ -335,9 +335,15 @@ def non_max_suppression_fast(boxes, overlapThresh):
 
 
 
-多目标检测的代码
+多目标检测的代码:
 
 ```python
+"""
+白话讲流程：
+1. 对 score 进行排序
+2. 从 score 最大的 bbox 开始，计算它与其它 bbox 的 iou，如果 IOU 大于某值，则丢掉那个 bbox
+3. 然后从剩下的 bbox 里面选 score 最大的，继续执行上一步。
+"""
 def nms(boxes, scores, overlap=0.5, top_k=200):
     """Apply non-maximum suppression at test time to avoid detecting too many
     overlapping bounding boxes for a given object.
