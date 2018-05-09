@@ -12,6 +12,31 @@ Learning **long-range dependencies** is a key challenge in many sequence transdu
 
 
 
+## Position Encoding
+
+* 目的，使得 self-attention 的结果对位置敏感一些。
+
+[https://mchromiak.github.io/articles/2017/Sep/12/Transformer-Attention-is-all-you-need/#mechanisms-used-to-compose-transformer-architecture](https://mchromiak.github.io/articles/2017/Sep/12/Transformer-Attention-is-all-you-need/#mechanisms-used-to-compose-transformer-architecture)
+
+
+
+
+
+## Multi-Head Attention
+
+假设 $k$ 个头
+
+* $Q, K, V$ ，分别被线性映射 $k$ 次，然后独立 attention，然后 attention 的结果 cat 起来，然后再映射。
+
+
+
+> Multi-head attention allows the model to jointly **attend to information from different representation subspaces** at different positions.
+
+* 一个头的也可以这样搞啊。不明白
+* 不同的 attention-head 可以注意 拥有不同的注意力分布，但是一个头的就只能有一个 注意力分布了。下面的信息收集的能够增多。
+
+
+
 ## Glossary
 
 * self-attention (intra-attention):  
