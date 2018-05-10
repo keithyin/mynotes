@@ -55,12 +55,14 @@ $$
 * The many-to-one property implies that the **output can’t have more time-steps than the input**.  
 
 
-
 ----
 
 ## Attention
 
 * 有语言模型，有对齐。
+* 没有条件独立性假设，很棒
+* 不是 monotonic alignment，很棒
+* 输出的长度可以长于输入的长度。
 
 
 
@@ -73,12 +75,11 @@ $$
 * many-to-one 的方式不一样，attention 是特征 多个融合，解码一个 time-step，CTC 是解码结果 merge。
   * attention 对齐时，$x_0, x_1, .., x_T$ 在每个解码 `step` 可以复用，ctc merge时，用一次就没了。
 * CTC 是一种 monotonic 对齐，而 attention 无所谓。
-* ​
+* CTC的输出长度不能大于输出长度，attention 无所谓。
 
 **相同点**
 
 * 都是 many-to-one 方式。
-* ​
 
 
 
