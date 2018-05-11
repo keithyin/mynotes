@@ -116,7 +116,7 @@
 ## CNN 用在 NLP 任务上的理解
 
 *  context window modeling
-* ​
+*  ​CNN 只关心这句话有没有 卷积核所表示的那些特征。CNN 特征提取的时候，是不关心时序信息的。
 
 
 
