@@ -26,7 +26,7 @@ out = (data - moving_mean) / moving_std * gamma + beta
 
 **InstanceNorm**
 
-* 不在 batch 维度上求均值
+* 不在 batch 维度上求均值, 计算每个样本的每个 channel  上的均值。
 
 ```python
 mean = np.mean(data, axis=[2, 3])
@@ -40,7 +40,7 @@ out = (data - mean) / std * gamma + beta # gamma: [C], beta: [C]
 
 **LayerNorm**
 
-* **样本** 的每一个点
+* **单个样本**  
 * 不会保存 moving-mean 和 moving-variance
 
 ```python
@@ -54,3 +54,6 @@ out = (data-mean)/std * gamma + beta # gamma: [C, H, W]
 
 
 
+## 参考资料
+
+[https://stackoverflow.com/questions/45463778/instance-normalisation-vs-batch-normalisation](https://stackoverflow.com/questions/45463778/instance-normalisation-vs-batch-normalisation)
