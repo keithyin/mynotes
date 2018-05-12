@@ -31,9 +31,28 @@ $\mathbb h^l = (h^l_1, ..., h^l_n)$ : decoder 第 $l$ 层的 输出
 * one dimensional convolution followed by a non-linearity
 
 
-
-## 问题：
+**问题：**
 
 * 为什么会加速
 * position embedding 有什么意义
+
+
+
+
+**理解 position embedding**
+
+* 位置信息有什么作用，
+
+* 在 attention 中，一般关注的都是距离比较近的，position embedding 可以帮助处理这个问题
+
+* > recurrent models typically do not use explicit position embeddings since they can learn where they are in the sequence through the **recurrent hidden state computation**. 
+
+* CNN 解码和 RNN 解码不同的之处就在与 hidden state，RNN 有， CNN 没有，position embedding 是用来补充这部分信息的。
+
+
+
+**补充实验**
+
+* RNN + position embedding。
+* RNN hidden state 到底保存了一些什么东西。
 
