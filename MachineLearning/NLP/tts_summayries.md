@@ -85,3 +85,6 @@
 [http://www.cstr.ed.ac.uk/downloads/publications/2010/king_hmm_tutorial.pdf](http://www.cstr.ed.ac.uk/downloads/publications/2010/king_hmm_tutorial.pdf)
 
 [https://deepmind.com/blog/wavenet-generative-model-raw-audio/](https://deepmind.com/blog/wavenet-generative-model-raw-audio/)
+
+[https://google.github.io/tacotron/](https://google.github.io/tacotron/)
+
