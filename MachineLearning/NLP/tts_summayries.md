@@ -22,8 +22,6 @@
 
 
 
-
-
 ## Glossary
 
 * **vocoder** [https://whatis.techtarget.com/definition/vocoder](https://whatis.techtarget.com/definition/vocoder)
@@ -63,7 +61,9 @@
 **Wavenet**
 
 * [WaveNet: A generative model for raw audios](http://cn.arxiv.org/pdf/1609.03499.pdf)
+* [FAST WAVENET GENERATION ALGORITHM](http://cn.arxiv.org/pdf/1611.09482.pdf)
 * [Parallel WaveNet: Fast High-Fidelity Speed Synthesis](http://cn.arxiv.org/pdf/1711.10433.pdf)
+* ​
 
 **Tacotron**
 
@@ -83,3 +83,5 @@
 [https://lirnli.wordpress.com/2017/10/16/pytorch-wavenet/](https://lirnli.wordpress.com/2017/10/16/pytorch-wavenet/)
 
 [http://www.cstr.ed.ac.uk/downloads/publications/2010/king_hmm_tutorial.pdf](http://www.cstr.ed.ac.uk/downloads/publications/2010/king_hmm_tutorial.pdf)
+
+[https://deepmind.com/blog/wavenet-generative-model-raw-audio/](https://deepmind.com/blog/wavenet-generative-model-raw-audio/)
