@@ -53,6 +53,33 @@
 * **stress** ： 表示重音。
 
 
+
+## 论文资料
+
+**DeepVoice**
+
+* [Deep Voice: Real-time Neural Text-to-Speech](http://cn.arxiv.org/pdf/1702.07825.pdf)
+
+**Wavenet**
+
+* [WaveNet: A generative model for raw audios](http://cn.arxiv.org/pdf/1609.03499.pdf)
+* [Parallel WaveNet: Fast High-Fidelity Speed Synthesis](http://cn.arxiv.org/pdf/1711.10433.pdf)
+
+**Tacotron**
+
+* [Tacotron: Towards End-to-End Speech Synthesis](http://cn.arxiv.org/pdf/1703.10135.pdf)
+* [Towards End-to-End Prosody Transfer for Expressive Speech Synthesis with Tacotron](http://cn.arxiv.org/pdf/1803.09047.pdf)
+* ​
+
+
 ## 参考资料
 
 [https://www.zhihu.com/question/26815523](https://www.zhihu.com/question/26815523)
+
+[https://zhuanlan.zhihu.com/p/36737737](https://zhuanlan.zhihu.com/p/36737737)
+
+[https://www.zhihu.com/question/50509644](https://www.zhihu.com/question/50509644)
+
+[https://lirnli.wordpress.com/2017/10/16/pytorch-wavenet/](https://lirnli.wordpress.com/2017/10/16/pytorch-wavenet/)
+
+[http://www.cstr.ed.ac.uk/downloads/publications/2010/king_hmm_tutorial.pdf](http://www.cstr.ed.ac.uk/downloads/publications/2010/king_hmm_tutorial.pdf)
