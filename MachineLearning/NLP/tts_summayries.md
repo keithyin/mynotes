@@ -34,7 +34,7 @@
   * 语音中最小的单位，依据音节里的发音动作来分析，一个动作构成一个音素，音素又分为 **元音、辅音** 两大类
 * **grapheme** ： 字形，字素，字母
   * 也就是 **word** , 单词。**hello world** 包含两个 `grapheme` 。
-* **linguistic **
+* **linguistic**
   * 语言学
 * **fundamental frequency** : [https://en.wikipedia.org/wiki/Voice_frequency](https://en.wikipedia.org/wiki/Voice_frequency)
   * ​
