@@ -26,17 +26,23 @@
 
 
 
-## 思考
+**思考**
 
 * 为什么不用 **LSTM** ，却使用 **dilated casual convolution**
   * 语音信号很长，**LSTM** 无法捕捉太长的时序信息。
+  * **LSTM** 的时序特性 导致训练的时候非常慢
 
 
 
-## 参考资料
+**参考资料**
 
 [https://deepmind.com/blog/wavenet-generative-model-raw-audio/](https://deepmind.com/blog/wavenet-generative-model-raw-audio/)
 
 [https://lirnli.wordpress.com/2017/10/16/pytorch-wavenet/](https://lirnli.wordpress.com/2017/10/16/pytorch-wavenet/)
 
 [https://github.com/oxford-cs-deepnlp-2017/lectures](https://github.com/oxford-cs-deepnlp-2017/lectures)
+
+
+
+# Parallel wave-net : Fast High-Fidelity Speech Synthesis
+
