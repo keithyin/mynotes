@@ -33,10 +33,10 @@ $$
 等式的两边同时对分布$Q(z)$求期望，得
 $$
 \begin{aligned}
-\mathbb E_{q(z;\lambda)}\text{log}P(x) &= \mathbb E_{q(z;\lambda)}\text{log}P(x,z)-\mathbb E_{q(z;\lambda)}\text{log}P(z|x) \\
-\text{log}P(x)&=\mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)}-\mathbb E_{q(z;\lambda)}\text{log}\frac{p(z|x)}{q(z;\lambda)} \\
-&=KL(q(z;\lambda)||p(z|x))+\mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)}\\
-\text{log}P(x)&=KL(q(z;\lambda)||p(z|x))+\mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)}
+\mathbb E_{q(z;\lambda)}\text{log}P(x) &= \mathbb E_{q(z;\lambda)}\text{log}P(x,z)-\mathbb E_{q(z;\lambda)}\text{log}P(z|x), \\
+\text{log}P(x)&=\mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)}-\mathbb E_{q(z;\lambda)}\text{log}\frac{p(z|x)}{q(z;\lambda)}, \\
+&=KL(q(z;\lambda)||p(z|x))+\mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)},\\
+\text{log}P(x)&=KL(q(z;\lambda)||p(z|x))+\mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)},
 \end{aligned}
 $$
 我们的目标是使 $q(z:\lambda)$ 靠近 $p(z|x)$ ,就是$\min_\lambda KL(q(z;\lambda)||p(z|x))$ ,由于 $KL(q(z;\lambda)||p(z|x))$ 中包含 $p(z|x)$ ，这项非常难求。将$\lambda$看做变量时，$\text{log}P(x)$ 为常量，所以， $\min_\lambda KL(q(z;\lambda)||p(z|x))$ 等价于 $\max_\lambda \mathbb E_{q(z;\lambda)}\text{log}\frac{p(x,z)}{q(z;\lambda)}$。 $\mathbb E_{q(z;\lambda)}[\text{log}p(x,z)-\text{log}q(z;\lambda)]$ 称为Evidence Lower Bound(`ELBO`)。

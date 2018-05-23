@@ -46,3 +46,19 @@
 
 # Parallel wave-net : Fast High-Fidelity Speech Synthesis
 
+
+
+
+
+# 所需知识
+
+**autoregressive model** (自回归模型)
+
+* [https://baike.baidu.com/item/%E8%87%AA%E5%9B%9E%E5%BD%92/12732327](https://baike.baidu.com/item/%E8%87%AA%E5%9B%9E%E5%BD%92/12732327)
+* 即：$x_t$ 的预测值，与 $x_{1\rightarrow (t-1)}$ 的预测之相关。
+
+
+
+**inverse autoregressive flows**
+
+* ​

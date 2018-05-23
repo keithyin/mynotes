@@ -10,13 +10,26 @@
 * 想进办法生成波形
 
 
-
 **建模的时候分成三个部分：**
+
+> A text-to-speech synthesis system typically consists of multiple stages, such as:
+>
+> * a text analysis
+> * a acoustic model
+> * an audio synthesis
+>
+> 摘自 Tacotron： Towards End-to-End Speech Synthesis，
+>
+> 如果想要对这三个部分有更具体的了解，可以读一下，Deep Voice：Real Time Neural Text-to-Speech
 
 * text analysis fronted : 文本分析前端
   * 抽取音素特征，重音。等等语音特征。
 * acoustic model ： 给定音素，输出声学特征（`duration prediction` , `fundamental frequency` 等等）。
 * audio synthesis module ： 根据声学特征，合成声音
+
+
+
+
 
 
 
@@ -69,8 +82,13 @@
 
 * [Tacotron: Towards End-to-End Speech Synthesis](http://cn.arxiv.org/pdf/1703.10135.pdf)
 * [Towards End-to-End Prosody Transfer for Expressive Speech Synthesis with Tacotron](http://cn.arxiv.org/pdf/1803.09047.pdf)
-* ​
 
+
+
+
+**tts 用到的技术**
+
+* [autoregressive & inverse autoregressive]()
 
 ## 参考资料
 
@@ -87,4 +105,3 @@
 [https://deepmind.com/blog/wavenet-generative-model-raw-audio/](https://deepmind.com/blog/wavenet-generative-model-raw-audio/)
 
 [https://google.github.io/tacotron/](https://google.github.io/tacotron/)
-
