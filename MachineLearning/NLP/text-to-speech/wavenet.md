@@ -34,6 +34,14 @@
 
 
 
+**wavenet 如何解决 TTS 问题**
+
+* 将文本特征作为条件输入：linguistic features, predicted log fundamental frequency(F0), phoneme durations
+* 然后训练 wavenet 网络。
+* 文本特征可以使用原始方法提取，也可以使用神经网络提取。
+
+
+
 **参考资料**
 
 [https://deepmind.com/blog/wavenet-generative-model-raw-audio/](https://deepmind.com/blog/wavenet-generative-model-raw-audio/)
@@ -46,7 +54,7 @@
 
 # Parallel wave-net : Fast High-Fidelity Speech Synthesis
 
-
+**使用了 inverse autoregressive flow，这样 inference 的时候就可以并行了，速度飕飕的。**
 
 
 
