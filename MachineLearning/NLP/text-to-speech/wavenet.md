@@ -61,4 +61,7 @@
 
 **inverse autoregressive flows**
 
-* ​
+* [norm_flows](http://akosiorek.github.io/ml/2018/04/03/norm_flows.html)
+* [masked-autoencoders](http://www.inference.vc/masked-autoencoders-icml-paper-highlight/)
+* [Normalizing Flows Tutorial](https://blog.evjang.com/2018/01/nf1.html)
+
