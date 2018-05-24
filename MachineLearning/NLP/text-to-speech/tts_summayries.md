@@ -91,7 +91,15 @@
 * [Variational Inference with Normalizing Flows](http://cn.arxiv.org/pdf/1505.05770.pdf)
 * [norm_flows](http://akosiorek.github.io/ml/2018/04/03/norm_flows.html)
 * [Improving Variational Inference with Inverse Autoregressive Flow](http://cn.arxiv.org/pdf/1606.04934.pdf)
-* ​
+
+
+
+**其它**
+
+* [PIXELCNN++](http://cn.arxiv.org/pdf/1701.05517.pdf)
+* [Pixel Recurrent Neural Networks](http://cn.arxiv.org/pdf/1601.06759.pdf)
+
+
 
 ## 参考资料
 
