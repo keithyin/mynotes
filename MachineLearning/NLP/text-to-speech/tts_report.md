@@ -64,6 +64,55 @@
 
 
 
+## Tacotron
+
+**text to spectrum**
+
+
+
+**网络结构**
+
+![](../imgs/tacotron1-1.png)
+
+
+
+**CBHG结构：** 
+
+![](../imgs/tacotron1-2.png)
+
+**encoder**：pre-net + CBHG
+
+**decoder**： content-based tanh attention decoder (输出 mel-spectrum)+ CBHG（输出 linear-spectrum） 
+
+**vocoder** ：Griffin-Lim (heuristic 算法， 不用训练)
+
+
+
+**content-based tanh attention decoder**
+
+
+
+
+
+**问题：**
+
+* 为什么使用 content-based tanh attention decoder？如果换成原始 attention 或者 self-attention 会怎么样。
+* ​
+
+
+
+## Tacotron 2
+
+
+
+## Char2Wav
+
+
+
+
+
+
+
 ## 参考资料
 
 [Deep Voice: Real-time Neural Text-to-Speech](http://cn.arxiv.org/pdf/1702.07825.pdf)
