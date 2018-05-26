@@ -92,8 +92,6 @@
 
 
 
-
-
 **问题：**
 
 * 为什么使用 content-based tanh attention decoder？如果换成原始 attention 或者 self-attention 会怎么样。
