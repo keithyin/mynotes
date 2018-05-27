@@ -21,18 +21,25 @@
 
 **目前的生成模型可以分为以下几类**
 
+----
+
 * GAN
 * VAE
 * autoregressive  model
 
 
 
+
 **生成模型可以做什么呢？**
 
-* density estimation, 给定一个 x 输出 $P(x)$
+----
+
+* density estimation, 给定一个 x 输出 $P(x)$， autoregressive model, autoregressive flow
 * 图片生成，输入噪声，输出逼真的图片 (GAN, VAE 都可以办到)
 * 图片修改，修改图片的某些特征，（VAE 可以做到， GAN 应该也可以）
 * 图片复原，给张有缺陷的图片，还原成原始图片（VAE可以做到，GAN应该也可以）
+
+
 
 
 
@@ -51,4 +58,3 @@
     * 从 单变量高斯分布中采样 $z_t$ , 通过 $x_{<t}$ 计算出 $\mu_t, \sigma_t$ , 然后 $x_t = \mu_t+z_t*\sigma_t$ 。
     * 把这个过程整合起来看，就像是先采样 $\mathbf z \sim N(0, I)$ 然后经过一个可逆的神经网络计算得到 $\mathbf x$ 。
   * 这个模型对**采样来说是不友好的**，因为采样有序列过程，无法并行。但是对于 density estimation 却是友好的。给定 $\mathbf x$， 使用 逆变换计算 得到 $\mathbf z$ ，然后再计算概率密度。
-
