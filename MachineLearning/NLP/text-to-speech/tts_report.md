@@ -145,13 +145,21 @@
 **总结：**
 
 * 最终结果：4.53 ， human 4.58
-* ​
+
+
 
 ## Wave Net
 
 **将 speech signals 建模为 自回归模型（autoregressive models）**
 
+* 可以 density estimation (高效)
+* 可以 sample （慢，因为当前步的采样结果，需要 之前步的结果。）
+
+
+
 ![](../imgs/wavenet-1.png)
+
+
 
 **wavenet 网络的特点**
 
@@ -166,6 +174,8 @@
 **如何使用 wavenet 做 tts 任务**
 
 * 将 linguistic，duration，$F_0$ 作为条件输入到 网络中。
+
+
 
 
 
