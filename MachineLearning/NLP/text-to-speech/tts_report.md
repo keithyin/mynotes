@@ -71,7 +71,7 @@
 
 **decoder**： content-based tanh attention decoder (输出 mel-spectrum)+ CBHG（输出 linear-spectrum） 
 
-**vocoder** ：Griffin-Lim (heuristic 算法， 不用训练)(一个频谱转waveform 算法)
+**vocoder** ：Griffin-Lim (算法无参数，不用训练)(一个频谱转 waveform 算法)
 
 ![](../imgs/tacotron1-1.png)
 
@@ -100,8 +100,11 @@
 
 **总结**
 
-* 优点：
-* ​
+* 最终结果：MOS 3.82， human 4.58
+
+
+* 优点：end-to-end 的优点。
+* 缺点：griffin lim 算法能力有点弱。
 
 
 
@@ -110,6 +113,7 @@
 * tacotron 输出的是功率谱，如果换成输出stft 的结果会如何？网络设置两个头，一个 real value 一个 imaginary value， 然后直接调用 istft。
 * 为什么使用 content-based tanh attention decoder？如果换成原始 attention 或者 self-attention 会怎么样。
 * decoder 的部分由于会存在长时间依赖，换成 dilated convolution 作为 decoder 会如何？
+* 替换掉 RNN，用 attention is all you need 中的那些操作。
 * 频率谱够了吗？是否需要加点其它东西上去。
 
 
@@ -118,9 +122,30 @@
 
 ## Tacotron 2
 
+**系统组成成分**
+
+* text ---> mel spectrogram (seq2seq + attention)
+* mel spectrogram ---> waveform (wavenet)
 
 
 
+![](../imgs/tacotron2.png)
+
+
+
+
+
+**网络特点**
+
+* 训练过程，两个部分分开训练。两个部分的梯度是不流通的。
+* RNN 部分的训练是 teacher-forcing。
+
+
+
+**总结：**
+
+* 最终结果：4.53 ， human 4.58
+* ​
 
 ## Wave Net
 
@@ -135,6 +160,14 @@
   - causal : 满足 autoregressive 模型的特征
 - gated convolution + residual + skip : 提供强有力的非线性支持。
 - softmax at output : 分类而不是回归。
+
+
+
+**如何使用 wavenet 做 tts 任务**
+
+* 将 linguistic，duration，$F_0$ 作为条件输入到 网络中。
+
+
 
 ## Parallel Wave Net
 
