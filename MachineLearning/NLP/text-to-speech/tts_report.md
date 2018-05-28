@@ -4,6 +4,14 @@
 
 
 
+**TTS 任务的特点**
+
+* 一对多，the same text can correspond to different pronunciations or speaking styles.
+* TTS outputs are continuous (感觉也可以是 discrete 的，16-bit 编码嘛)
+* outputs sequences are usually much longer that those of the input，（人不可能一秒中说16k个字）。
+
+
+
 **一个 tts 系统通常包含三个部分**
 
 * text analysis fronted
@@ -47,7 +55,7 @@
 **特点**
 
 * tts 每个模块都使用深度学习模型替换，灵活性和可扩展性优于传统方法。
-* 缺点在于，三个模型独立，不能一起优化，会导致 loss 的累积。
+* three modules are trained independently, so errors from each component may compound.(如果第一个阶段的 phoneme 分类有错误，那么即使第二个阶段训练的再好，也不可能纠正第一个阶段犯的错误。)
 
 
 
@@ -59,6 +67,12 @@
 
 **网络结构**
 
+**encoder**：pre-net + CBHG
+
+**decoder**： content-based tanh attention decoder (输出 mel-spectrum)+ CBHG（输出 linear-spectrum） 
+
+**vocoder** ：Griffin-Lim (heuristic 算法， 不用训练)(一个频谱转waveform 算法)
+
 ![](../imgs/tacotron1-1.png)
 
 
@@ -67,22 +81,38 @@
 
 ![](../imgs/tacotron1-2.png)
 
-**encoder**：pre-net + CBHG
-
-**decoder**： content-based tanh attention decoder (输出 mel-spectrum)+ CBHG（输出 linear-spectrum） 
-
-**vocoder** ：Griffin-Lim (heuristic 算法， 不用训练)(一个频谱转waveform 算法)
-
-
+* 具有 K-gram 建模模块（cnn）。
+* 然后基本都是特征上的 transform。
 
 **content-based tanh attention decoder**
 
 
 
-**问题：**
+**decoder output**
 
+* 傅立叶变换得到的功率谱信息过于冗余（要不然也不会有 mfcc），所以选用 mel 功率谱。
+* 一个 decoder step 输出多个 frame 的值
+  * 由于每个 phoneme 发音可能占多个帧，所以这种建模方式是合理的
+  * 不然的话，可能会使得 模型 attend to the same input token for multiple time-steps.
+  * ​
+
+
+
+**总结**
+
+* 优点：
+* ​
+
+
+
+**一些想法：**
+
+* tacotron 输出的是功率谱，如果换成输出stft 的结果会如何？网络设置两个头，一个 real value 一个 imaginary value， 然后直接调用 istft。
 * 为什么使用 content-based tanh attention decoder？如果换成原始 attention 或者 self-attention 会怎么样。
+* decoder 的部分由于会存在长时间依赖，换成 dilated convolution 作为 decoder 会如何？
 * 频率谱够了吗？是否需要加点其它东西上去。
+
+
 
 
 
@@ -121,6 +151,16 @@
 
 
 
+
+## 总结
+
+**integrated end-to-end TTS system 的优点**
+
+* alleviating the need for laborious feature engineering, which may involve heuristic and brittle design choices
+* it more easily allows for rich conditioning on various attributes, such as speaker or language, or high-level features like sentiment. **HOW???** this is because conditioning can occur at the very beginning of the model.
+* adaptation to new data might also be easier. 如果是传统方法，可能还需要继续 feature engineering。浪费时间。
+* a single model is likely to be more robust than a multi-stage model where each component's errors can compound.
+* 缺点可能就是 需要大量数据了吧。
 
 
 
