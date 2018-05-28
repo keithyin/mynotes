@@ -58,3 +58,23 @@
     * 从 单变量高斯分布中采样 $z_t$ , 通过 $x_{<t}$ 计算出 $\mu_t, \sigma_t$ , 然后 $x_t = \mu_t+z_t*\sigma_t$ 。
     * 把这个过程整合起来看，就像是先采样 $\mathbf z \sim N(0, I)$ 然后经过一个可逆的神经网络计算得到 $\mathbf x$ 。
   * 这个模型对**采样来说是不友好的**，因为采样有序列过程，无法并行。但是对于 density estimation 却是友好的。给定 $\mathbf x$， 使用 逆变换计算 得到 $\mathbf z$ ，然后再计算概率密度。
+
+
+
+## VAE
+
+[https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf](https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf)
+
+**下面对链接里的文章的内容进行提炼**
+
+* 首先，vae 是个生成模型，生成模型是用来生成图片的
+* 理解 vae 要和 ae 对比着看
+* ae 的训练会使得 latent space 不够连续，这样对生成图片是不利的
+* vae 用了两个方法使得 latent space 足够连续，这样就可以开心的生成图片了。
+
+
+
+**这个解释可以看出，采样对于生成模型来说，似乎是非常重要的，因为采样可以使得 latent space 更加连续一点。**
+
+## GAN
+

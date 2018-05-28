@@ -54,9 +54,8 @@
 
 ## Tacotron
 
-**text to spectrum**
-
-
+* 神经网络用作 text to spectrum 的变换，
+* 然后用 griffin-lim 算法将 spectrogram 转换成 waveform。griffin-lim 算法无参数，不用学习。
 
 **网络结构**
 
