@@ -161,6 +161,10 @@
 
 
 
+![](../imgs/wavenet-1.gif)
+
+
+
 **wavenet 网络的特点**
 
 - causal dilated convolution: 
@@ -168,6 +172,12 @@
   - causal : 满足 autoregressive 模型的特征
 - gated convolution + residual + skip : 提供强有力的非线性支持。
 - softmax at output : 分类而不是回归。
+  - 优点：可以建模任意 distribution （单峰，多峰都没问题）
+  - 缺点：对于 softmax 来说，他并不知道 值127 和 128,129 很近。（parallel wavenet 有改进）
+
+
+
+![](../imgs/wavenet-2.png)
 
 
 
@@ -177,9 +187,19 @@
 
 
 
+**总结**
+
+* autoregressive model 对 waveform 建模，使用 dilated convolution 增大感受野。
+* 训练时候 可以并行，（teacher forcing）
+* inference 时候只能串行（parallel wavenet 对这部分进行了改进，使得在 inference 的时候可以并行）。
+
 
 
 ## Parallel Wave Net
+
+
+
+
 
 
 
