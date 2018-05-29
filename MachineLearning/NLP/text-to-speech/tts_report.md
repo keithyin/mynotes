@@ -191,7 +191,9 @@
 
 
 
-## Parallel Wave Net
+
+
+## Parallel Wave Net (a inverse autoregressive flow)
 
 **对  wavenet 的两个改进**
 
