@@ -131,10 +131,6 @@
 
 ![](../imgs/tacotron2.png)
 
-
-
-
-
 **网络特点**
 
 * 训练过程，两个部分分开训练。两个部分的梯度是不流通的。
@@ -148,7 +144,7 @@
 
 
 
-## Wave Net
+## Wave Net (a autoregressive deep generative model)
 
 **将 speech signals 建模为 自回归模型（autoregressive models）**
 
@@ -197,9 +193,12 @@
 
 ## Parallel Wave Net
 
+**对  wavenet 的两个改进**
 
+* softmax distribution ---> discretized mixture of logistic
+* probability density distillation
 
-
+![](../imgs/parallel-wavenet-1.png)
 
 
 
