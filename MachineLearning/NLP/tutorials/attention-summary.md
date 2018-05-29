@@ -46,3 +46,15 @@ $$
 
 
 **self-attention**
+
+
+
+**[location sensitive attention](http://papers.nips.cc/paper/5847-attention-based-models-for-speech-recognition.pdf) **
+
+* adding location awareness to the attention mechanism
+* avoid concentrating the attention on a single frame
+* content based ： $\alpha_t = Attend(h_t, e_t)$
+  * 这个方法的问题在与， 如果 $e_a, e_b$ 值一样，无论他俩的位置多远，都会赋予相同的 attend weight
+* location based：$$
+* hybrid : $\alpha_t = Attend(h_t, e_t, \alpha_{t-1})$
+
