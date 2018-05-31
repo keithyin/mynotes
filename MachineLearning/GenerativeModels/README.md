@@ -65,6 +65,8 @@
 
 [https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf](https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf)
 
+
+
 **下面对链接里的文章的内容进行提炼**
 
 * 首先，vae 是个生成模型，生成模型是用来生成图片的
@@ -75,6 +77,10 @@
 
 
 **这个解释可以看出，采样对于生成模型来说，似乎是非常重要的，因为采样可以使得 latent space 更加连续一点。**
+
+
+
+[https://nips.cc/Conferences/2016/Schedule](https://nips.cc/Conferences/2016/Schedule)
 
 ## GAN
 

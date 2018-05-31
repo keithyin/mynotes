@@ -4,6 +4,12 @@
 
 ----
 
+* a **simple initial density** is transformed into a **more complex one** by applying a **sequence of invertible transformations** until a desired level of complexity is attained.
+  * 有个疑问：为什么要是 **invertible transformations ???????????????????**
+
+
+
+
 * invertible transformations of densities can be used to implement more complex densities。
   * 随机变量函数的分布，函数是 invertible 的。$Y=g(X)$ 
 * $Y=g_3(g_2(g_1(X)))$ , 这个就是 Normalizing Flow。将 transformation chain 起来。
@@ -18,6 +24,7 @@
 
 * 从简单分布（正态分布， etc）中采样得到 $\mathbf z$ , 经过函数变化得到 $\mathbf y$ ,  得到的$P(\mathbf y)$ 是非常复杂的。
 * 即：将 **简单分布** 中采样的样本变换成 **复杂分布**采样的样本
+* 缓解了 VAE 的 mean-field assumption 的问题。
 
 
 
@@ -69,6 +76,10 @@
 **为啥要行列式好计算？？？？？？？？？**
 
 
+
+
+
+## Normalizing Flows and Variational auto-encoder
 
 
 
