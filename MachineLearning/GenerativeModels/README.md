@@ -82,5 +82,13 @@
 
 [https://nips.cc/Conferences/2016/Schedule](https://nips.cc/Conferences/2016/Schedule)
 
+
+
+**amortized variational inference**
+
+* Monte Carlo gradient estimation and inference network when used together.
+
+
+
 ## GAN
 
