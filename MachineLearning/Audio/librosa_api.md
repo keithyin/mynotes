@@ -22,7 +22,7 @@ librosa.output.write_wav(path, y, sr, norm=False)
 
 
 
-**各种谱**
+**傅立叶变换与逆傅立叶变换**
 
 ```python
 # short time fourier transform, 返回 复数！！！
@@ -45,5 +45,17 @@ def stft_istft():
     i_data = librosa.istft(spec, hop_length=hop_length, win_length=window)
     print(i_data)
     # i_data 与 data 一样。
+```
+
+
+
+**mel 谱**
+
+```python
+# power = 1.0 能量谱 power = 2.0 功率谱
+# y ：audio time-series shape=[n, ]
+# S : spectrum [d, t], stft 计算得到的 功率谱， 
+librosa.feature.melspectrogram(y=None, sr=22050, S=None, n_fft=2048, hop_length=512, power=2.0, **kwargs)
+
 ```
 
