@@ -27,7 +27,7 @@ librosa.output.write_wav(path, y, sr, norm=False)
 ```python
 # short time fourier transform, 返回 复数！！！
 # 滑动窗口撸，win_length: 滑动窗口大小，hop_length: 一次平移多少。
-# 返回值 shape：[1 + n_fft/2, t]
+# 返回值 shape：[1 + n_fft/2, t] t = data_length // hop_length
 # t = len(data) // hop_length
 librosa.core.stft(y, n_fft=2048, hop_length=None, win_length=None, window='hann', center=True, dtype=<class 'numpy.complex64'>, pad_mode='reflect')
 
