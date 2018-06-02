@@ -52,10 +52,30 @@ def stft_istft():
 **mel 谱**
 
 ```python
-# power = 1.0 能量谱 power = 2.0 功率谱
+# power = 1.0 能量谱,  power = 2.0 功率谱
 # y ：audio time-series shape=[n, ]
 # S : spectrum [d, t], stft 计算得到的 功率谱， 
 librosa.feature.melspectrogram(y=None, sr=22050, S=None, n_fft=2048, hop_length=512, power=2.0, **kwargs)
-
 ```
+
+
+
+**分贝**
+
+```python
+# 功率谱 转 db
+librosa.core.power_to_db(S, ref=1.0, amin=1e-10, top_db=80.0)
+"""
+这个式子用来计算： 10*log10(S/ref)
+ref : 因为 分贝是个相对单位， ref 就是对应相对的那个值。
+amin : 对 功率进行 clip。
+top_db: 决定了会对 分贝的最小值 进行 clip，保证 max_db - min_db <= top_db
+"""
+```
+
+* 关于 `amin` : 一般设置为 `10^-5` 即可，因为人类听力阈值就是 `10^-5 Pa`(amplitude), 如果是功率的话，就平方一下即可。`power_to_db` 的就是功率的，求个平方，就是 `10^-10` 了。**这个是用来对 power/amplitude 进行 clip 的。**
+* 关于 `ref` ：关于听力的分贝计算， ref 是 `10^-5` （amplitude），`1e-10`（power），得到的是正值。其实当 `amplitude=0.2` 的时候，按照 `ref=1e-5` 来计算的话，就已经是 `80db`了，非常吵了。当我们将 `ref=0.2` 的话，那么得到的大部分分贝就是 `0` 以下了。
+* 关于 `top_db` ： 这个是限制感兴趣 `db` 区间范围的。
+
+> 在进行深度学习模型训练的时候，通常会将得到的 db 进行归一化一下。到 [0, 1] 的区间内。
 
