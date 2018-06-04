@@ -12,7 +12,7 @@
 
 
 
-**一个 tts 系统通常包含三个部分**
+**传统的 tts 系统通常包含三个部分**
 
 * text analysis fronted
 * acoustic model
@@ -274,6 +274,12 @@
 [Deep Voice 2: Multi-Speaker Neural Text-to-Speech](http://cn.arxiv.org/pdf/1705.08947.pdf)
 
 [Deep Voice 3: 2000-Speaker Neural Text-to-Speech](http://cn.arxiv.org/pdf/1710.07654.pdf)
+
+[wave net](https://arxiv.org/abs/1609.03499)
+
+[parallel wave net](https://arxiv.org/abs/1711.10433)
+
+[Fast Wave net Generation Algorithm](https://arxiv.org/abs/1611.09482)
 
 
 
