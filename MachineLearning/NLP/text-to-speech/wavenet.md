@@ -73,3 +73,26 @@
 * [masked-autoencoders](http://www.inference.vc/masked-autoencoders-icml-paper-highlight/)
 * [Normalizing Flows Tutorial](https://blog.evjang.com/2018/01/nf1.html)
 
+
+
+
+
+
+# 数据预处理与实现细节
+
+**实现细节**
+
+* 如何 `casual convolution` ：
+
+  * 计算到达 `same` 效果需要多少 `padding`，然后全部 `pad` 到输入的左边，然后计算卷积。
+  * 或者使用原始 same 卷积，但是 weight 的部分进行置 0 处理。
+
+
+  * 看到很多实现在使用 valid 卷积，不明觉厉
+
+**数据预处理**
+
+* `waveform` ： rescale 到 [-1, 1] 区间内
+* `mel_db` ： rescale 到 [0, 1] 区间内
+* 对 waveform 进行 padding，保证 `padded_waveform % hop_length == 0 , len(padded_wf)/len(mel) == hop_length` 
+* `mini-batch` 训练的时候，也需要对数据集进行 `padding` 。 input 记得开始用 `GO` 表示。然后预测第一个时刻的 输出值。
