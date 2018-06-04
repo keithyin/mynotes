@@ -22,7 +22,7 @@
 
 
 
-## Deep Voice
+## Deep Voice 1
 
 ![](../imgs/deep_voice.png)
 
@@ -57,6 +57,22 @@
 * tts 每个模块都使用深度学习模型替换，灵活性和可扩展性优于传统方法。
 * three modules are trained independently, so errors from each component may compound.(如果第一个阶段的 phoneme 分类有错误，那么即使第二个阶段训练的再好，也不可能纠正第一个阶段犯的错误。)
 
+
+
+
+## Deep Voice 2
+
+**key words**
+
+* trainable speaker embedding.
+* post-processing neural vocoder.
+* can learn hundreds of unique voices from less than half an hour of data per speaker.
+
+
+
+
+
+## Deep Voice 3
 
 
 
@@ -144,6 +160,16 @@
 
 
 
+
+**与 tacotron1 对比**
+
+* 2 使用 location sensitive attention。这种 attention 鼓励 解码模型一直往后注意
+* 使用了 wavenet 作为 vocoder。
+* 拿掉了 1 中 CBHG 模块。
+
+
+
+
 ## Wave Net (a autoregressive deep generative model)
 
 **将 speech signals 建模为 自回归模型（autoregressive models）**
@@ -206,7 +232,10 @@
 
 **问题**
 
-* 能否换个 sample 模型，感觉没有必要使用 normalizing flow（可以进行 density estimation，但是这里又不需要 density estimation）。
+* student 模型真的需要 autoregressive 性质吗？
+* 为什么使用 distillation 训练而不直接用真实标签训练。猜想，因为 iaf 模型对 autoregressive 问题建模能力若，所以用 distillation 进行训练更靠谱。（distillation 的提出本来就是为了 压缩模型，用能力小的模型得到大模型的相近的结果。）
+
+
 
 
 
@@ -232,6 +261,13 @@
 
 [Deep Voice: Real-time Neural Text-to-Speech](http://cn.arxiv.org/pdf/1702.07825.pdf)
 
+[Deep Voice 2: Multi-Speaker Neural Text-to-Speech](http://cn.arxiv.org/pdf/1705.08947.pdf)
+
+[Deep Voice 3: 2000-Speaker Neural Text-to-Speech](http://cn.arxiv.org/pdf/1710.07654.pdf)
+
+
+
 [oxford-cs-deepnlp-2017-lectures-text-to-speech](https://github.com/oxford-cs-deepnlp-2017/lectures/blob/master/Lecture%2010%20-%20Text%20to%20Speech.pdf)
 
 [Generative Model-Based Text-to-Speech Synthesis](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45882.pdf)
+
