@@ -50,8 +50,6 @@
 
 
 
-
-
 **特点**
 
 * tts 每个模块都使用深度学习模型替换，灵活性和可扩展性优于传统方法。
@@ -68,11 +66,22 @@
 * post-processing neural vocoder.
 * can learn hundreds of unique voices from less than half an hour of data per speaker.
 
+![](../imgs/deepvoice2-1.png)
 
+![](../imgs/deepvoice2-2.png)
 
+**总结**
 
+* not only can a single model generate speech from multiple different voices, but also that significantly less data is required per speaker than when training single-speaker systems.
 
 ## Deep Voice 3
+
+**key words**
+
+* avoids recurrent neural networks.
+* fully-convolution character-to-spectrogram architecture.
+
+![](../imgs/deepvoice3-1.png)
 
 
 
@@ -257,6 +266,7 @@
 
 
 
+
 ## 参考资料
 
 [Deep Voice: Real-time Neural Text-to-Speech](http://cn.arxiv.org/pdf/1702.07825.pdf)
@@ -270,4 +280,3 @@
 [oxford-cs-deepnlp-2017-lectures-text-to-speech](https://github.com/oxford-cs-deepnlp-2017/lectures/blob/master/Lecture%2010%20-%20Text%20to%20Speech.pdf)
 
 [Generative Model-Based Text-to-Speech Synthesis](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45882.pdf)
-
