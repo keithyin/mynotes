@@ -214,7 +214,7 @@
 
 **如何使用 wavenet 做 tts 任务**
 
-* 将 linguistic，duration，$F_0$ 作为条件输入到 网络中。
+* 将 linguistic，duration，$F_0$ 作为条件输入到 网络中。或者将 mel-spectrogram 输入网络中。
 
 
 
@@ -222,9 +222,17 @@
 
 * autoregressive model 对 waveform 建模，使用 dilated convolution 增大感受野。
 * 训练时候 可以并行，（teacher forcing）
+
+
+**优点**
+
+* 效果好。
+
+**缺点**
+
 * inference 时候只能串行（parallel wavenet 对这部分进行了改进，使得在 inference 的时候可以并行）。
-
-
+* same padding，no pooling layer，显存消耗巨大。
+* 因为训练时候 teacher forcing，所以也可能会有 exposure bias 的问题。
 
 
 
