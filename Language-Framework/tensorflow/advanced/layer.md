@@ -8,6 +8,7 @@
 
   * 如果想要**添加模型参数**，使用 `add_variable` 
   * 然后调用 `super's build()` 方法，它会设置 `self.built=True`
+  * 当然，也可以在 `call()` 中创建模型参数，这时候要记得 `override` 一个什么都不敢干的 `build` 方法。
 * 重写 `call()` 方法： 执行 前向计算操作，层的逻辑操作都在这里面实现。
 
 
@@ -419,14 +420,6 @@ class Layer(object):
 
     self.built = True
     return outputs
-
-  @property
-  def dtype(self):
-    return self._dtype
-
-  @property
-  def name(self):
-    return self._name
 
   @property
   def activity_regularizer(self):
