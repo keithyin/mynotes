@@ -57,3 +57,19 @@ $$
   * 这个方法的问题在与， 如果 $e_a, e_b$ 值一样，无论他俩的位置多远，都会赋予相同的 attend weight
 * location based：$\alpha_i = Attend(h_t, \alpha_{t-1})$
 * hybrid : $\alpha_t = Attend(h_t, e_t, \alpha_{t-1})$
+
+
+
+**[content based attention](https://arxiv.org/abs/1412.7449)**
+$$
+u_i^t = v^T\tanh(W_1'h_i+W_2'd_t)
+$$
+
+$$
+a_i^t = \text{softmax}(u_i^t)
+$$
+
+$$
+d'_t = \sum_{i=1}^{T_A} a_i^th_i
+$$
+
