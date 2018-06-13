@@ -1,7 +1,7 @@
 **学习方法（和拥有的数据集有关）**
 
 * 监督学习
-* 非监督学习
+* 无监督学习
 * 半监督学习
 
 
@@ -10,6 +10,14 @@
 
 * 生成模型
 * 判别模型
+
+
+
+
+**无监督学习**
+
+* 只有 data 没有 label
+* Learn some underlying hidden structure of the data
 
 
 
@@ -27,6 +35,10 @@
 * VAE
 * autoregressive  model
 
+
+
+
+![](./imgs/generative-models.png)
 
 
 
@@ -91,4 +103,12 @@
 
 
 ## GAN
+
+
+
+
+
+## 参考资料
+
+[stanford CS231N](http://cs231n.stanford.edu/slides/2018/cs231n_2018_lecture12.pdf)
 
