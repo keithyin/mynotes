@@ -94,5 +94,11 @@
 
 * `waveform` ： rescale 到 [-1, 1] 区间内
 * `mel_db` ： rescale 到 [0, 1] 区间内
-* 对 waveform 进行 padding，保证 `padded_waveform % hop_length == 0 , len(padded_wf)/len(mel) == hop_length` 
+* **对 waveform 进行 padding** (注意这个不是 mini-batch 时的 padding)，保证 `padded_waveform % hop_length == 0 , len(padded_wf)/len(mel) == hop_length` 
+  * 用什么值进行 pad 呢？使用静音的值还是使用 reflect pad 方式？
+
+
+
 * `mini-batch` 训练的时候，也需要对数据集进行 `padding` 。 input 记得开始用 `GO` 表示。然后预测第一个时刻的 输出值。
+  * 其实也就是 输入的 shape 为 `[1,1,1]`, 然后使用 causal same pad 进行 padding，然后计算。
+
