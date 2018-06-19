@@ -55,6 +55,22 @@
 
 
 
+
+# Pixel RNN & CNN
+
+* spatial RNN ： rnn 的 time-step 在 宽度上，通过 卷积来累积 高度上的信息，所以称之为 2D-LSTM
+* pixel CNN : 玩了一个 精确控制感受野的游戏
+
+
+
+**CNN 感受野精细控制**
+
+* skew 操作
+* shift + crop 操作
+
+
+
+
 # Normalizing Flow
 
 **总结一下**
@@ -65,12 +81,12 @@
   * 为啥 需要是 invertible 的？
   * invertible 好计算转换过去值的概率
   * 为啥要计算转换过去的值的概率？
-* 希望 Normalizing Flow 能够扩展到高维空间，考虑到了 autoregressive flow
+*  希望 Normalizing Flow 能够扩展到高维空间，考虑到了 autoregressive flow
   * 为啥扩展到高维，需要 autoregressive
   * 猜测的可能原因：原始 Normalizing Flow 由于 bottleneck 层的影响，导高维建模能力堪忧，需要叠加好些层才能达到想要的效果。但是如果把 bottleneck 层换成 autoregressive nn，建模能力就大大增强了哟。
-* 但是 autoregressive flow 的性质（这一步的值需要之前的值），所以不适合采样任务
-* 所以出来另外一种流，inverse autoregressive flow，因为这种流的形式和 autoregressive flow 的形式互逆。这种流就好处多多了，采样贼快。
-* ar 与 iar 只是两种不同的建模方式而已，不要纠结太多。
+*  但是 autoregressive flow 的性质（这一步的值需要之前的值），所以不适合采样任务
+*  所以出来另外一种流，inverse autoregressive flow，因为这种流的形式和 autoregressive flow 的形式互逆。这种流就好处多多了，采样贼快。
+*  ar 与 iar 只是两种不同的建模方式而已，不要纠结太多。
 
 
 
