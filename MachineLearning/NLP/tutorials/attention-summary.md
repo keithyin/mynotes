@@ -62,7 +62,7 @@ $$
 
 **[content based attention](https://arxiv.org/abs/1412.7449)**
 $$
-u_i^t = v^T\tanh(W_1'h_i+W_2'd_t)
+u_i^t = v^T\tanh(W_1'h_i+W_2'd_t + b)
 $$
 
 $$
@@ -73,3 +73,23 @@ $$
 d'_t = \sum_{i=1}^{T_A} a_i^th_i
 $$
 
+## Bahdanau Attention
+**[content based attention](https://arxiv.org/abs/1412.7449)**
+$$
+u_i^t = v^T\tanh(W_1'h_i+W_2'd_t + b)
+$$
+
+$$
+a_i^t = \text{softmax}(u_i^t)
+$$
+
+$$
+d'_t = \sum_{i=1}^{T_A} a_i^th_i
+$$
+
+
+
+
+## Monotonic Attention
+
+训练的时候使用 几何分布 进行建模。
