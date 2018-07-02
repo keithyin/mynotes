@@ -1,4 +1,4 @@
-# Debugging Neural Nets for NLP
+# 10. Debugging Neural Nets for NLP
 
 **Isolate the problem**
 
@@ -118,7 +118,7 @@
 
 
 
-# Structured Prediction 
+# 15. Structured Prediction 
 
 * 对于 machine translation 来说，有 无限种可能结果，称之为 Structured Prediction
 
@@ -178,7 +178,7 @@
 
 
 
-# Reinforcement Learning for NLP
+# 14. Reinforcement Learning for NLP
 
 * Environment X
 * ability to make actions A
@@ -239,3 +239,64 @@ $$
 
 
 
+
+
+
+# 20. Dialogue
+
+**Type of dialogue**
+
+* task driven
+* chat
+
+
+
+**Two Paradigms**
+
+* Generation-based Models
+  * take input, generate output
+  * Good if you want to be creative
+* Retrieval-Based Models
+  * take input, find most appropriate output
+  * Good if you want to be safe
+
+
+
+**Dialog 存在的难题**
+
+* **Dialog More Dependent on Global Coherence**
+* **Dialog allows much more varied responses**
+  * 对于 translation 来说，可以有单词上的差距，但是意思是一样的
+  * 但是对于 dialog 来说，意思可能都不一样
+* **Diversity is a Problem for Evaluation**
+  * Translation uses BLEU score, while imperfect, not horrible
+  * 既然 Evaluation 是个大问题，那就学习如何评分吧。Learning to Evaluation
+* **Dialog Agents should have Personality**
+
+
+
+
+
+**Generation-Based Models**
+
+* train machine translation system to perform translation from utterance to response
+* lots of filtering, etc., to make sure that the extracted translation rules are reliable
+* Unlike machine translation: 上下文信息有时候有用，有时候是无用的。
+* ​
+
+
+
+**Retrieval-Based Models**
+
+* 很多问题都可以使用模板来回答的，只需要从 corpus 中找到最合适的 response 就好了。
+
+
+
+**Task-Driven Dialog**
+
+* **Task-Completion Dialog**
+  * Natural language understanding to **fill the slots** in the frame based on the user utterance
+  * **Dialog state tracking** to keep track of the overall dialog state over multiple turns.
+  * **Dialog control** to decide the next action based on state
+  * Natural language generation to generate utterances based on current state
+  * ​
