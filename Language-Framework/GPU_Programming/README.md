@@ -105,7 +105,7 @@
 
 **CUDA可以保证**
 
-* 一个 block 内的 所有 thread 在同一时刻 ，同一个 SM 上运行
+* 一个 block 内的 所有 thread 在同一时刻 ，**同一个 SM 上运行**
 * 在 下一个 kernel 的 block 运行之前， 当前的 kernel 的所有 blocks 均已执行完毕。（**同 stream**）
 
 
