@@ -1,6 +1,6 @@
 # 硬件结构与CUDA结构
 
-**GPU Framework**
+**GPU Framework( 硬件)**
 
 * Graphic Processing Unit (GPU)
 * Graphic Processing Cluster (一个GPU中有多个 Cluster)
@@ -16,6 +16,12 @@
   * 32 SPs 构成一个 warp，32个 core 跑同一个程序，数据不同。
 
 
+
+**CUDA 与 GPU**
+
+* GPU 保证，**一个 block 中的线程会在同一个 SM 上执行**
+  * 但是，一个 SM 上可以运行多个 blocks
+* ​
 
 
 

@@ -126,6 +126,58 @@ $$
 
 
 
+**Occupancy**
+
+* 一个 SM 上的资源
+  * thread blocks： 最多8个
+  * threads：最多可以运行 1536/2048 个线程（逻辑上）
+  * registers for all threads： 65536 个
+  * bytes of shared memory： 16KB-48KB
+
+
+
+**如何影响 Occupancy**
+
+> 增加 Occupancy 可能会有帮助，也可能没有帮助
+>
+> exposes more parallelism, transactions in flight
+>
+> may force GPU to run less efficiently
+
+* 控制 使用的 shared_memory 的大小
+* 更改 threads，blocks 的数量
+* compilation options to control register usage.
+
+
+
+**如何减小 barrier 的影响**
+
+* 减少 block 中的线程数
+* 增加 SM 中 Block 的数量？？？？？？？？？？
+
+
+
+## Optimizing Compute Performance
+
+> Goal: maximize useful computation/second
+
+* minimize time waiting at barriers
+  * 减少 thread block 中的线程数量
+* minimize thread divergence
+  * ​
+
+**什么叫 thread divergence**
+
+在GPU中，一个 warp 的 threads 在同一时间执行相同的指令。但是如果一个 kernel 代码中 if...else ...指令的话。一个 warp 中的 threads 可能一部分执行 if-branch，一部执行 else-branch。但是 warp 中的 threads 又必须在同一时刻执行相同的指令，所以 硬件自动的 deactivate 一些线程。先执行 if-branch 的线程，再执行 else-branch 的线程，这样就会浪费时间。
+
+![](../../imgs/thread-divergence-1.png)
+
+
+
+
+
+
+
 ## 一个 Demo
 
 一个矩阵 transpose 的代码，如果每个点一个线程的话，会导致
@@ -159,3 +211,9 @@ $$
 
 * 让 内存的 pipe 变得 **更宽**。
 
+
+
+## Glossary
+
+* warp: **set of threads** that **execute the same instruction**  **at a time**
+* SIMD: single instruction, multiple data
