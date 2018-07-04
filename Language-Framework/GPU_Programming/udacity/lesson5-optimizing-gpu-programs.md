@@ -141,5 +141,21 @@ $$
 
 
 
+**Little's LAW**
 
+> how to utilize all memory bandwidth
+>
+> Little's LAW:  **useful of bytes delivered = average latency of each transaction * bandwidth**
+
+![](../../imgs/memory-transaction-1.png)
+
+* 将 memory 机制看作一个 pipe， pipe是 **又长又宽** 
+* **长** 是因为，需要多个 clock cycle 才能将数据读出来
+* **宽** 允许同一时间可以处理多个 **线程** 的请求。
+
+
+
+**对于 memory ，我们能怎么 干呢？**
+
+* 让 内存的 pipe 变得 **更宽**。
 

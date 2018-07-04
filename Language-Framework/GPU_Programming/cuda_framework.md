@@ -12,7 +12,7 @@
   * minimal scheduling unit, SPs in same warp executes same instructions
   * 最小的调度单元（由多个 cuda core 构成）
   * 一个 warp 中的 cuda core 只能跑同一个程序，只是数据不同。
-* SP（cuda core）
+* SP（cuda core）,TESLA v100 一个 SM 上有 64 个 FP32 core，64个int32 core。。。
   * 32 SPs 构成一个 warp，32个 core 跑同一个程序，数据不同。
 
 
