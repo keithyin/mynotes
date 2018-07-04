@@ -8,12 +8,16 @@
   * share registers, 
   * 最细粒度的调度器
   * 任务给SM，SM来调度下面的小兵来执行这个程序，SM最小的调度单元是warp
-* Warp
+* Warp [https://stackoverflow.com/questions/3606636/cuda-model-what-is-warp-size](https://stackoverflow.com/questions/3606636/cuda-model-what-is-warp-size)
   * minimal scheduling unit, SPs in same warp executes same instructions
   * 最小的调度单元（由多个 cuda core 构成）
   * 一个 warp 中的 cuda core 只能跑同一个程序，只是数据不同。
 * SP（cuda core）
   * 32 SPs 构成一个 warp，32个 core 跑同一个程序，数据不同。
+
+
+
+
 
 **CUDA  Framework（API 从高层到底层）**
 
