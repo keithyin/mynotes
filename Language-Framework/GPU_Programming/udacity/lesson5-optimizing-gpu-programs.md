@@ -42,7 +42,7 @@ $$
 
 
 
-## 代码优流程
+## 代码优化流程
 
 
 ![](../../imgs/apod-1.png)
@@ -164,17 +164,102 @@ $$
 * minimize time waiting at barriers
   * 减少 thread block 中的线程数量
 * minimize thread divergence
-  * ​
+  * Avoid branchy code
+    * lots of if, switch statements ?
+    * adjacent threads likely to take different paths?
+    * Try to restructure
+  * Beware large imbalance in thread workloads
+    * look at loops, recursive calls
+    * Try  to restructure
+
+
 
 **什么叫 thread divergence**
 
-在GPU中，一个 warp 的 threads 在同一时间执行相同的指令。但是如果一个 kernel 代码中 if...else ...指令的话。一个 warp 中的 threads 可能一部分执行 if-branch，一部执行 else-branch。但是 warp 中的 threads 又必须在同一时刻执行相同的指令，所以 硬件自动的 deactivate 一些线程。先执行 if-branch 的线程，再执行 else-branch 的线程，这样就会浪费时间。
+在GPU中，一个 **warp** 的 threads 在同一时间执行相同的指令。但是如果一个 kernel 代码中 if...else ...指令的话。**一个 warp 中的 threads 可能一部分执行 if-branch，一部执行 else-branch**。但是 warp 中的 threads 又必须在同一时刻执行相同的指令，所以 硬件自动的 deactivate 一些线程。先执行 if-branch 的线程，再执行 else-branch 的线程，这样就会浪费时间。
 
 ![](../../imgs/thread-divergence-1.png)
 
+* 只有一个 if-else，称作 two-way branch divergence
+
+![](../../imgs/warps-1.png)
+
+* 上图表示了 cuda 如何 是根据什么顺序将 threads warp 起来的。
+* switch 语句也和 if-else 一样。
 
 
 
+**Loops Divergence**
+
+* 这个要考虑的是，一个 block 需要多少时间执行完
+* 如果有 loop 的话，warp 的执行的时间等于 warp 中线程的最长时间。
+
+
+
+**Assorted math optimizations**
+
+* use double precision only when you mean it
+
+  * > fp64 > fp32
+    >
+    > float a = b + 2.5; ? float a = b+2.5f;
+
+* use intrinsics when possible
+
+  * `__sine(), __cos()..`, 使用 built-in function
+
+
+
+## HOST GPU interaction
+
+* PCIe can transfer memory that has been **page locked or pinned**, and i keeps a special chunk of pinned host memory set aside for this purpose.
+* 当我们想将 Host 上的一块 memory 拷贝到 GPU 上去的时候，CUDA 的操作流程如下
+  * Host memory --> Host pinned memory --(PCIe)--> GPU memory
+* 可以在 Host 上手动分配 pinned memory，这样就会省下第一步的 时间
+
+![](../../imgs/memory-transfer-1.png)
+
+**手动分配 pinned memory 有两个好处**
+
+* 更快，省去了 host memory ---> host pinned memory 的转移时间
+* 可以使用 cudaMemcpyAsync() , 可以进行异步数据传输了
+  * let's the CPU keep working while the memory transfer completes.
+
+![](../../imgs/memory-transfer-2.png)
+
+## Streams
+
+> sequence of operations that execute **in order **, (memory transfers, kernels)
+
+![](../../imgs/streams-1.png)
+
+```c++
+cudaStream_t s;        // 声明
+cudaStreamCreate(&s);  // 创建
+cudaStreamDestroy(s);  // 销毁
+```
+
+
+
+**需要注意的一点是**
+
+```c++
+cudaMemcpyAsync(&d_arr1, &h_arr1, numbytes, cudaH2D, s1);
+A<<<1, 128, s2>>>(d_arr1);
+// 如果每个算法都是 1 s 钟可以结束，那么以上程序 1s 中就可以执行完
+// 但是 结果是错误的！！！
+```
+
+![](../../imgs/streams-2.png)
+
+**Advantage of Streams**
+
+* overlap memory & compute (资源充足的情况下)
+* Help fill GPU with smaller kernels
+  * many problems with limited parallelism
+  * computations with narrow phases (reduce)
+* Caveats ---> see CUDA Programming Guide
+  * Streams    Events
 
 
 
@@ -210,6 +295,28 @@ $$
 **对于 memory ，我们能怎么 干呢？**
 
 * 让 内存的 pipe 变得 **更宽**。
+
+
+
+
+
+## 总结
+
+* APOD
+* measure & improve memory bandwidth
+  * assure sufficient occupancy
+  * coalesce global memory accesses
+  * Minimize latency between accesses, **barrier 问题**
+* minimize thread divergence
+  * 注意 warp 的问题
+  * avoid branchy code
+  * avoid thread workload imbalance , for loop 的问题
+* consider fast math, 
+  * 内置的 函数
+  * 使用 double precision on purpose
+* 使用 Streams
+  * overlap computation and CPU-GPU memory transfer
+* ​
 
 
 
