@@ -303,7 +303,7 @@ A<<<1, 128, s2>>>(d_arr1);
 ## 总结
 
 * APOD
-* measure & improve memory bandwidth
+* measure & improve **memory bandwidth**
   * assure sufficient occupancy
   * coalesce global memory accesses
   * Minimize latency between accesses, **barrier 问题**
@@ -316,9 +316,6 @@ A<<<1, 128, s2>>>(d_arr1);
   * 使用 double precision on purpose
 * 使用 Streams
   * overlap computation and CPU-GPU memory transfer
-* ​
-
-
 
 ## Glossary
 
