@@ -5,8 +5,8 @@
 `C++` 异常处理建立在三个关键字之上：
 
 *  `throw` : 抛出异常
-* `try` ： 
-* `catch`： 捕获异常
+*  `try` ： 
+*  `catch`： 捕获异常
 
 ```c++
 #include <iostream>
@@ -105,6 +105,10 @@ int main() {
 
 
 
+
+```c++
+std::current_exception(); // 可以用来获取当前的 exception
+```
 
 
 
