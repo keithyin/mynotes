@@ -113,7 +113,7 @@ int main(){
 
 
 
-`chrono`: 用来处理时间问题
+`chrono`: 用来处理时间相关
 
 ```c++
 void promise_set(promise<string> &&pms){
@@ -134,6 +134,29 @@ void test_promise_future(){
   t.join();
 }
 ```
+
+
+
+**另一种操作：async**
+
+```c++
+// 更少的代码，达到和 promise / future 相同的效果
+string func(){
+  std::string str("hello world");
+  return str;
+}
+
+int main(){
+  // ftr 的析构函数 保证 线程会在最后 join 一下
+  // 当然，func 也可以不返回值，这样 ftr 就 get 出来空
+  future ftr = std::async(func);
+  string str = ftr.get();
+  cout << str << endl;
+  reurn 0;
+}
+```
+
+
 
 
 
