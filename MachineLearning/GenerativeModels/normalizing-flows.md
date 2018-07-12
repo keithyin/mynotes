@@ -6,6 +6,8 @@
 
 * a **simple initial density** is transformed into a **more complex one** by applying a **sequence of invertible transformations** until a desired level of complexity is attained.
   * 有个疑问：为什么要是 **invertible transformations ???????????????????**
+  * 因为 invertible 的话，给定 $z \in p(z), y = f(z)$, 就能算出 $p(y)$
+  * 如果想要计算 $p(y)$ 轻松一些的话， 行列式的值和 $f^{-1}$ 也需要 trivial 的。
 
 
 
@@ -80,6 +82,17 @@
 
 
 ## Normalizing Flows and Variational auto-encoder
+
+
+
+
+
+## NICE: Non-linear Independent Components Estimation
+
+> Learning a highly non-linear transformation that maps the **training data** to space where its **distribution is approximately factorized**.  
+>
+> **By directly maximizing log-likelihood**.
+
 
 
 
