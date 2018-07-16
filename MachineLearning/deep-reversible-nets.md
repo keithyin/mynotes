@@ -1,4 +1,24 @@
+**生成模型三大任务**
+
+* inference: 计算 $z=f(x)$
+* sample:  计算 $x = g(z)$
+* density-estimation: 计算 $p(x)$
+
+|                     | inference | sample | density-estimation | train |
+| ------------------- | --------- | ------ | ------------------ | ----- |
+| NICE                | 可并行       | 可并行    | 可并行                | 可并行   |
+| realNVP             | 可并行       | 可并行    | 可并行                | 可并行   |
+| Glow                | 可并行       | 可并行    | 可并行                | 可并行   |
+| Autoregressive Flow | 可并行       | 串行     | 可并行                | 可并行   |
+| IAF                 | 串行        | 可并行    |                    |       |
+
+
+
 # Deep reversible nets
+
+
+
+
 
 **什么是 deep reversible nets**
 
@@ -48,8 +68,6 @@
 
 * 这个结构是可逆的，而且 det 也好求。
 
-
-
 ## Density Estimation Using Real NVP
 
 [一个 summary](http://www.shortscience.org/paper?bibtexKey=journals/corr/1605.08803)
@@ -67,3 +85,72 @@
 * 比 realNVP 多了个 1×1 的卷积层。
 * channel 之间的信息交互的更加有效
 
+
+
+## Masked Autoregressive Flow for Density Estimation
+
+**自回归模型**
+$$
+p(\mathbb x) = \prod_{d=1}^D p(\mathbb x_{d}|\mathbb x_{<d})
+$$
+**采样过程**
+$$
+\mathbb x_i = u_i*\exp \alpha_i + \mu_i
+$$
+
+$$
+\mu_i=f_{\mu_i}(\mathbb x_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb x_{1:i-1}),  u_i\sim N(0,1)
+$$
+
+* 可以看出，采样的过程是序列的
+
+
+
+**推断过程，（和 density estimation 是差不多的）**
+$$
+u_i = (\mathbb x_i-\mu_i)\exp (-\alpha_i)
+$$
+
+$$
+\mu_i=f_{\mu_i}(\mathbb x_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb x_{1:i-1})
+$$
+
+* 可以看出，给定 $\mathbb x$ ，这个式子完全可以并行。
+
+
+
+## IAF
+
+* density estimation 的时候比较慢
+* sampling 的时候挺快的
+
+
+
+**逆自回归流**
+
+
+
+**采样过程，（即自回归流的 推断过程）**
+$$
+\mathbb x_i = (\mathbb u_i-\mu_i)\exp (-\alpha_i)
+$$
+
+$$
+\mu_i=f_{\mu_i}(\mathbb u_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb u_{1:i-1}), \mathbb u_i \sim N(0,1)
+$$
+
+* 此过程可并行
+
+
+
+**推断过程，（即自回归流的 采样过程）**
+$$
+\mathbb u_i = \mathbb x_i*\exp \alpha_i + \mu_i
+$$
+
+$$
+\mu_i=f_{\mu_i}(\mathbb u_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb u_{1:i-1})
+$$
+
+* 可以看出，需要串行。
+* 所以做 **density estimation** 非常慢。
