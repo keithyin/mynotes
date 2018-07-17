@@ -95,11 +95,11 @@ p(\mathbb x) = \prod_{d=1}^D p(\mathbb x_{d}|\mathbb x_{<d})
 $$
 **采样过程**
 $$
-\mathbb x_i = u_i*\exp \alpha_i + \mu_i
+\mathbb x_i = \mathbb z_i* \sigma_i + \mu_i
 $$
 
 $$
-\mu_i=f_{\mu_i}(\mathbb x_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb x_{1:i-1}),  u_i\sim N(0,1)
+\mu_i=f_{\mu_i}(\mathbb x_{1:i-1}), \sigma_i=f_{\sigma_i}(\mathbb x_{1:i-1}),  \mathbb z_i\sim N(0,1)
 $$
 
 * 可以看出，采样的过程是序列的
@@ -108,11 +108,11 @@ $$
 
 **推断过程，（和 density estimation 是差不多的）**
 $$
-u_i = (\mathbb x_i-\mu_i)\exp (-\alpha_i)
+\mathbb z_i = (\mathbb x_i-\mu_i) / \sigma_i
 $$
 
 $$
-\mu_i=f_{\mu_i}(\mathbb x_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb x_{1:i-1})
+\mu_i=f_{\mu_i}(\mathbb x_{1:i-1}), \sigma_i=f_{\sigma_i}(\mathbb x_{1:i-1})
 $$
 
 * 可以看出，给定 $\mathbb x$ ，这个式子完全可以并行。
@@ -132,25 +132,39 @@ $$
 
 **采样过程，（即自回归流的 推断过程）**
 $$
-\mathbb x_i = (\mathbb u_i-\mu_i)\exp (-\alpha_i)
+\mathbb x_i = (\mathbb z_i-\mu_i) / \sigma_i
 $$
 
 $$
-\mu_i=f_{\mu_i}(\mathbb u_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb u_{1:i-1}), \mathbb u_i \sim N(0,1)
+\mu_i=f_{\mu_i}(\mathbb z_{1:i-1}), \sigma_i=f_{\sigma_i}(\mathbb z_{1:i-1}), \mathbb z_i \sim N(0,1)
 $$
 
 * 此过程可并行
 
-
-
 **推断过程，（即自回归流的 采样过程）**
 $$
-\mathbb u_i = \mathbb x_i*\exp \alpha_i + \mu_i
+\mathbb z_i = \mathbb x_i* \sigma_i + \mu_i
 $$
 
 $$
-\mu_i=f_{\mu_i}(\mathbb u_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb u_{1:i-1})
+\mu_i=f_{\mu_i}(\mathbb z_{1:i-1}), \alpha_i=f_{\alpha_i}(\mathbb z_{1:i-1})
 $$
 
 * 可以看出，需要串行。
 * 所以做 **density estimation** 非常慢。
+
+
+
+**re-parameterize**
+
+* 如果直接用上面方式**建模采样过程**的话，可能会有些问题，如果 $\sigma_i=0$ ，就 GG了。 
+
+所以，进行 re-parameterize trick 之后，采样过程可以写成下面这种形式
+$$
+\mathbb x_i = \mathbb z_i * \sigma_i +\mu_i 
+$$
+
+$$
+\mu_i=f_{\mu_i}(\mathbb z_{1:i-1}), \sigma_i=f_{\sigma_i}(\mathbb z_{1:i-1}), \mathbb z_i \sim N(0,1)
+$$
+
