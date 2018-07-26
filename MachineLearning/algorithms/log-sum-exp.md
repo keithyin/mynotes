@@ -15,11 +15,18 @@ $$
 \max\{x_1, x_2, ..., x_n\} \le LSE(x_1, x_2, ..., x_n) \le \max\{x_1, x_2, ..., x_n\} + \log(n)
 $$
 在使用计算机时候经常使用一个 `trick` 为了避免数值计算错误
+
+
 $$
-LSE(x_1, x_2, x_3, ..., x_n) =x^* + \log\Bigr(\exp(x_1-x^*)+\exp(x_2-x^*) + ...+\exp(x_n-x^*)\Bigr)
+LSE(x_1, x_2, x_3, ..., x_n) =x^*  + \log\Bigr(\exp(x_1-x^* )+\exp(x_2-x^* ) + ...+\exp(x_n-x^*)\Bigr)
 $$
 
-* $x^* = \max\{x_1, x_2, ..., x_n\}$
+
+$$
+x^* = \max \{x1, x2, ..., x_n\}
+$$
+
+
 
 
 
