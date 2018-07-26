@@ -4,6 +4,7 @@
 
 * `register_forward_hook()`
 * `register_forward_pre_hook()`
+  * 官方使用此 `hook` 实现了 `weight_norm` ，通过重设 `Module` 的 `weight` 属性。
 * `register_backward_hook()`
 
 ```python
@@ -38,9 +39,15 @@ def __call__(self, *input, **kwargs):
 
 
 
+
+
+
+
 **总结**
 
 * `forward_hook` : 不会对正常的 计算图产生影响，只是对 `Module` 的输入和输出进行窥探。
+
+
 * `register_backward_hook()`: 是注册到 `Module` 输出的 `Tensor` 的 `grad_fn` 上的。**可以用来影响梯度流**
 
 ```python
