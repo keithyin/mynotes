@@ -802,7 +802,7 @@ int sem_post(sem_t* sem); // 信号量++
 * 借助 `fcntl` 实现的， `file control`
 
 ```c
-F_SETLK(struct flock*) ; // 设置文件锁，相当于 trylock，非阻塞的
+F_SETLK(struct flock*) ; // 设置文件锁，相当于 trylock，非阻塞的 
 F_SETLKW(struct flock*); // lock 版本， 带阻塞的
 F_GETLK(struct flock*);  // 获取文件锁
 ```
