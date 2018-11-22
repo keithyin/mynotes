@@ -6,7 +6,7 @@ ulimit -a # 当前系统的资源上限
 
 
 
-![](../imgs/memory-segment.png)
+![](../..//imgs/memory-segment.png)
 
 ## 操作系统基础
 
