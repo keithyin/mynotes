@@ -59,7 +59,7 @@ template <typename T> class Blob{
 
 // 定义函数方法
 template<typename T>
-  void ::Blob<T>::push_back(T &&t){
+  void Blob<T>::push_back(T &&t){
     do_something;
   }
 
@@ -110,5 +110,65 @@ template <class T = int> class Numbers{
 
 ## 成员模板
 
-> 类的方法是一个 模板
+> 类的方法是一个 模板， 而类并不是模板类
+
+
+
+## 控制实例化
+
+```c++
+extern template declaration; // 实例化声明
+template declaration;        // 实例化定义
+
+/*例子*/
+extern template class Blob<string>;
+extern template int compare(const int&, const int&);
+template int compare(const int&, const int&);
+template class Blob<string>;
+```
+
+* 显式实例化模板类会实现类的所有成员
+
+
+
+## 模板特例化
+
+* 通用模板定义对于特定类型可能是不适合的，这时候就需要 特例化一个模板了
+* 函数模板
+  * 特例化
+* 类模板
+  * 特例化
+  * 部分特例化，`special specialization`
+
+```c++
+// 函数模板特例化
+template<> int compare(const char* p1, const char* p2){
+  // 特例化代码
+}
+
+// 类模板特例化
+template<> class Student<People>{
+  // 特例化的代码，和通用的部分没有啥关系咯
+}
+
+/* 类模板部分特例化， partial specialization
+ 类的部分特例化依旧是一个模板
+*/
+template <typename T> struct remove_reference{
+  typedef T type;
+};
+template <typename T> struct remove_reference<T&>{
+  typedef T type;
+};
+template <typename T> struct remove_reference<T&&>{
+  typedef T type;
+};
+
+// 特例化类模板的某个成员
+template<> void Foo<int>::Bar(){
+  // 特例化代码
+}
+```
+
+
 
