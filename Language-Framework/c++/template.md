@@ -172,3 +172,12 @@ template<> void Foo<int>::Bar(){
 
 
 
+
+
+## Expression Template
+
+[link](http://shoddykid.blogspot.com/2008/07/expression-templates-demystified.html)
+
+* 保存的是表达式对象，`call` 是一个参数
+* 表达式对象构建出来一个二叉树。复杂表达式类负责构建二叉树
+* Constant 和 Variable 是叶子节点，`call` 是一个参数

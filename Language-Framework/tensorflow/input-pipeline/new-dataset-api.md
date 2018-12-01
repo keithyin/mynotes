@@ -1,5 +1,9 @@
 # 通过 tf.data API 读取数据
 
+[https://www.tensorflow.org/guide/datasets](https://www.tensorflow.org/guide/datasets)
+
+
+
 `tf.data` API 在 `tensorflow1.4` 版本加入了 `tensorflow`, 提供更加简便的 数据读取方法. 在没有`tf.data` 之前, 需要使用 `queue_runner(), Coordinate()` 这些方法, 是非常麻烦的.
 
 
@@ -8,7 +12,7 @@
 
 ```python
 dataset = tf.data.Dataset(...)
-dataset = dataset.map(_map_func) # 解析函数
+dataset = dataset.map(_map_func) # 解析函数, 对Dataset 中的每个 sample 做此操作
 dataset = dataset.shuffle(...) # 是否对数据集进行 shuffle, 不是完全 shuffle (可选)
 dataset = dataset.batch(...) # 设置 batch_size 
 dataset = dataset.repeat(...) # 重复多少次数据集 (可选)
@@ -32,7 +36,55 @@ tf.data.Dataset.from_tensor_slices()
 
 # 使用 TFRecord 构建 Dataset
 tf.data.TFRecordDataset(filenames)
+
+# 使用 generator 构建 Dataset
+tf.data.from_generator()
 ```
+
+```python
+# 函数对象均可
+def GenerateData():
+    datas = []
+    tmp = []
+    for i in range(100):
+        tmp.append(i)
+        datas.append(copy.deepcopy(tmp))
+    for idx in range(101):
+        tmp = datas[idx]
+        yield (tmp, )
+
+class GenerateData2(object):
+    def __init__(self):
+        self.datas = []
+        self.cur_idx = 0
+        self._generate_data()
+
+    def _generate_data(self):
+        tmp = []
+        for i in range(100):
+            tmp.append(i)
+            self.datas.append(copy.deepcopy(tmp))
+
+    def __call__(self):
+        for i in range(100):
+            tmp = self.datas[i]
+            yield (tmp, )
+
+if __name__ == "__main__":
+    dataset = tf.data.Dataset.from_generator(
+        GenerateData, (tf.int64, ), output_shapes=(tf.TensorShape([None]), ))
+    dataset2 =  tf.data.Dataset.from_generator(
+        GenerateData2(), (tf.int64, ), 
+        output_shapes=(tf.TensorShape([None]), ))
+    iterator = dataset.make_one_shot_iterator()
+    next_data = iterator.get_next()
+    with tf.Session() as sess:
+        for i in range(101):
+            print(sess.run(next_data))
+    print("hello world")
+```
+
+
 
 
 
@@ -65,11 +117,20 @@ def func(example_proto):
 >
 > * one-shot: 一次性迭代器, 用过就完
 > * initializable: 可初始化的迭代器, 可多次使用
-> * reinitializable: ...
-> * feedable: ...
+>   * 可以使用 placeholder 参数化 Dataset 的某些定义
+> * reinitializable: 
+>   * 可以用不同的 `Dataset 对象` 初始化之，
+>   * 可以使用多个 Dataset 的 iterator
+> * feedable: 
+>   * 一个可以切换不同的 iterator 的 iterator
+>   * 可以使用多个 iterator 的 iterator
+
+
+
+**make_one_shot_iterator**
 
 ```python
-# one-shot, 不支持参数化, 不能重新初始化, repeat, batch, shuffle 都可以用
+# one-shot, 不支持参数化, 不能重新初始化, repeat, batch, shuffle 可以用
 dataset = tf.data.Dataset.range(100)
 iterator = dataset.make_one_shot_iterator()
 next_element = iterator.get_next()
@@ -78,8 +139,12 @@ for i in range(100):
   assert i == value
 ```
 
+
+
+**make_initializable_iterator**
+
 ```python
-# initializable, 可初始化的迭代器, 支持参数化.
+# initializable, 可初始化的迭代器, 支持参数化 Dataset
 max_value = tf.placeholder(tf.int64, shape=[])
 dataset = tf.data.Dataset.range(max_value)
 iterator = dataset.make_initializable_iterator()
@@ -100,7 +165,158 @@ for i in range(100):
 
 
 
+**reinitializable**
 
+* 使用结构定义，一个多个 `Dataset` 可以共用一个`Iterator` 
+
+```python
+# 用结构定义，而不是用 Dataset 进行定义，所以可以应用到多个 Dataset
+# Define training and validation datasets with the same structure.
+training_dataset = tf.data.Dataset.range(100).map(
+    lambda x: x + tf.random_uniform([], -10, 10, tf.int64))
+validation_dataset = tf.data.Dataset.range(50)
+
+# A reinitializable iterator is defined by its structure. We could use the
+# `output_types` and `output_shapes` properties of either `training_dataset`
+# or `validation_dataset` here, because they are compatible.
+iterator = tf.data.Iterator.from_structure(training_dataset.output_types,
+                                           training_dataset.output_shapes)
+next_element = iterator.get_next()
+
+training_init_op = iterator.make_initializer(training_dataset)
+validation_init_op = iterator.make_initializer(validation_dataset)
+
+# Run 20 epochs in which the training dataset is traversed, followed by the
+# validation dataset.
+for _ in range(20):
+  # Initialize an iterator over the training dataset.
+  sess.run(training_init_op)
+  for _ in range(100):
+    sess.run(next_element)
+
+  # Initialize an iterator over the validation dataset.
+  sess.run(validation_init_op)
+  for _ in range(50):
+    sess.run(next_element)
+```
+
+
+
+**feedable iterator**
+
+* 可以在使用中切换 `iterator` ，通过 `feed_dict`
+* 切换时不需要初始化 `iterator`，可以保存 `iterator ` 的状态
+
+```python
+# Define training and validation datasets with the same structure.
+training_dataset = tf.data.Dataset.range(100).map(
+    lambda x: x + tf.random_uniform([], -10, 10, tf.int64)).repeat()
+validation_dataset = tf.data.Dataset.range(50)
+
+# A feedable iterator is defined by a handle placeholder and its structure. We
+# could use the `output_types` and `output_shapes` properties of either
+# `training_dataset` or `validation_dataset` here, because they have
+# identical structure.
+handle = tf.placeholder(tf.string, shape=[])
+iterator = tf.data.Iterator.from_string_handle(
+    handle, training_dataset.output_types, training_dataset.output_shapes)
+next_element = iterator.get_next()
+
+# You can use feedable iterators with a variety of different kinds of iterator
+# (such as one-shot and initializable iterators).
+training_iterator = training_dataset.make_one_shot_iterator()
+validation_iterator = validation_dataset.make_initializable_iterator()
+
+# The `Iterator.string_handle()` method returns a tensor that can be evaluated
+# and used to feed the `handle` placeholder.
+training_handle = sess.run(training_iterator.string_handle())
+validation_handle = sess.run(validation_iterator.string_handle())
+
+# Loop forever, alternating between training and validation.
+while True:
+  # Run 200 steps using the training dataset. Note that the training dataset is
+  # infinite, and we resume from where we left off in the previous `while` loop
+  # iteration.
+  for _ in range(200):
+    sess.run(next_element, feed_dict={handle: training_handle})
+
+  # Run one pass over the validation dataset.
+  sess.run(validation_iterator.initializer)
+  for _ in range(50):
+    sess.run(next_element, feed_dict={handle: validation_handle})
+
+```
+
+
+
+## Effective tf.data
+
+[https://www.tensorflow.org/guide/performance/datasets](https://www.tensorflow.org/guide/performance/datasets)
+
+
+
+### Parallelize Data Extraction
+
+-----
+
+```python
+# 没有用 parallelize data extraction 的
+files = tf.data.Dataset.list_files("/path/to/dataset/train-*.tfrecord")
+dataset = files.interleave(tf.data.TFRecordDataset)
+
+# 使用 parallelize data extraction
+dataset = files.apply(tf.contrib.data.parallel_interleave(
+    tf.data.TFRecordDataset, cycle_length=FLAGS.num_parallel_readers))
+```
+
+
+
+
+
+### Parallelize Data Transformation
+
+----
+
+* 在 `dataset pipeline` 的最后使用 `prefetch(1)` 
+
+```python
+dataset = dataset.batch(batch_size=FLAGS.batch_size)
+dataset = dataset.prefetch(buffer_size=FLAGS.prefetch_buffer_size)
+return dataset
+```
+
+* 给 `map` 指定 `num_parallel_calls` 参数，让 `map` 并行起来
+
+```python
+dataset = dataset.map(map_func=parse_fn, 
+                      num_parallel_calls=FLAGS.num_parallel_calls)
+```
+
+* 如果 batch 的数量比较大的话，那就使用 融合的 api
+
+```python
+#  batch大 不建议使用
+dataset = dataset.map(map_func=parse_fn, 
+                      num_parallel_calls=FLAGS.num_parallel_calls)
+dataset = dataset.batch(batch_size=FLAGS.batch_size)
+
+
+# batch 大建议使用
+dataset = dataset.apply(tf.contrib.data.map_and_batch(
+    map_func=parse_fn, batch_size=FLAGS.batch_size))
+```
+
+
+
+
+
+## 如何写出更高效的 input pipeline
+
+* `Map and Batch`: 如果 `map` 执行的操作非常少，那就可以先 `Batch`，然后再 `Map` 
+* `Repeat and Shuffle`： 
+  * `repeat before shuffle` : provides better performance
+  * `shuffle before repeat` ：provides stronger ordering guarantees 
+  * 使用 `contrib.data.shuffle_and_repeat` 效果会更好哦
 
 
 
