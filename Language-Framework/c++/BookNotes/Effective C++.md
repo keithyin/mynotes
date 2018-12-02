@@ -195,7 +195,7 @@
     	std::string BirthDate();
     	std::string Address();
     private:
-    	std::shared_ptr<PersonImpl*> impl; //指针，指向实现物
+    	std::shared_ptr<PersonImpl> impl; //指针，指向实现物
   }
   /*
   这样一搞，就不用 #include <personimpl> 这些东西了。
