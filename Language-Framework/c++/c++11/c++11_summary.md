@@ -91,3 +91,77 @@ enum 的问题：
 `enum class` ：
 
 * 强类型的，不会隐式转换了。
+
+
+
+## constexpr (常量表达式)
+
+**常量表达式**
+
+* 值不会改变
+* 编译过程就能得到结果
+
+```c++
+const int max_files = 20; // max_files 是常量表达式
+const int limit = max_files + 1; // limit 是常量表达式
+int staff_size = 27; // staff_size不是常量表达式，staff_size 的值可以被改变
+const int sz = get_size() ; // sz 不是常量表达式，因为，运行中才能知道结果
+```
+
+
+
+* constexpr  变量，C++11 允许将变量声明为 `constexpr` 类型，以便由编译器来验证变量的值是不是一个常量表达式。
+  * 声明为 `constexpr` 的变量一定是一个常量，而且必须用常量的表达式初始化
+  * 一般来说，如果你认定 变量是一个 常量表达式，那就把它声名为 `constexpr`
+
+```c++
+constexpr int mf = 20; // 20是常量表达式
+constexpr int limit = mf + 1; // mf + 1 是常量表达式
+
+// 只有当 size 是一个 constexpr 函数时，才是正确的声名语句
+constexpr int sz = size(); 
+```
+
+
+
+* `constexpr` 函数
+  * 声明为 `constexpr` 函数会被编译器搞成内联的
+
+
+
+
+
+## 类型推断
+
+* `auto`
+  * 顶层常量会被忽略
+    * 底层常量不会忽略，常量对象取地址是一个底层 `const`
+    * 如果 `auto &a = var;` 的话，顶层常量不会被忽略。为了保证 var 的常量性
+  * 引用会被忽略
+
+```c++
+int i=0, &r=i;
+auto a = r; // r是个引用，但是 a 不是引用类型
+
+const int ci = i, &cr = ci;
+auto b = ci; // b 不是常量，因为顶层常量会被忽略
+auto c = cr; // c是个整数，不是常量，也不是引用
+auto e = &ci; // e 是一个指向证书常量的指针，常量
+
+auto &g = ci; // g是个整形常量引用
+```
+
+
+
+* `decltype`
+  * 顶层常量和引用都不会忽略
+
+```c++
+const int ci=0, &cj = ci;
+decltype(ci) x = 0; // x 是 const int
+decltype(cj) y = x; // y 是 const int &
+decltype(cj) x;     // 错误，引用必须要初始化
+```
+
+
+
