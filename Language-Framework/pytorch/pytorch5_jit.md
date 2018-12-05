@@ -18,7 +18,9 @@
 
 ## Tracing
 
+* 追踪，给定一个输入，通过追踪数据的流动，将走过的路径记录下来。
 * 如果函数或者可调用对象中**没有控制流** ,使用 tracing
+* Tracing a *function* will produce a `ScriptModule` with a single `forward`method that implements that function.
 
 ```python
 import torch
@@ -70,6 +72,7 @@ class MyScriptModule(ScriptModule):
         self.conv1 = trace(nn.Conv2d(1, 20, 5), torch.rand(1, 1, 16, 16))
         self.conv2 = trace(nn.Conv2d(20, 20, 5), torch.rand(1, 20, 16, 16))
 		self.weight = torch.nn.Parameter(torch.rand(N, M))
+    
     @script_method
     def forward(self, input):
       input = F.relu(self.conv1(input))
@@ -86,3 +89,10 @@ class MyScriptModule(ScriptModule):
 
 * 代码中创建一个对象
 * 然后通过读取文件给对象设置属性
+
+
+
+## script 与 trace
+
+* `script` 中套 `trace`
+* `trace` 中套 `script`
