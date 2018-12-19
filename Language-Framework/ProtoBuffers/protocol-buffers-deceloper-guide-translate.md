@@ -23,10 +23,19 @@ message Person {
   }
   repeated PhoneNumber phone = 4;
 }
-```  
-可以看到,`message`的格式是非常简单的--每个`message`类型都有一个或多个 编号的 字段, 每个字段都有一个名字和值的类型. 值的类型可以是数值类型(整型或者浮点型), 布尔型, 字符串, `raw bytes`, 甚至是 `protocol buffer message`类型.允许你去层次的结构化数据. 你可以指定 可选字段, [必填字段](https://developers.google.com/protocol-buffers/docs/proto#required_warning),和重复字段.在[这里](https://developers.google.com/protocol-buffers/docs/proto),你可以找到关于如何写 `.proto`文件更详细的信息.
+```
+可以看到,`message`的格式是非常简单的--每个`message`类型都有一个或多个 编号的 字段, 每个字段都有一个名字和值的类型. 值的类型可以是数值类型(整型或者浮点型), 布尔型, 字符串, `raw bytes`, 甚至是 `protocol buffer message`类型.允许你去层次的结构化数据. 你可以指定
 
-一旦定义好了 `messages`, 你就可以  在`.proto`文件上运行 编程语言相关的`protocol buffer compiler`去生成数据访问类(data access classes). 它们对每个字段提供了简单的访问器(就像 `name()`, 和 `set_name()`) 和 将整个结构 从 `raw bytes`解析和序列化成`raw bytes`的方法. 例如, 如果选择使用 `c++` 语言, 对上述的例子进行编译会生成一个 `Person` 类. 之后,就可以在应用程序中使用这个类进行填充,序列化和检索 `Person protocol buffer messages`. 你可能会写出以下代码:
+*  可选字段,
+*  [必填字段](https://developers.google.com/protocol-buffers/docs/proto#required_warning),
+* 重复字段.
+
+在[这里](https://developers.google.com/protocol-buffers/docs/proto),你可以找到关于如何写 `.proto`文件更详细的信息.
+
+
+
+一旦定义好了 `messages`, 你就可以  在`.proto`文件上运行 编程语言相关的`protocol buffer compiler`去生成 **数据访问类(data access classes)**.  它们对每个字段提供了简单的访问器(就像 `name()`, 和 `set_name()`) 和 将整个结构 从 `raw bytes`解析和序列化成`raw bytes`的方法. 例如, 如果选择使用 `c++` 语言, 对上述的例子进行编译会生成一个 `Person` 类. 之后,就可以在应用程序中使用这个类进行填充,序列化和检索 `Person protocol buffer messages`. 你可能会写出以下代码:
+
 ```c++
 Person person;
 person.set_name("John Doe");
