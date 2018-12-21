@@ -121,8 +121,7 @@ do
   echo "hello world"
 done
 
-if [1]
-then
+if [1]; then
  echo "hello world"
 else
  echo "hello world if else"
