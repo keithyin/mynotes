@@ -8,7 +8,7 @@
 
 **Demo**
 ```shell
-#!/bin/sh
+#! /bin/sh
 #file : example.sh
 #note : this is demo.
 #date : 2018.12.21
@@ -41,6 +41,7 @@ cd ..; ls -all #一行中执行多个命令，使用 ; 隔开
 
 * 全局变量：被 `export` 导出的
 * 本地变量：没有被导出的
+* 建议：变量取值总是放在 `""` 之中， `"$VAR"`
 
 ```shell
 VAR=hello; # 定义变量然后赋值
@@ -94,9 +95,8 @@ VAR2=$[VAR+40]; #返回的是 代数运算的值
 * 双引号：允许变量扩展
 
 ```shell
-VAR1 = hello;
-VAR2 = ;		# 这个代表空
-
+VAR1=hello #变量定义，不能有空格
+VAR2= 		# 这个代表空
 ```
 
 
@@ -106,50 +106,86 @@ $0 # 脚本名
 $1 #第一个参数
 $# #参数总数，不包含$0
 $* #所有参数，不包含$0
-
 ```
 
-## 控制流
+
+
+## 条件测试
+
+- 使用命令 `test` 或者 `[` 可以测试一个条件是否成立
+- `[` 是一个命令，记得和参数之间要有空格分隔开
+- 真的时候返回 0 ，假的时候返回 1
+
 ```shell
-for idx in `seq 1 20`
-do
-  echo "$idx"
-done
+if [ $VAR1 command $VAR2 ]
+test 10 -gt 4
+```
 
-while [1]
-do
-  echo "hello world"
-done
+**command**
 
-if [1]; then
+- 对于数值 -eq, -ne, -ge, -le, -gt, -lt
+- 对于字符串：=, !=, -Z(字符串空), -n(字符串非空)
+- `-d` 是否是目录
+- `-f` 是否是文件
+- `-e` 文件是否存在
+- `-a` and
+- `-o` or
+
+
+
+## 控制流
+
+```shell
+if [ 1 ]; then
  echo "hello world"
 else
  echo "hello world if else"
+elif
+  echo "dododo"
 fi
 
+if : ; then # : 永远为真
+  echo "dodod"
 
 case $VAR in 
-yes)
+yes) # yes|y|YES) ，只有) 哦
   echo "yes"
-  ;;
+  ;; #代表 break
 no)
   echo "no"
   ;;
 *)
   echo "input unkown"
   ;;
+esac
+
+for idx in `seq 1 20`
+do
+  echo "$idx"
+done
+
+for idx in `seq 1 20`; do
+	echo "hehe"
+done
+
+while [ 1 ]
+do
+  echo "hello world"
+done
 ```
 
-## 条件测试
+
+
+## 输入输出
+
 ```shell
-
-if [$VAR1 command $VAR2]
-
+read VAR # 与标准输入交互
+echo "$VAR"
 ```
-**command**
-* 对于数值 -eq, -ne, -ge, -le, -gt, -lt
-* 对于字符串：=, !=, Z(字符串空), -n(字符串非空)
-* 
+
+
+
+
 
 ## 函数
 ```shell
@@ -161,5 +197,5 @@ function new_func()
 }
 
 new_func hello world #函数调用
-echo $? #获取函数返回值
+echo $? #上一个进程退出的值
 ```
