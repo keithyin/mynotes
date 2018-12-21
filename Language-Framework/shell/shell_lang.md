@@ -6,7 +6,16 @@
 #!/bin/sh
 ```
 
-
+**Demo**
+```shell
+#!/bin/sh
+#file : example.sh
+#note : this is demo.
+#date : 2018.12.21
+#author : keithyin
+#update : 2018.12.22
+#note : add a function
+```
 
 ## 关键字
 
@@ -35,7 +44,9 @@ cd ..; ls -all #一行中执行多个命令，使用 ; 隔开
 
 ```shell
 VAR=hello; # 定义变量然后赋值
+VAR3="hello" #这个和上面那个是一样的
 VAR2=$VAR; # $用于取值
+VAR4=${VAR2} #取值，加花括号和不加是一样的
 unset VAR; # 将定义的环境变量/本地变量删除
 ```
 
@@ -89,8 +100,67 @@ VAR2 = ;		# 这个代表空
 ```
 
 
+## 传参及使用
+```shell
+$0 # 脚本名
+$1 #第一个参数
+$# #参数总数，不包含$0
+$* #所有参数，不包含$0
+
+```
+
+## 控制流
+```shell
+for idx in `seq 1 20`
+do
+  echo "$idx"
+done
+
+while [1]
+do
+  echo "hello world"
+done
+
+if [1]
+then
+ echo "hello world"
+else
+ echo "hello world if else"
+fi
+
+
+case $VAR in 
+yes)
+  echo "yes"
+  ;;
+no)
+  echo "no"
+  ;;
+*)
+  echo "input unkown"
+  ;;
+```
 
 ## 条件测试
+```shell
 
+if [$VAR1 command $VAR2]
 
+```
+**command**
+* 对于数值 -eq, -ne, -ge, -le, -gt, -lt
+* 对于字符串：=, !=, Z(字符串空), -n(字符串非空)
+* 
 
+## 函数
+```shell
+function new_func()
+{
+  echo $1 #函数的第一个参数
+  echo $2 #函数的第二个参数
+  return 0
+}
+
+new_func hello world #函数调用
+echo $? #获取函数返回值
+```
