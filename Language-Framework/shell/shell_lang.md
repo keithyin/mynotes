@@ -64,7 +64,7 @@ unset VAR; # 将定义的环境变量/本地变量删除
 ## 命令代换
 
 ```shell
-VAR=`date`; # $VAR 会执行date命令
+VAR=`date`; # $VAR 得到的是date命令执行后的结果
 VAR2=$(date); #完成和上面同一个功能
 ```
 
@@ -100,12 +100,16 @@ VAR2= 		# 这个代表空
 ```
 
 
-## 传参及使用
+## 传参及使用，特殊变量
 ```shell
 $0 # 脚本名
 $1 #第一个参数
 $# #参数总数，不包含$0
 $* #所有参数，不包含$0
+$? #上一个进程（函数）的返回值
+$@ #表示参数列表，和 $* 一样
+$$ #当前进程号
+shift #将参数列表左移，相当于列表的 出队列操作
 ```
 
 
@@ -167,12 +171,20 @@ done
 for idx in `seq 1 20`; do
 	echo "hehe"
 done
+for FRUIT in apple banana pear; do
+	echo "$FRUIR"
+done
 
-while [ 1 ]
-do
+# do done 就可以看作 { 和  }
+while [ 1 ]; do
   echo "hello world"
 done
 ```
+
+
+
+* `break[n]` 可以指定跳出几层循环
+* continue
 
 
 
@@ -199,3 +211,21 @@ function new_func()
 new_func hello world #函数调用
 echo $? #上一个进程退出的值
 ```
+
+
+
+## 文件重定向
+
+
+
+## 脚本调试方法
+
+```shell
+. some.sh -n # 只看一下是否有语法错误
+
+
+# -x 调试, 执行的时候 sh -x file.sh
+set -x #调试位置的开始
+set +x # 调试位置的结束
+```
+
