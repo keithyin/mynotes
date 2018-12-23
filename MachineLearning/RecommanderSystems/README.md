@@ -40,4 +40,13 @@ $$
 * $V_i$ 解释成 embedding vector。
 * 是不是需要 one-step further，把输入搞成 embedding 向量，然后再 FM？
 * 怎么定义 high-order interaction，由于 Neural Network可以模拟任何函数，当然 high-order了？ 但是实际上， heaven knows。。。。
-* ​
+
+
+
+
+
+## Wide & Deep Learning for Recommender Systems
+
+* Memorization of feature interactions through a wide set of cross-product feature transformations are effective and interpretable, while generalization requires more feature engineering effort.
+* With less feature engineering, deep neural networks can generalize better to unseen feature combinations through low-dimensional dense embeddings learned for the sparse features.
+* However, deep neural networks with embeddings can over-generalize and recommend less relevant items when the user-item interactions are sparse and high-rank
