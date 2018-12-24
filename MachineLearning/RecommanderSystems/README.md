@@ -50,3 +50,57 @@ $$
 * Memorization of feature interactions through a wide set of cross-product feature transformations are effective and interpretable, while generalization requires more feature engineering effort.
 * With less feature engineering, deep neural networks can generalize better to unseen feature combinations through low-dimensional dense embeddings learned for the sparse features.
 * However, deep neural networks with embeddings can over-generalize and recommend less relevant items when the user-item interactions are sparse and high-rank.
+
+
+
+## Item-Based Collaborative Filtering Recommendation Algorithms
+
+**two steps**
+
+* 计算相似性
+* prediction computation
+
+
+
+**Item相似性计算**
+
+* cosine based similarity
+  * 需要 item 的向量表示
+
+$$
+sim(\mathbf i ,\mathbf j)=cos(\mathbf i ,\mathbf j)
+$$
+
+* Adjusted Cosine Similarity
+  * 只需要评分矩阵就可以了
+  * $R_{u,i}$, 表示 用户 $u$ 对物品 $i$ 的评分
+  * 需要找到 $\mathbf i, \mathbf j$ 共现的 user
+  * $\overline R_u$ 是用户 $u$ 评分的均值，这个是为了消除 不同用户打分标准不同的影响
+
+$$
+sim(\mathbf i, \mathbf j) = \frac {\sum_{u\in U}(R_{u,i}-\overline R_u)(R_{u,j}-\overline R_u)}{\sqrt{\sum_{u\in U}(R_{u,i}-\overline R_u})^2{\sqrt{\sum_{u\in U}(R_{u,j}-\overline R_u})^2}}
+$$
+
+
+
+**评分预测**
+$$
+P_{u, i} = \frac {\sum _{all-similar-items, N}(s_{i,N}*R_{u,N})}{\sum _{all-similar-items, N}(|s_{i,N}|)}
+$$
+
+* 目标是计算 用户 $u$ 对 item $i$ 的评分
+* 找到和所有 $i$ 相似的 items,用上面计算的相似性，和用户的评分计算 $i$ 的得分。
+
+
+
+## Neural Collaborative Filtering (2017)
+
+* user embedding
+* item embedding
+* 将 user 和 item 的交互从 inner product 换成 神经网络
+  * 神经网络有更强的函数拟合能力
+
+![](imgs/ncf-1.png)
+
+* 此文章关注点是在  implicit feedback（看或不看，看多久）上，而不是在 explicit feedback（rating，review）上
+* ​
