@@ -103,4 +103,30 @@ $$
 ![](imgs/ncf-1.png)
 
 * 此文章关注点是在  implicit feedback（看或不看，看多久）上，而不是在 explicit feedback（rating，review）上
-* ​
+
+**关于数据**
+
+* user-item 交互矩阵 如果 user（$u$） 和 item ($i$) 有交互，则 $y_{u,i}=1$ 否则为 0
+  * $y_{u,i}=1$ 并不意味着，$u$ 喜欢 $i$，同样 $y_{u,i}=0$ 也并不意味着 $u$ 不喜欢 $i$
+  * 缺乏 negative-sample，negative-sample问题如何解决？
+  * 也可以不这么打标签啊。具体业务具体实现
+* negative-sample 问题如何解决
+  * 采样 unobserved-data 作为负例
+  * 如果是 pairwise-learning 的话，observed-data 的得分比 unobserved 的得分低就好
+
+
+
+**loss函数**
+$$
+p(\mathcal Y, \mathcal Y^-) = \prod_{(u,i)\in\mathcal Y} \hat y_{u,i}\prod_{(u,j)\in\mathcal Y^-} (1-\hat y_{u,j})
+$$
+
+* $\mathcal Y$ : observed data
+* $\mathcal Y^-$ : unobserved data
+* mse 的 高斯分布假设很不合适，所以用这种方式来表示 loss
+* 用 SGD 更新参数
+
+
+
+## Personalized Top-N Sequential Recommendation via Convolutional Sequence Embedding
+
