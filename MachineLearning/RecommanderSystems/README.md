@@ -7,6 +7,7 @@
   * One reason for huge sparsity is that the underlying problem deals with large categorical variable domains。对于 类别的特征，需要用 one hot 来表示，所以就稀疏了， 但是这个问题可以通过 embedding 来解决啊。
 * 稀疏带来的问题：学习 特征之间的交互就比较困难
   * 比如 `ax+by+cz=y` : `x, y, z` 为特征值，`a, b, c` 是他们对应的系数，如果特征大部分为0, 即使多给几个这样的等式，也难以正确的估计出 `a,b,c` 所对应的值
+* general preference
 
 ## Factorization Machine
 
@@ -62,7 +63,7 @@ $$
 
 
 
-**Item相似性计算**
+**Item相似性计算， 如何计算 i 和 j 的相似度**
 
 * cosine based similarity
   * 需要 item 的向量表示
@@ -74,7 +75,7 @@ $$
 * Adjusted Cosine Similarity
   * 只需要评分矩阵就可以了
   * $R_{u,i}$, 表示 用户 $u$ 对物品 $i$ 的评分
-  * 需要找到 $\mathbf i, \mathbf j$ 共现的 user
+  * 需要找到 $\mathbf i, \mathbf j$ 共现的 所有user
   * $\overline R_u$ 是用户 $u$ 评分的均值，这个是为了消除 不同用户打分标准不同的影响
 
 $$
@@ -128,5 +129,45 @@ $$
 
 
 
-## Personalized Top-N Sequential Recommendation via Convolutional Sequence Embedding
+## Personalized Top-N Sequential Recommendation via Convolutional Sequence Embedding （2018）
 
+* modeling each user as a sequence of items interacted in the past and aims to predict top-N ranked items that a user will likely interact in a "near future"
+* more recent items in sequence have a larger impact on the next item
+
+
+
+**之前模型的缺点**
+
+* markov model: 缺点来自于其假设，当前状态只和上一状态有关系
+
+
+
+**CNN模型的好处**
+
+* 引入 general preference
+* 可以建模 1-gram, 2-gram, 3-gram ...
+
+
+
+![](imgs/caser-1.png)
+
+**模型**
+
+* 对每个用户 $u$ , 取出用户的 general preference embedding
+* 从用户的交互序列中读取
+  * 取出 $L$ 个连续的 items 作为input，
+  * 再取 $T$ 个作为 target
+* 输出的激活是 sigmoid。ie：多 label 输出
+* 对于整个数据集的 likelihood 可以用如下公式表达出来
+  * $u$ : 表示 user
+  * $C^u$ : 表示我们想要预测的 time-step的集合 {L+1, L+2, ...}
+  * $S_t^u$ : 表示用户在 $t$ 时刻与 哪个 item 进行交互了
+  * 论文中的公式有问题吧。。。。。。
+
+$$
+p(S|\Theta)=\prod_u \prod_{t\in C^u} \sigma(y_{S_t^u}^{(u,t)}) \prod_{j\ne S^u_t} (1-\sigma(y_j^{(u,t)}))
+$$
+
+
+
+## Outer Product-based Neural Collaborative Filtering (2018)
