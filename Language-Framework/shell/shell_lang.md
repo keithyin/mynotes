@@ -42,6 +42,7 @@ cd ..; ls -all #一行中执行多个命令，使用 ; 隔开
 * 全局变量：被 `export` 导出的
 * 本地变量：没有被导出的
 * 建议：变量取值总是放在 `""` 之中， `"$VAR"`
+* `VAR=hello` 会被shell解释成赋值，而`VAR = hello` 则：VAR会被 shell解释成命令，后面两个是命令的参数。所以在 shell 编程中，一定要搞清楚什么时候需要空格，什么时候不需要空格。
 
 ```shell
 VAR=hello; # 定义变量然后赋值
@@ -148,6 +149,7 @@ fi
 
 if : ; then # : 永远为真
   echo "dodod"
+fi
 
 case $VAR in 
 yes) # yes|y|YES) ，只有) 哦
