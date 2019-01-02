@@ -16,7 +16,7 @@
 * logging 是由 logger 的实例完成的
 * logger 的每个实例都有一个名字
 * logger 的名字是由 命名空间的 层次来组织的
-  * 啥意思
+  * 起名字的时候一般按层次起：`name="a.b.c"`
 * 默认情况下，logger 并没有设置 输出destination，可以通过 `basicConfig()` 来设置。
 * If you call the functions [`debug()`](https://docs.python.org/2/library/logging.html#logging.debug), [`info()`](https://docs.python.org/2/library/logging.html#logging.info), [`warning()`](https://docs.python.org/2/library/logging.html#logging.warning), [`error()`](https://docs.python.org/2/library/logging.html#logging.error) and [`critical()`](https://docs.python.org/2/library/logging.html#logging.critical), they will check to see if no destination is set; and if one is not set, they will set a destination of the console (`sys.stderr`) and a default format for the displayed message before delegating to the root logger to do the actual message output.
 
