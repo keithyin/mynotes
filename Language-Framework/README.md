@@ -80,3 +80,20 @@ a_utf8_byte_str.decode("gbk")    # 这就会报错了
 * allowing multiple entry points for suspending and resuming execution at certain locations
 * 能 hold state
 * coroutine 自己负责什么时候放弃资源，跳到执行另一个 coroutine或者subroutine
+
+
+
+```c++
+// 协程操作 网络 IO
+
+/*
+有一个调度器，调度协程进行工作
+当协程等待IO的时候，控制权交给控制器
+
+epoll 可以当作一个调度器吗？
+那么协程等待IO的时候，怎么将控制权交给 epoll？
+还是只有当 条件满足时才执行协程，执行之后自动给 epoll？
+怎么感觉上面说的只是 IO 多路复用而已。。。协程是啥个玩意
+*/
+```
+
