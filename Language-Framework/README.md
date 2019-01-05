@@ -49,3 +49,34 @@ a_utf8_byte_str.decode("gbk")    # 这就会报错了
   * 用什么样的编码输出在 python 中是可以设置的。
 * linux terminal 按照自己的配置来 decode python输出的字节流`(0001 1101 0011 0001)`
   * 当然如果 linux terminal 的解码方式 和 python 的编码方式不一致的话，那就会报错了
+
+
+
+
+
+# 协程
+
+**Preemptive multitasking (抢占式多任务)**
+
+* 进程什么时候放弃资源 由 操作系统决定
+* 有一个 中断机制 和 调度器
+
+
+
+**Non-Preemptive multitasking (非抢占式多任务)**
+
+* 什么时候放弃资源 **由进程自己决定**
+
+
+* 调度器干什么事
+  * 启动进程
+  * 等待进程**自愿**将控制权交给 调度器
+
+
+
+**coroutine (协程)**
+
+* **Coroutines** are computer-program components that generalize subroutines for **non-preemptive multitasking**
+* allowing multiple entry points for suspending and resuming execution at certain locations
+* 能 hold state
+* coroutine 自己负责什么时候放弃资源，跳到执行另一个 coroutine或者subroutine
