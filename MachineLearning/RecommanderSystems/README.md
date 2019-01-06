@@ -187,6 +187,8 @@ $$
 * 用 SGD 更新参数
 
 
+
+
 ## Attentive Collaborative Filtering: Multimedia Recommendation with item- and component- level attention (2017)
 
 * 用户喜欢一段视频 或者 一个图片，可能仅仅是对 视频/图像 的一部分感兴趣。
@@ -201,6 +203,21 @@ $$
 - instead of simple push-pull mechanisms between user and item pairs, we propose to learn **latent relations** that describe each user and item pairs
 - Considering the **many-to-many nature** of the collaborative ranking problem, enforcing a good fit in vector space can be really challenging from a geometric perspective especially since the optimal point of **each user and item is now a single point in vector space.** 
   - 解释了为什么 push-pull user vector 和 item vector 不好。
+
+
+
+* 提出了一个 memory 模块。假设用户 为 p，item 为 q
+  * 如果 p 喜欢 q，那么 memory 模块计算 p-q （即：r）。
+  * 如果 p 不喜欢 q，那么 memory 模块随便算算就好。
+  * 训练过后，可以解释为，memory 模块记住了出现在训练集中的 user-item pair 之间的关系，没有出现在训练集中的 pair，memory 模块对他们的关系描述并不准确。
+* 此模型能达到相似的user 的 embedding 在一块，相似的 item 的embedding 在一块吗？
+  * 如果模型能力过强的话，会记住 训练集中的 pair，即使 user embedding 和 item embedding 随机初始化，在训练的时候不更新，此模型在训练集上也会表现很好。
+  * memory 模块在学习 $f(p, q)=p-q$ ，但是 memory 模块并没有这么灵活，他仅仅是提供了一些 memory slice，希望模型能通过 memory slices 组合出来 $p-q$ 的值。**$p-q$** 是可以充满整个 **N维** 空间的，而 memory slices的组合只能充满一个 **M维** 子空间而已。
+  * 所以此模型为了降低 loss，也会将 $p$ 和 $q$ 移动到一个子空间上。**移动的时候会形成聚簇？** 
+    * 假设有两类用户，两个 item，一个 r，可以分析的确可以学习出来用户的聚簇。
+    * 复杂情况就说不清了。。。。。
+
+![](imgs/lram-1.png)
 
 
 
