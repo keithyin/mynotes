@@ -9,6 +9,8 @@
   * 比如 `ax+by+cz=y` : `x, y, z` 为特征值，`a, b, c` 是他们对应的系数，如果特征大部分为0, 即使多给几个这样的等式，也难以正确的估计出 `a,b,c` 所对应的值
 * general preference
 
+
+
 ## Factorization Machine
 
 ![](imgs/factorization-machine-2.png)
@@ -185,6 +187,23 @@ $$
 * 用 SGD 更新参数
 
 
+## Attentive Collaborative Filtering: Multimedia Recommendation with item- and component- level attention (2017)
+
+* 用户喜欢一段视频 或者 一个图片，可能仅仅是对 视频/图像 的一部分感兴趣。
+* 可以达到更精确的特征刻画
+
+
+
+
+
+## Latent Relational Metric Learning via Memory-based Attention for Collaborative Ranking (2018)
+
+- instead of simple push-pull mechanisms between user and item pairs, we propose to learn **latent relations** that describe each user and item pairs
+- Considering the **many-to-many nature** of the collaborative ranking problem, enforcing a good fit in vector space can be really challenging from a geometric perspective especially since the optimal point of **each user and item is now a single point in vector space.** 
+  - 解释了为什么 push-pull user vector 和 item vector 不好。
+
+
+
 
 
 ## Outer Product-based Neural Collaborative Filtering (2018)
@@ -197,6 +216,8 @@ $$
 
 
 ![](imgs/outer-product-ncf.png)
+
+
 
 
 
@@ -239,4 +260,8 @@ $$
 $$
 p(S|\Theta)=\prod_u \prod_{t\in C^u} \sigma(y_{S_t^u}^{(u,t)}) \prod_{j\ne S^u_t} (1-\sigma(y_j^{(u,t)}))
 $$
+
+
+
+## Session-Based Recommendations with Recurrent Neural Networks (2016)
 
