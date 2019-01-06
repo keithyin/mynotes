@@ -28,11 +28,35 @@ $$
 
 * $x_i$ 代表的是一个field，还是只是输入向量的某一维？
 
-  * 如果只是某一维，总感觉有点问题。。。
+  * 如果只是某一维，总感觉有点问题。。。（没有问题，就是 embedding）
   * 如果是一个 field，这个公式表示的又不像是那样。。。 amazing
     * 如果是 field，那么 field之间的交互如何定义，因为 field的 one-hot vector长度不一定相同。。。
 
-  ​
+
+
+
+**FM 就像 Embedding 一样**
+
+* 每个人用一个 embedding 表示
+* 每个电影用 3 个 embedding 表示
+  * 表示 **active item** 的 embedding (此次要预测的 item 的 embedding)
+  * 表示 item 评分的 embedding
+  * 表示 对 此电影评分时（active item），上一次看了啥电影的 embedding
+* 时间维度用一个 embedding 表示
+
+----
+
+* 这里需要注意的是，电影评分的 embedding 和 时间维度的 embedding
+  * 电影评分：不同的电影会有不同的评分，一个电影会有多个评分。这里对 **电影-评分** 存在两种 embedding 方式。
+    * 将 **电影-评分** 进行 embedding：这样就会有  $|Movies|*|RankLevels|$ 个 embedding
+    * 将电影进行 embedding，评分仅对 embedding 的长度进行 rescale，这样就只有 $|Movies|$ 个 embedding 了。文中采用的就是这种方式。 这种简单的分解是不是有些问题，如果将 $RankLevel$ 也给 embedding 了，是不是更好。
+  * 时间维度的也同理，
+    * 对时间概念进行 embedding，然后具体时间的 embedding 是对时间概念embedding 的 rescale。
+    * 这样进行处理没啥问题吗？
+
+
+
+
 
 ## DeepFM
 
@@ -40,8 +64,20 @@ $$
 
 * $V_i$ 解释成 embedding vector。
 * 是不是需要 one-step further，把输入搞成 embedding 向量，然后再 FM？
+  * （FM其实就是embedding，只是一个**建模了 low-order feature interaction 的模型** ，虽然可以建模 higher-order，但是复杂度就太大了。）
 * 怎么定义 high-order interaction，由于 Neural Network可以模拟任何函数，当然 high-order了？ 但是实际上， heaven knows。。。。
+  * higher-order interaction，多个特征存在直接交互。比如 order-2 的 FM，仅仅有两个特征之间的直接交互，order-10 的 FM，就可以看作 high-order interaction 了。
+* 用 CNN 也可以建模 high-order 的特征交互吧
+  * dilated cnn
+  * deformable cnn ????
 
+
+
+
+**关于此篇论文**
+
+* FM 用来建模 low-order feature interactions （用来捕捉比较通用的信息）
+* DNN 建模 high-order feature interactions（刻画更加细节的信息）
 
 
 
@@ -50,7 +86,28 @@ $$
 
 * Memorization of feature interactions through a wide set of cross-product feature transformations are effective and interpretable, while generalization requires more feature engineering effort.
 * With less feature engineering, deep neural networks can generalize better to unseen feature combinations through low-dimensional dense embeddings learned for the sparse features.
-* However, deep neural networks with embeddings can over-generalize and recommend less relevant items when the user-item interactions are sparse and high-rank.
+* However, deep neural networks with embeddings can over-generalize and recommend less relevant items when the user-item interactions are sparse and high-rank. （意味着数据量量少，不足以训练出一个优秀的神经网络。）
+
+
+
+
+**文中提到的 Memorization 和 Generalization**
+
+* Memorization can be loosely defined as learning the frequent, co-occurrence of items or features and exploiting the correlation available in the historical data.
+  * 因为 wide 部分模型能力小，会 under-fitting。所以只会记住 高频的一些特性
+* Generalization， 对于出现频率不高的 pair 也会有自己的判断。但是由于 数据的 sparse 和 high-rank，导致训练数据不足，没法有效的学习出 正确的 embedding 表征，所以就会过拟合。
+
+
+
+**wide**
+
+* 输入部分是 raw input features 和 transformed features
+  * raw input features ： `[性别，语言，年龄]`  
+
+**deep**
+
+* embedding 走起
+
 
 
 
@@ -129,6 +186,21 @@ $$
 
 
 
+
+## Outer Product-based Neural Collaborative Filtering (2018)
+
+聚焦到 user-embedding 和 item-embedding 上来
+
+- 考虑 user-embedding 中的每个维度 和 item-embedding 中的每个维度之间的特征交互
+- outer product 就有种 FM 的感觉了，又有些区别，FM还需要 user-embedding 自己的 cross-product。
+
+
+
+![](imgs/outer-product-ncf.png)
+
+
+
+
 ## Personalized Top-N Sequential Recommendation via Convolutional Sequence Embedding （2018）
 
 * modeling each user as a sequence of items interacted in the past and aims to predict top-N ranked items that a user will likely interact in a "near future"
@@ -168,6 +240,3 @@ $$
 p(S|\Theta)=\prod_u \prod_{t\in C^u} \sigma(y_{S_t^u}^{(u,t)}) \prod_{j\ne S^u_t} (1-\sigma(y_j^{(u,t)}))
 $$
 
-
-
-## Outer Product-based Neural Collaborative Filtering (2018)
