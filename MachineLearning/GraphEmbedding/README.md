@@ -20,6 +20,11 @@
 
 [http://www.ntu.edu.sg/home/xbresson/pdf/talk_xbresson_gcnn.pdf](http://www.ntu.edu.sg/home/xbresson/pdf/talk_xbresson_gcnn.pdf)
 
+
+[turorial of spectral clusting](https://www.cs.cmu.edu/~aarti/Class/10701/readings/Luxburg06_TR.pdf)
+
+[Lectures on spectral graph theory](http://120.52.51.19/www.math.ucsd.edu/~fan/cbms.pdf)
+
 ## Spectral Graph Theory
 
 [https://www.youtube.com/watch?v=rVnOANM0oJE](https://www.youtube.com/watch?v=rVnOANM0oJE)
