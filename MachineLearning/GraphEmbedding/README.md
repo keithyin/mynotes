@@ -25,6 +25,16 @@
 
 [Lectures on spectral graph theory](http://120.52.51.19/www.math.ucsd.edu/~fan/cbms.pdf)
 
+
+[https://simons.berkeley.edu/talks/spectral-graph-theory](https://simons.berkeley.edu/talks/spectral-graph-theory)
+
+[https://courses.cs.washington.edu/courses/cse521/16sp/521-lecture-12.pdf](https://courses.cs.washington.edu/courses/cse521/16sp/521-lecture-12.pdf)
+[http://theory.stanford.edu/~tim/s17/l/l11.pdf](http://theory.stanford.edu/~tim/s17/l/l11.pdf)
+
+[https://www.quora.com/Are-there-any-good-video-lectures-to-catch-up-spectral-graph-theory](https://www.quora.com/Are-there-any-good-video-lectures-to-catch-up-spectral-graph-theory)
+
+[https://www.cse.iitk.ac.in/users/rmittal/prev_course/s18/reports/11intro_sgt.pdf](https://www.cse.iitk.ac.in/users/rmittal/prev_course/s18/reports/11intro_sgt.pdf)
+
 ## Spectral Graph Theory
 
 [https://www.youtube.com/watch?v=rVnOANM0oJE](https://www.youtube.com/watch?v=rVnOANM0oJE)
