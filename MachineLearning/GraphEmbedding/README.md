@@ -35,6 +35,12 @@
 
 [https://www.cse.iitk.ac.in/users/rmittal/prev_course/s18/reports/11intro_sgt.pdf](https://www.cse.iitk.ac.in/users/rmittal/prev_course/s18/reports/11intro_sgt.pdf)
 
+[https://www.osti.gov/servlets/purl/1295693](https://www.osti.gov/servlets/purl/1295693)
+
+[http://aris.me/contents/teaching/data-mining-2016/slides/spectral.pdf](http://aris.me/contents/teaching/data-mining-2016/slides/spectral.pdf)
+
+[http://www.maths.nuigalway.ie/~rquinlan/teaching/spectralgraphtheory.pdf](http://www.maths.nuigalway.ie/~rquinlan/teaching/spectralgraphtheory.pdf)
+
 ## Spectral Graph Theory
 
 [https://www.youtube.com/watch?v=rVnOANM0oJE](https://www.youtube.com/watch?v=rVnOANM0oJE)
