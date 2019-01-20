@@ -76,7 +76,7 @@
 * $L(G)$ 有 
   * real-valued, non-negative eigenvalue
   * real-valued, orthogonal eigenvector
-*  当且仅当 $L(G)$ 有 $K$ 个值为0的 eigenvalues 时 图 $G$ 有 $K$ 个连接
+* 当且仅当 $L(G)$ 有 $K$ 个值为0的 eigenvalues 时 图 $G$ 有 $K$ 个连接
   * 这个结论告诉我们 Graph Laplacian 的 eigenvalue 的值能够告诉我们一些Graph中vertex的连接情况
   * eigenvector：表示谱中的成分。对于光谱来说就是7种颜色
   * eigenvalue：是谱中成分的值。对于光谱来说就是7中颜色各个的强度
@@ -92,7 +92,101 @@
 
 
 
-# Papers
+
+# Spectral Graph Theory and Fourier Transform
+
+**符号表达**
+
+* 带 $\hat ?$ 的 是频域表示，不带的是时域表示 
+
+
+
+**假设信号 $f(t)$**
+
+傅立叶变换( Fourier Transform) 的公式为
+$$
+\hat f(\xi):=\int_{\mathbb R} f(t)e^{-2\pi i\xi t} dt
+$$
+
+* 积分形式可以协程矩阵乘的形式：$[f(t_0), f(t_1), ...] * [e^{-2\pi i\xi t_0},e^{-2\pi i\xi t_0}, ...]^T$ 
+* 而矩阵乘的另一个解释就是投影，所以 $\hat f(\xi)$ 就可以看作是 $f(\mathbf t)$ 在 $e^{-2\pi i\xi \mathbf t}$ 上的投影值
+
+逆变换的公式为：
+$$
+f(t)=\int_{\mathbb R} \hat f(\xi)e^{2\pi i\xi t} d\xi
+$$
+现在瞅一眼 $e^{2\pi i \xi t}$ 的性质
+$$
+-\Delta e^{2\pi i\xi t} = \frac{\partial^2 e^{2\pi i\xi t}}{\partial t^2} = (2\pi\xi)^2e^{2\pi i\xi t}
+$$
+这东西看起来像不像 矩阵中 eigenvalue 和 eigenvector 的定义？ $A\mathbf x=\lambda \mathbf x$ , 
+
+* 所以 傅立叶变换中的 $e^{2\pi i\xi \mathbf t}$ 就可以看作 特征向量
+* $(2\pi\xi)^2$ 就是特征值
+* 反过来看也一样，矩阵的 **特征向量** 其实是 傅立叶变换中的 $e^{2\pi i\xi \mathbf t}$ 
+* **矩阵的特征值** 就是  $(2\pi \xi)^2$ 
+  * 可以看出，矩阵的特征值和 频率息息相关，成正比关系
+
+
+
+这时候，如果将图的 Laplace Matrix 定义出来，就都清楚了：
+$$
+\begin{align}
+L&=D-W \\
+LU&=\Lambda U
+\end{align}
+$$
+
+
+类似的，Graph Fourier Transform 就可以定义为
+$$
+\hat f(\lambda_l) = \sum_{i=1}^{N} f(i) \mathbf u_l^*(i)
+$$
+逆变换可以定义为
+$$
+f(i)=\sum_{l=0}^{N-1} \hat f(\lambda_l) \mathbf u_l(i)
+$$
+
+* $N$ : 图中 vertex 的数量
+* $f(i)$ : 图中，i-vertex 的值（signal）是啥
+
+
+
+仔细观察公式可以看出
+
+* $\lambda_l$ ：其实可以看作频率的
+* $\mathbf u_l\in \mathbb R^N$ ： **对应于 正弦波**（频率为 $\lambda_l$ ）， $\lambda_l$ 越大 $\mathbf u_l$ 振动就越快 。$\mathbf u_l$ 中的每个分量对应于图中的 每个 vertex。
+
+
+
+## Filtering （滤波）
+
+**傅立叶变换**
+
+先看傅立叶变换的中的频域滤波
+$$
+\hat f_{out}(\xi) = \hat f_{in}(\xi)\hat h(\xi)
+$$
+变换到时域就成了（卷积）：
+$$
+f_{out}(t)=\int_{\mathbb R} f_{in}(\tau)h(t-\tau)d\tau =: (f_{int} *h)(t)
+$$
+
+
+**Graph  Fourier Transform**
+$$
+\hat f_{out}(\lambda_l) = \hat f_{in}(\lambda_l)\hat h(\lambda_l)
+$$
+转换到频域（利用逆变换的公式）：
+$$
+f_{out}(i) = \sum_{l=0}^{N-1} \hat f(\lambda_l)\hat h(\lambda_l) \mathbf u_l(i)
+$$
+
+
+
+
+
+#  Papers
 
 
 
