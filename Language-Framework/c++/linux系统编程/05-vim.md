@@ -66,8 +66,8 @@
     * `:s/jack/tom` 替换第一个 `jack` 到 `tom`
     * `:s/jack/tom/g` 此行所有 `jack` 到 `tom`
   * 所有文件操作
-    * `:*s/jack/tom` :替换所有行第一个 jack 到 tom
-    * `:*s/jack/tom/g` : 替换所有
+    * `:%s/jack/tom` :替换所有行第一个 jack 到 tom
+    * `:%s/jack/tom/g` : 替换所有
     * `:10,10s/jack/tom/g` :第10行到 20行的所有 jack 到 tom
 * 执行 shell 命令
   * `:!ls` ，感叹号+命令，然后回车就会执行了
