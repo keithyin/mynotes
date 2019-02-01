@@ -359,6 +359,156 @@ auto Engine::evaluate_function(FunctionTask& task) -> void {
 
 ## Function
 
+```c++
+struct TORCH_API Function : std::enable_shared_from_this<Function> {
+ public:
+  /// Construct a new `Function` with the given `next_edges`. `sequence_nr` is
+  /// a (currently THE) hint to prioritization in the backward() pass, with
+  /// higher sequence numbers prioritized before lower sequence numbers.
+  explicit Function(
+      uint64_t sequence_nr,
+      edge_list&& next_edges = edge_list())
+      : sequence_nr_(sequence_nr),
+      next_edges_(std::move(next_edges)) {
+    if (AnomalyMode::is_enabled()) {
+      metadata()->store_stack();
+    }
+  }
+
+  explicit Function(edge_list&& next_edges = edge_list())
+      : Function(get_next_sequence_nr()++, std::move(next_edges)) {}
+
+  /// Functions are neither copyable nor moveable.
+  Function(const Function& other) = delete;
+  Function(Function&& other) = delete;
+  Function& operator=(const Function& other) = delete;
+  Function& operator=(Function&& other) = delete;
+  virtual ~Function() = default;
+
+  /// Evaluates the function on the given inputs and returns the result of the
+  /// function call.
+  variable_list operator()(variable_list&& inputs) {
+    profiler::RecordFunction rec(this);
+    return apply(std::move(inputs));
+  }
+
+  // Graph Connectivity API
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  // Inputs. NOTE: inputs of the grad_fn correspond to Tensor outputs of the
+  // forward function.
+
+  // Marker for expected undefined input
+  struct undefined_input {};
+
+  /// Adds the type and shape metadata for a new input. Returns the index of
+  /// of the new input.
+  uint32_t add_input_metadata(
+    const at::Type& type
+  , at::IntList shape
+  , const int64_t device) noexcept {
+    uint32_t input_nr = input_metadata_.size();
+    input_metadata_.emplace_back(type, shape, device);
+    return input_nr;
+  }
+
+  uint32_t add_input_metadata(const at::Tensor& t) noexcept {
+    uint32_t input_nr = input_metadata_.size();
+    input_metadata_.emplace_back(t);
+    return input_nr;
+  }
+
+  /// Adds a placeholder for an input that will not be used.
+  uint32_t add_input_metadata(undefined_input u) noexcept {
+    uint32_t input_nr = input_metadata_.size();
+    input_metadata_.emplace_back();
+    return input_nr;
+  }
+
+  uint32_t num_inputs() const noexcept {
+    return input_metadata_.size();
+  }
+
+  const InputMetadata& input_metadata(size_t index) const {
+    return input_metadata_[index];
+  }
+
+  void clear_input_metadata() {
+    input_metadata_.clear();
+  }
+
+  // Outputs ("Next Edges")
+
+  const Edge& next_edge(size_t index) const noexcept {
+    return next_edges_[index];
+  }
+
+  void set_next_edge(size_t index, Edge edge) {
+    next_edges_[index] = std::move(edge);
+  }
+
+  void add_next_edge(Edge edge) {
+    next_edges_.push_back(std::move(edge));
+  }
+
+  void set_next_edges(edge_list&& next_edges) {
+    next_edges_ = std::move(next_edges);
+  }
+
+  const edge_list& next_edges() const noexcept {
+    return next_edges_;
+  }
+
+  edge_list& next_edges() noexcept {
+    return next_edges_;
+  }
+
+  uint32_t num_outputs() const noexcept {
+    return next_edges_.size();
+  }
+
+  // Miscellaneous Methods
+  //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+  /// The sequence number of this `Function`.
+  uint64_t sequence_nr() const noexcept {
+    return sequence_nr_;
+  }
+
+  /// Returns a shared pointer to `this`. `PyFunction`s are not managed by
+  /// `shared_ptr`s by default, but are bound to the lifetime of their Python
+  /// object instead.
+  virtual std::shared_ptr<Function> get_shared_ptr() {
+    return shared_from_this();
+  }
+
+  /// Returns the name of the dynamic type of the function, for debugging.
+  virtual std::string name() const;
+
+  static uint64_t peek_at_next_sequence_nr();
+
+ protected:
+  static uint64_t& get_next_sequence_nr();
+
+  /// Performs the `Function`'s actual operation.
+  virtual variable_list apply(variable_list&& inputs) = 0;
+
+  /// Calls `apply()`, but instruments it with tracing machinery.
+  variable_list traced_apply(variable_list inputs);
+
+  // Since `Function`s are neither copyable nor moveable, we can have const
+  // fields.
+  const uint64_t sequence_nr_;
+
+  edge_list next_edges_;
+  PyObject* pyobj_ = nullptr; // weak reference
+  std::unique_ptr<AnomalyMetadata> anomaly_metadata_ = nullptr;
+  std::vector<std::unique_ptr<FunctionPreHook>> pre_hooks_;
+  std::vector<std::unique_ptr<FunctionPostHook>> post_hooks_;
+  at::SmallVector<InputMetadata, 2> input_metadata_;
+};
+```
+
 
 
 
