@@ -1,10 +1,130 @@
 # input pipeline
 
 * tokenization
-* pad
-* neumericalization
 * vocab
+* neumericalization
+* batching (padding)
 
+
+
+
+## 核心类
+
+* `Tokenizer`:  `allennlp.data.tokenizers` 
+  * 执行 `tokenization`
+* `Token` : `allennlp.data.tokenizers.Token` 
+  * 用来表示一个 符号（单词/词语）
+* `TokenIndexer` : `allennlp.data.token_indexers`，
+  * 执行 `neumericalization`
+* `Field`: `allennlp.data.fields`
+  * 用来表示样本的不同域（输入域，输出域）
+* `Instance` : `allennlp.data`
+  * 用来表示一个样本实例，样本由多个 `Field` 构成
+* `Batch` : `allennlp.data.dataset`
+  * 构建 mini-batch
+  * 计算如何填充 batch 中的样本，然后调用
+* `Vocabulary` : `allennlp.data.vocabulary`
+  * 保存 `token->idx` , `idx->token` 之间的映射关系
+* `Iterator` : `allennlp.data.iterators`
+  * 迭代器，用来迭代一个又一个mini-batch
+
+
+
+**在使用 allennlp 输入流水线的时候会分成三步走，下面也将从三个部分详细介绍 allennlp 中的 输入流水线**
+
+* 自定义 `DatasetReader` 类
+* 构建 `Vocabulary` 实例
+* 构建迭代器
+
+
+
+## 自定义 `DatasetReader` 类
+
+* 负责从文本文件中读数据，并将其中的每个样本转成 `Instance` 实例
+* 涉及到类型有:
+  * `TokenIndexer`
+  * `Token`
+  * `Field`
+  * `Instance`
+* 必须重写其 `_read` 方法。负责 `yield Instance` 实例
+```python
+class PosDatasetReader(DatasetReader):
+    """
+    DatasetReader for PoS tagging data, one sentence per line, like
+        The###DET dog###NN ate###V the###DET apple###NN
+    """
+
+    def __init__(self, token_indexers: Dict[str, TokenIndexer] = None) -> None:
+        super().__init__(lazy=False)
+        self.token_indexers = token_indexers or {"tokens": SingleIdTokenIndexer()}
+
+    def text_to_instance(self, tokens: List[Token], tags: List[str] = None) -> Instance:
+        sentence_field = TextField(tokens, self.token_indexers)
+        fields = {"sentence": sentence_field}
+
+        if tags:
+            label_field = SequenceLabelField(labels=tags, sequence_field=sentence_field)
+            fields["labels"] = label_field
+
+        return Instance(fields)
+
+    def _read(self, file_path: str) -> Iterator[Instance]:
+        with open(file_path) as f:
+            for line in f:
+                pairs = line.strip().split()
+                sentence, tags = zip(*(pair.split("###") for pair in pairs))
+                yield self.text_to_instance([Token(word) for word in sentence], tags)
+```
+
+* 注意：`TokenIndexer` 是数据集级别的。`Field` 是样本级别的
+* 一个 `Instance` 实例由多个 `Fields` 实例构成，一个 `Fields` 又可能存在多个 `TokenIndexer` 。
+
+
+
+## 构建 Vocabulary
+
+```python
+reader = PosDatasetReader()
+train_dataset = reader.read(cached_path(
+    'https://raw.githubusercontent.com/allenai/allennlp'
+    '/master/tutorials/tagger/training.txt'))
+validation_dataset = reader.read(cached_path(
+    'https://raw.githubusercontent.com/allenai/allennlp'
+    '/master/tutorials/tagger/validation.txt'))
+vocab = Vocabulary.from_instances(train_dataset + validation_dataset)
+```
+
+* `Vocabulary.from_instances`
+  * `instance.count_vocab_items(self, counter: Dict[str, Dict[str, int]])`
+    * 对 `instance` 中的每个 `field` 调用 `field.count_vocab_items(self, counter: Dict[str, Dict[str, int]])`
+      * 对`field`中的每一个 `indexer`调用 `indexer.count_vocab_items(self, token: Token, counter: Dict[str, Dict[str, int]])`
+* 其中由 `Dict[str, Dict[str, int]]` 表示的是
+
+```json
+{
+  "indexer1.namespace":{"token1":count1, "token2":count2, ...},
+  "indexer2.namespace":{"token1":count1, "token2":count2, ...}
+}
+// 如果 不同的 indexer 的 namespace 相同，那么 counter 会当作同一个 indexer看待
+```
+
+* 在`Vocabulary` 实例中保存的映射关系也是 `namespace` 相关的
+
+
+
+## 构建 `Iterator`
+
+```python
+iterator = BucketIterator(batch_size=2, sorting_keys=[("sentence", "num_tokens")])
+iterator.index_with(vocab)
+```
+
+
+
+产生最终 训练数据（`tensor`） 的具体流程为：
+
+* 通过 `indexer.tokens_to_indices(self.tokens, vocab, indexer_name)` ，将 `tokens` 转成 `indices`
+* 通过 `indexer.pad_token_sequence(self, desired_num_tokens, padding_lengths)` 对 `indices` 进行填充
 
 
 
@@ -125,4 +245,9 @@ def pad_token_sequence(self,
 **方法**
 
 * 在构建 `vocab` 的时候会调用 `instance.count_vocab_items()` 方法
+
+
+
+
+## allennlp 输入流水线的整个流程
 
