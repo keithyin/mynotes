@@ -28,6 +28,7 @@ bool ready = false;
 void print_id (int id) {
   // unique_lock 这个创建对象的时候，就已经调用了 mtx.lock() 
   std::unique_lock<std::mutex> lck(mtx); 
+  /* 这个位置一般放置访问共享数据的代码*/
   while (!ready)  // 如果标志位不为 true ，则等待！！！ 由 cv.wait(lck) 阻塞
     cv.wait(lck); // 当 mtx locked 时， 该函数会 调用 lck.unlock() 释放锁。
     // 在被唤醒时， lck 被设置为 进入 wait 之前的 状态！！！
@@ -36,6 +37,7 @@ void print_id (int id) {
 
 void go() {
   std::unique_lock<std::mutex> lck(mtx);
+  /*这个位置一般放置 访问共享数据的代码*/
   ready = true;
   cv.notify_all();
 }
