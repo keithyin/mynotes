@@ -11,7 +11,7 @@ brew install tmux
 复制代码
 Config
 Tmux默认不支持鼠标滚动查看窗口中的前后内容。需要修改配置来支持。
-
+```shell
 touch ~/.tmux.conf
 
 # 开启鼠标模式
@@ -102,4 +102,5 @@ Prefix ！
 
 # 窗格交换位置
 Prefix + {/}
+```
 复制代码
