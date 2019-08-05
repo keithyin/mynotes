@@ -51,7 +51,7 @@ a_utf8_byte_str.decode("gbk")    # 这就会报错了
   * 当然如果 linux terminal 的解码方式 和 python 的编码方式不一致的话，那就会报错了
 
 
-
+[https://www.jianshu.com/p/53bb448fe85b](https://www.jianshu.com/p/53bb448fe85b)
 
 
 # 协程
