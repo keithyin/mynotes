@@ -97,3 +97,81 @@ epoll 可以当作一个调度器吗？
 */
 ```
 
+
+## tmux配置
+```
+# Set that stupid Esc-Wait off, so VI works again
+set -sg escape-time 0
+
+# All commands start with C-a
+set -g prefix C-a
+
+# Use 256 colors
+set -g default-terminal "screen-256color"
+
+# Use mouse
+setw -g mode-mouse on
+set -g mouse-select-window on
+set -g mouse-select-pane on
+set -g mouse-resize-pane on
+# set -g mouse-utf on
+
+# Start numbering at 1
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+
+set -g allow-rename off
+
+set -g history-limit 5000
+
+# Bindings
+unbind %
+bind | split-window -h
+bind _ split-window -v
+
+unbind [
+bind Escape copy-mode
+unbind p
+bind p paste-buffer
+bind -t vi-copy 'v' begin-selection
+bind -t vi-copy 'y' copy-selection
+bind -t vi-copy 'V' rectangle-toggle
+
+# move x clipboard into tmux paste buffer
+bind C-p run "tmux set-buffer \"$(xclip -o)\"; tmux paste-buffer"
+# move tmux copy buffer into x clipboard
+bind C-y run "tmux save-buffer - | xclip -i"
+
+bind C-a send-prefix
+bind a last-window
+
+# Smart pane switching with awareness of vim splits
+is_vim='echo "#{pane_current_command}" | grep -iqE "(^|\/)(g?(view|n?vim?)(diff)?|git)$"'
+bind -n C-h if-shell "$is_vim" "send-keys C-h" "select-pane -L"
+bind -n C-j if-shell "$is_vim" "send-keys C-j" "select-pane -D"
+bind -n C-k if-shell "$is_vim" "send-keys C-k" "select-pane -U"
+bind -n C-l if-shell "$is_vim" "send-keys C-l" "select-pane -R"
+bind -n C-\ if-shell "$is_vim" "send-keys C-\\" "select-pane -l"
+
+bind C-l send-keys 'C-l'
+
+bind -n M-h previous-window
+bind -n M-l next-window
+bind -n M-Left previous-window
+bind -n M-Right next-window
+
+# Reload the config.
+bind r source-file ~/.tmux.conf \; display "Reloaded ~/.tmux.conf"
+
+# Set panel title
+bind t command-prompt -p "Panel title:" "send-keys 'printf \"'\\033]2;%%\\033\\\\'\"' C-m"
+
+# Do not load them if remote, since it's probably a nested tmux and I want an
+# easy way to differentiate the two
+if-shell 'test -z "$SSH_CLIENT"' \
+  "source-file ~/.tmux-theme.conf"
+setw -g utf8 on
+set -g status-utf8 on
+set -g display-panes-time 2000
+```
