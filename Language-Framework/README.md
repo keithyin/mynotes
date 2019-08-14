@@ -98,7 +98,7 @@ epoll 可以当作一个调度器吗？
 ```
 
 
-## tmux配置
+## tmux配置 （~/.tmux.conf）
 ```
 # Set that stupid Esc-Wait off, so VI works again
 set -sg escape-time 0
