@@ -112,9 +112,12 @@ std::current_exception(); // 可以用来获取当前的 exception
 
 
 
+## 终极理解方法
 
-
-
+* 当 throw 时候，实际上是在调用 catch 函数。
+* 一个 try 多个 catch，实际上就是对于 catch 函数的重载。
+* 所以，throw 出来啥东西，就 catch 啥对象就行了。
+* c++ 的异常，catch了 之后代码还是会继续执行，没有像 java 一样的 finally 关键字
 
 ## 参考资料
 
