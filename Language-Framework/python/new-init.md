@@ -1,4 +1,4 @@
-# python new 与 init
+# python new 与 init 与 super
 
 ```python
 demo = Demo()
@@ -13,7 +13,7 @@ demo = Demo()
 
 需要注意的几点：
 
-* `__new__` 需要有返回值， 返回一个实例
+* `__new__` 需要有返回值， 返回一个实例 (不返回的话，SomeCls() 得到的东西就是 None 了)
 * `__init__` 不需要有返回值
 * 当为一个类同时写 `__new__` 和 `__init__` 方法时， 注意 `__new__` 也是需要接收参数的
 * 如果 `__new__` 返回当前类的实例， 那么 `__init__` 方法对被自动调用
@@ -28,3 +28,4 @@ demo = Demo()
 [http://spyhce.com/blog/understanding-new-and-init](http://spyhce.com/blog/understanding-new-and-init)
 
 [http://howto.lintel.in/python-__new__-magic-method-explained/](http://howto.lintel.in/python-__new__-magic-method-explained/)
+[https://www.runoob.com/python/python-func-super.html](https://www.runoob.com/python/python-func-super.html)
