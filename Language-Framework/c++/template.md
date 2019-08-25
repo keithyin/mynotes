@@ -121,10 +121,10 @@ extern template declaration; // 实例化声明
 template declaration;        // 实例化定义
 
 /*例子*/
-extern template class Blob<string>;
+extern template class Blob<string>; // 在当前文件中并不会对此模板进行实例化，其实例化在其它cpp文件中。链接的时候自会找到
 extern template int compare(const int&, const int&);
 template int compare(const int&, const int&);
-template class Blob<string>;
+template class Blob<string>; //在当前 cpp 文件中实例化
 ```
 
 * 显式实例化模板类会实现类的所有成员
