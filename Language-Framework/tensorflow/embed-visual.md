@@ -43,3 +43,6 @@ projector.visualize_embeddings(summary_writer, config)
 
 ## 缺点
 为什么不能 可视化`Tensor`
+
+## 参考资料
+https://www.tensorflow.org/guide/embedding
