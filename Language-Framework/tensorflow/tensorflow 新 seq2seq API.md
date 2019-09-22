@@ -6,17 +6,7 @@
 
 `tensorflow`在此处的抽象为：
 
-* `RNNCell`
-* `TrainingHelper` : 存解码用的 `embedding`，`decoder_lengths`
-* `BasicDecoder`: `decoder_cell, training_helper, encoder_state`搞到一起
-
-* `LuongAttention` : 
-* `AttentionWrapper` : 将 `attention` 和 `decoder_cell` 搞在一起
-*  `BeamSearchDecoder`:
-
-
-
-* `Decoder`
+* `Decoder`: 实现了 解码时候，单个 `step` 的计算
   * `BasicDecoder` : 将 `rnn_cell, helper`封装起来，用于解码，`cell, helper, initial_state, output_layer=None`
   * `BeamSearchDecoder`
 * `DecoderOutput`
@@ -25,7 +15,7 @@
   * `FinalBeamSearchDecoderOutput`
 * `DecoderState`
   * `BeamSearchDecoderState`
-* `Helper`
+* `Helper`: 负责 `decoder` 的输入，不考虑`Attention机制`的时候，用来解码的 `rnn_cell` 就两个部分输入，`state, inputs`. `Helper` 就是负责计算 下一个时间步 `rnn_cell` 的输入的
   * `Helper` : 
   * `CustomHelper`
   * `TrainingHelper` : 将 `inputs, sequences_length` 封装起来，其中 `inputs` 是 `decoder_cell`的输入 `embedding` 
@@ -34,14 +24,65 @@
   * `SampleEmbeddingHelper`
   * `ScheduledEmbeddingTrainingHelper`
   * `ScheduledOutputTrainingHelper`
-* `Attention`
+* `AttentionMechanism` : 封装 `attention_state` ，计算当前时间步的 `alignments` 。
   * `BahdanauAttention`
   * `LuongAttention`
   * `BahdanauMonotonicAttention`
   * `LuongMonotonicAttention`
-* `AttentionWrapper`
-* `AttentionMechanism`
+* `AttentionWrapper` : 封装 `RNNCell, AttentionMechanism` 得到一个新的 `decoder_cell`。当加入`Attention机制`的时候，原始`rnn_cell` 的输入会有所改变，但是`tf` 的选择并不是扩充`Helper`的功能，而是引入`AttentionWrapper` 将原始 `rnn_cell` 和 `attention机制`封装起来，变为一个复杂一些的 `rnn_cell/decoder_cell`。
 * `AttentionWrapperState`
+
+
+
+在写seq2seq代码时：
+
+* 训练时：
+  * `decoder` 每一时间步的输入，和 `decoder` 序列的长度，由`TrainHelper`封装，`TrainHelper` 负责 `decoder` 下一个时间步的输入
+  * 使用`attention` 机制的时候，`AttentionWrapper` 将 `AttentionMechnism,RNNCell` 封装程一个新的`cell`
+
+
+
+## 封装层级
+
+* `Helper(embedding_inputs, seq_lengths)`, `RNNCell(num_units)` , `AttentionMechism(memory)`
+* `AttentionWrapper(attention_mechism, rnn_cell)->RNNCell`
+* `Decoder(rnn_cell, helper)->decoder_cell`
+* `dynamic_deocde(decoder_cell)`
+
+
+
+```python
+# Decoder
+def step(self, time, inputs, state, name=None):
+  """Perform a decoding step.
+
+    Args:
+      time: scalar `int32` tensor.
+      inputs: A (structure of) input tensors.
+      state: A (structure of) state tensors and TensorArrays.
+      name: Name scope for any created operations.
+
+    Returns:
+      `(outputs, next_state, next_inputs, finished)`.
+    """
+  with ops.name_scope(name, "BasicDecoderStep", (time, inputs, state)):
+    cell_outputs, cell_state = self._cell(inputs, state)
+    if self._output_layer is not None:
+      cell_outputs = self._output_layer(cell_outputs)
+      sample_ids = self._helper.sample(
+        time=time, outputs=cell_outputs, state=cell_state)
+      (finished, next_inputs, next_state) = self._helper.next_inputs(
+        time=time,
+        outputs=cell_outputs,
+        state=cell_state,
+        sample_ids=sample_ids)
+      outputs = BasicDecoderOutput(cell_outputs, sample_ids)
+      return (outputs, next_state, next_inputs, finished)
+```
+
+
+
+
 
 
 
