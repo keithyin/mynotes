@@ -10,6 +10,9 @@
 
 **使用 tf.data API 的基本流程为**
 
+* 设置 Dataset
+* 构建 iterator
+
 ```python
 dataset = tf.data.Dataset(...)
 dataset = dataset.map(_map_func) # 解析函数, 对Dataset 中的每个 sample 做此操作
