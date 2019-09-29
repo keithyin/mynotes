@@ -9,7 +9,13 @@
   * 比如 `ax+by+cz=y` : `x, y, z` 为特征值，`a, b, c` 是他们对应的系数，如果特征大部分为0, 即使多给几个这样的等式，也难以正确的估计出 `a,b,c` 所对应的值
 * general preference
 
+## 一些简单分类
 
+* 数据 eshow, click, conversion
+* 长期兴趣建模, 短期兴趣建模
+* top-1 推荐 还是 top-k 推荐
+  * 为啥要 top-k, top-k 和 top-1 推荐的方法有啥区别, 为什么会导致这种区别
+* 
 
 ## Factorization Machine
 
@@ -281,4 +287,46 @@ $$
 
 
 ## Session-Based Recommendations with Recurrent Neural Networks (2016)
+
+
+
+## RealTime Personalization using embeddings for search ranking at airbnb
+
+* 业务场景特点
+  * 用户每次搜索 都有强烈的 目标驱动
+  * 用户在一个 session 中的点击 具有强相关性, 
+* 使用数据类型, click 和 conversion
+
+
+
+**模型1 (短期兴趣建模, 使用 click session 的信息)**
+
+* Skip-gram model for listing embeddings  
+  * 用户的点击 session
+    * booked session : 带有 booking 的 session
+    * exploratory session : 不带有 booking 的 session
+  * 用户 session  到 句子上的映射
+    * session --> 句子
+    * session 窗口 --> 句子窗口
+  * 模型训练
+    * booked session: 不仅预测上下文, 还预测最终的订阅
+    * exploratory session: 仅预测上下文
+
+**模型2(长期兴趣建模, 使用 booking session 的信息)**
+
+* user-type & listing-type embeddings
+* 
+
+
+
+**如何处理冷启动**
+
+* 使用 meta 信息找相似, 这个需要统计一下 cover 度
+
+**其它**
+
+* 数据稀疏 如何处理
+  * 将特征分解成 独立的多个部分, 然后训练模型. Eg. 将user_id分解为user的一些基本属性, 使用属性表示人
+* 长期兴趣的建模 如果 处理用户兴趣变化的问题
+  * 
 
