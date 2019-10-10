@@ -41,6 +41,8 @@
 
 [http://www.maths.nuigalway.ie/~rquinlan/teaching/spectralgraphtheory.pdf](http://www.maths.nuigalway.ie/~rquinlan/teaching/spectralgraphtheory.pdf)
 
+https://www.slideshare.net/soyeon1771/convolutional-neural-networks-on-graphs-with-fast-localized-spectral-filtering
+
 ## Spectral Graph Theory
 
 [https://www.youtube.com/watch?v=rVnOANM0oJE](https://www.youtube.com/watch?v=rVnOANM0oJE)
