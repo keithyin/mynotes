@@ -339,3 +339,84 @@ $$
 
 
 
+
+
+# 推荐系统中存在的一些偏置
+
+[http://www.cs.virginia.edu/~hw5x/Course/IR2017/_site/docs/Presentations/yj9xs.pdf](http://www.cs.virginia.edu/~hw5x/Course/IR2017/_site/docs/Presentations/yj9xs.pdf)
+
+* position bias (item 的展现位置会对点击率造成一定影响)
+* presentation bias
+* trust bias
+
+
+
+## Unbiased Learning-to-Rank with Biased Feedback
+
+* (通过专家标注学习ranking model)专家标注相关性存在问题: query 和 document 的相关性
+  * pooling bias: 由于不可能全标, 所以只能选一部分标相关性, 这会导致 pooling bias
+  * 专家也有可能标错
+* (通过用户的隐式反馈学习ranking model)
+  * 没有看到的 feedback 导致的不利影响 高于 专家标错的影响
+    * 关于推荐系统中用户的点击行为可以分为以下几类
+      * 看到 点击 (相关)
+      * 看到 不点击 (不相关)
+      * 没看到 不点击 (Unk)
+    * 一般在模型训练的时候 仅仅是考虑 展现的那部分的 item 的点击与不点击行为
+      * 展现 点击 (相关)
+      * 展现 不点击 (又分为 看到-不点击, 没看到-不点击)
+      * 不展现
+    * 由于训练数据 并不是整体 item, 所以希望模型的泛化能力更加优秀一些
+      * ps(总感觉现在模型的训练是 hard-mining 的方式)
+
+**数学符号含义**
+
+* $N, K$ : $N$ 个query, $K$ 个 item, 
+* $r_i(y)$ : 表示query $\pmb x_i$ 与某个 item $y$ 的相关性
+* $\Delta(\pmb y|\pmb x_i, r_i)=\sum_{y\in\pmb y}\text{rank}(y|\pmb y)*r_i(y)$ , performance measure, 相关性的计算包含了所有的 item
+  * 本文所提出的模型中, 认为 存在一个真实的$\pmb r_i(\pmb y)$ 相关性向量, 但是, 对于每个 query 来说, 相关性是部分 可见的
+* $\pmb o_i \sim \mathbf P(\pmb o| \pmb x_i, \pmb{\overline y_i}, r_i)$ , 给定一个 ranking $\pmb{\overline y_i}$ ,  $\pmb o_i\in\{0,1\}^K$ indicating which relevance values were revealed
+  * 相关性是真实存在的, 但是在一次  query 中, 不可能观测到所有的相关性, 所以才有这么一个概率
+* $Q(o_i(y)=1|\pmb x_i, \pmb{\overline y_i}, r_i)$ , marginal probability, 表示观察到 相关性$r_i(y)$ 的概率
+
+
+
+
+
+未完待续...
+
+## Slate-Q
+
+* State: 一次推荐一个 set, 而不是一次推荐一个
+
+  * 和 top-k 推荐的区别是什么???
+
+* simulation environment
+
+  * 用户: 用户通过对于 topic 的兴趣进行建模 $\mathbf u\in [-1,1]^{|T|}$,-1表示对此topic 完全不感兴趣, 1表示非常感兴趣.
+    * 用户有一个 budget, budget随着时间以固定速率下降, 但是如果consume一个满意的东西的时候, 用户的 budget 会稍稍增长一下
+  * Document:
+    *  $|D|$ 个文档, $|T|$ 个 topic, 一个文档仅包含一个 topic. 所以一个 文档可以用一个 $\mathbf d\in \{0,1\}^{|T|}$ 的向量表示. 
+    * 每个文档还有一个不可见的属性 $quality ~L_d$ , drawn randomly from $N(\mu_{T_d}, \sigma^2)$, $\mu_t$ 为topic $t$ 的平均质量. 不同 topic 的质量是不同的.
+    *  
+  * 用户和 文档特征向量的内积表示 对此 document 的感兴趣程度
+
+* MDP
+
+  * 环境
+
+  * 状态
+
+  * 动作: 先取 $m$ 个 candidate, 然后从其中取 $k$ 个做 slate recommendation
+
+  * 奖励: 用户从 相关性分布中 采样一个 document (consume)
+
+    * 当用户 consume 一个 document 的时候, 此用户对于该 document 所对应的 topic 的兴趣是稍微增加的.
+
+  * 状态转移概率
+
+    * 用户的状态会被consumed 的document所影响(相关性和质量)
+
+  * 衰减因子
+
+    
