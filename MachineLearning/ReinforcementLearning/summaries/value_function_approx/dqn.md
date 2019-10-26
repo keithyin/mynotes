@@ -72,7 +72,7 @@ $$
 * batch-size: 32
 * RMSprop
 * $\varepsilon=1$  模拟退火到 $\varepsilon=.1$
-* ​
+* 
 
 
 
@@ -81,4 +81,12 @@ $$
 1. **total reward the agent collects in an episode**  (averaged reward)
 2. **track Q-value**, how to track, 
    1. **collect a fixed set of states** by running a random policy before training starts and track its Q-value
+
+
+
+
+
+## 为什么 DQN 可以不用 importance sampling
+
+[https://www.reddit.com/r/reinforcementlearning/comments/b2e0xr/why_no_importance_sampling_in_dqn/](https://www.reddit.com/r/reinforcementlearning/comments/b2e0xr/why_no_importance_sampling_in_dqn/)
 
