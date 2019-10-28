@@ -1,5 +1,23 @@
 # 推荐系统论文总结
 
+## 常见特征类型和常见处理方式
+
+**常见特征类型及其处理方式**
+
+* categorical 特征
+  * 类别类型: 性别, 各种 id(userid, itemid 等等)
+  * 一般使用 $one-hot$, 或者 $embedding$ 表示
+* numerical 特征
+  * 身高, 体重, 此类特征 (当然, 这些数据也可以进行离散化表示, 然后使用 categorical 特征表示)
+  * 一般直接用数值表示, 或者 数值 和 embedding 表示 $x*\text{emb_x}$
+* 文本特征
+  * 如果只是 word, 可以使用 $one-hot$ 或者 $embedding$ 表示
+  * 如果是文本: 可以使用 $tf-idf$ , $CBOW$ , $embedding$ 的方式表示
+* 图连接特征
+  * 常根据图处理为 graph-embedding 
+
+
+
 ## 常用术语
 
 * sparse data: 特征向量中的元素大部分是0,只有少数是其它值
@@ -19,9 +37,9 @@
 
 ## Factorization Machine
 
-![](imgs/factorization-machine-2.png)
+<img src="imgs/factorization-machine-2.png" style="zoom:50%;" />
 
-![](imgs/factorization-machine-1.png)
+<img src="imgs/factorization-machine-1.png" style="zoom: 50%;" />
 $$
 \hat y(x) = w_0+\sum_{i=1}^{N}w_ix_i + \sum_{i=1}^N\sum_{j=i+1}^N <\mathbf v_i,\mathbf v_j>x_ix_j
 $$
@@ -68,7 +86,7 @@ $$
 
 ## DeepFM
 
-![](imgs/deep-fm-1.png)
+<img src="imgs/deep-fm-1.png" style="zoom:50%;" />
 
 * $V_i$ 解释成 embedding vector。
 * 是不是需要 one-step further，把输入搞成 embedding 向量，然后再 FM？
@@ -166,7 +184,7 @@ $$
 * 将 user 和 item 的交互从 inner product 换成 神经网络
   * 神经网络有更强的函数拟合能力
 
-![](imgs/ncf-1.png)
+<img src="imgs/ncf-1.png" style="zoom:50%;" />
 
 * 此文章关注点是在  implicit feedback（看或不看，看多久）上，而不是在 explicit feedback（rating，review）上
 
@@ -223,7 +241,7 @@ $$
     * 假设有两类用户，两个 item，一个 r，可以分析的确可以学习出来用户的聚簇。
     * 复杂情况就说不清了。。。。。
 
-![](imgs/lram-1.png)
+<img src="imgs/lram-1.png" style="zoom:50%;" />
 
 
 
@@ -238,7 +256,7 @@ $$
 
 
 
-![](imgs/outer-product-ncf.png)
+<img src="imgs/outer-product-ncf.png" style="zoom:50%;" />
 
 
 
@@ -263,9 +281,7 @@ $$
 * 引入 general preference
 * 可以建模 1-gram, 2-gram, 3-gram ...
 
-
-
-![](imgs/caser-1.png)
+<img src="imgs/caser-1.png" style="zoom:50%;" />
 
 **模型**
 
