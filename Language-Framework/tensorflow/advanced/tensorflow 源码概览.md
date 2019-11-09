@@ -4,8 +4,6 @@
 * 通过计算图找对应注册的kernel执行计算
 * 参数如何保存
 
-
-
 ## Kernel相关
 
 > 由于同一个kernel, 可能需要运行在不同的平台上(CPU, GPU, TPU), 所以 一个接口可能对应多个kernel
@@ -17,6 +15,8 @@
 
 
 **接口定义**
+
+* 最终会将接口定义 注册在 `OpRegistry` 的一个静态对象中
 
 ```c++
 #define REGISTER_OP(name) REGISTER_OP_UNIQ_HELPER(__COUNTER__, name)
@@ -79,6 +79,8 @@ OpRegistry* OpRegistry::Global() {
 
 
 **Kernel注册**
+
+* 最终会将 Kernel 注册到 `KernelRegistry` 中
 
 ```c++
 #define REGISTER_KERNEL_BUILDER(kernel_builder, ...) \
@@ -248,11 +250,13 @@ struct KernelRegistry {
     * 通过 `KernelDefBuilder` 构建的 `KernelDef` 构建 `key(op_name, device, label) `
     * 将  `factory` 注册到 `KernelRegistry` 中
 
-
-
 ## Session
 
 [DirectSession](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/common_runtime/direct_session.h)
+
+
+
+`GraphDef` 和 `NodeDef` 是前端的一些 `protobuf` 定义, 主要用来够表示前端构成的图.
 
 * `GraphDef`
 
@@ -265,39 +269,10 @@ message GraphDef {
   // each release of TensorFlow will support a range of GraphDef versions.
   VersionDef versions = 4;
 
-  // Deprecated single version field; use versions above instead.  Since all
-  // GraphDef changes before "versions" was introduced were forward
-  // compatible, this field is entirely ignored.
-  int32 version = 3 [deprecated = true];
-
-  // EXPERIMENTAL. DO NOT USE OR DEPEND ON THIS YET.
-  //
-  // "library" provides user-defined functions.
-  //
-  // Naming:
-  //   * library.function.name are in a flat namespace.
-  //     NOTE: We may need to change it to be hierarchical to support
-  //     different orgs. E.g.,
-  //     { "/google/nn", { ... }},
-  //     { "/google/vision", { ... }}
-  //     { "/org_foo/module_bar", { ... }}
-  //     map<string, FunctionDefLib> named_lib;
-  //   * If node[i].op is the name of one function in "library",
-  //     node[i] is deemed as a function call. Otherwise, node[i].op
-  //     must be a primitive operation supported by the runtime.
-  //
-  //
   // Function call semantics:
-  //
-  //   * The callee may start execution as soon as some of its inputs
-  //     are ready. The caller may want to use Tuple() mechanism to
-  //     ensure all inputs are ready in the same time.
-  //
-  //   * The consumer of return values may start executing as soon as
-  //     the return values the consumer depends on are ready.  The
-  //     consumer may want to use Tuple() mechanism to ensure the
-  //     consumer does not start until all return values of the callee
-  //     function are ready.
+  //  被调用者, 可能在部分输入准备好的时候就可以执行了.
+  //  如果想要保证被调用者 等到所有的输入都准备好才执行的话, 调用者需要使用Tuple机制.
+
   FunctionDefLibrary library = 2;
 };
 ```
@@ -306,34 +281,17 @@ message GraphDef {
 
 ```protobuf
 message NodeDef {
-  // The name given to this operator. Used for naming inputs,
-  // logging, visualization, etc.  Unique within a single GraphDef.
-  // Must match the regexp "[A-Za-z0-9.][A-Za-z0-9_>./]*".
+  // 用来命名输出的一个名字, GraphDef级别唯一, 表示此 op 的输出用什么名字引用.
+  // 还会被用来 logging, visualization
   string name = 1;
 
   // The operation name.  There may be custom parameters in attrs.
   // Op names starting with an underscore are reserved for internal use.
   string op = 2;
 
-  // Each input is "node:src_output" with "node" being a string name and
-  // "src_output" indicating which output tensor to use from "node". If
-  // "src_output" is 0 the ":0" suffix can be omitted.  Regular inputs
-  // may optionally be followed by control inputs that have the format
-  // "^node".
+  // 此 Node 输入的 其它 Node 的名字
   repeated string input = 3;
 
-  // A (possibly partial) specification for the device on which this
-  // node should be placed.
-  // The expected syntax for this string is as follows:
-  //
-  // DEVICE_SPEC ::= PARTIAL_SPEC
-  //
-  // PARTIAL_SPEC ::= ("/" CONSTRAINT) *
-  // CONSTRAINT ::= ("job:" JOB_NAME)
-  //              | ("replica:" [1-9][0-9]*)
-  //              | ("task:" [1-9][0-9]*)
-  //              | ("device:" [A-Za-z]* ":" ([1-9][0-9]* | "*") )
-  //
   // Valid values for this string include:
   // * "/job:worker/replica:0/task:1/device:GPU:3"  (full specification)
   // * "/job:worker/device:GPU:3"                   (partial specification)
@@ -357,29 +315,6 @@ message NodeDef {
   // attr's type field.
   // TODO(josh11b): Add some examples here showing best practices.
   map<string, AttrValue> attr = 5;
-
-  message ExperimentalDebugInfo {
-    // Opaque string inserted into error messages created by the runtime.
-    //
-    // This is intended to store the list of names of the nodes from the
-    // original graph that this node was derived. For example if this node, say
-    // C, was result of a fusion of 2 nodes A and B, then 'original_node' would
-    // be {A, B}. This information can be used to map errors originating at the
-    // current node to some top level source code.
-    repeated string original_node_names = 1;
-
-    // This is intended to store the list of names of the functions from the
-    // original graph that this node was derived. For example if this node, say
-    // C, was result of a fusion of node A in function FA and node B in function
-    // FB, then `original_funcs` would be {FA, FB}. If the node is in the top
-    // level graph, the `original_func` is empty. This information, with the
-    // `original_node_names` can be used to map errors originating at the
-    // current ndoe to some top level source code.
-    repeated string original_func_names = 2;
-  };
-
-  // This stores debug information associated with the node.
-  ExperimentalDebugInfo experimental_debug_info = 6;
 };
 ```
 
@@ -466,7 +401,9 @@ versions {
 
 
 
+
+
 * `GraphExecutionState` 通过 `GraphDef` 构建 `Graph`
   * 内部调用 `GraphConstructor::Construct`
 * `GraphConstructor`: 通过 `GraphDef` 构建 `Graph`
-
+  * 

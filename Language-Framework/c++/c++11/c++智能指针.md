@@ -11,9 +11,11 @@
 
 为了可以更安全的使用动态内存，所以在`c++11`中增加了**智能指针**,用来**管理动态内存**, 它们分别是:
 
-* shared_ptr
-* unique_ptr
-* weak_ptr
+> ownership : 负责 对象的释放. 不具有的话就是不负责对象的释放
+
+* shared_ptr (具有对象的 ownership)
+* unique_ptr(具有对象的 ownership)
+* weak_ptr (不具有对象的 ownership)
 
 > g++中的在 boost 中 `boost::shared_ptr<class T>` 
 >
@@ -21,7 +23,11 @@
 >
 > 智能指针也就是指针，只不过比较智能而已（自己管理引用计数）
 
+**限制**
 
+* 只能管理用 `new` 创建的, 可以被 `delete` 的对象
+* 保证对于 `managered object` 只能有一个 `manager object`
+  * `manager object` 是使用 `raw pointer` 作为实参 构建 `shared_ptr` 时候构建的. 所以, 只要 `raw_pointer` 不被放进两个 `shared_pointer` 构造函数中即可 
 
 ## shared_ptr
 
@@ -86,11 +92,22 @@ int main(){
 }
 ```
 
+## week_ptr
 
+* 仅仅观察 由  `shared_ptr` 管理的对象, 提供判断 对象是否 还存在的方法 (`week_ptr` 与 `shared_ptr` 一起使用)
+  * 什么情况下 , `shared_ptr` 管理的对象没了?????
+  * 相比与 `raw_pointer` 的优点是, `week_ptr` 知道它 `observe` 的对象到底还存不存在. `raw_pointer` 由于不知道存不存在, 直接访问的话, 执行的代码会 异常的.
+* 只能由 `shared_ptr `初始化, 没有 `*, ->, get()` 方法, 只能转成 `shared_ptr` 之后操作
+* `wp.lock()` 检查 观察的 `object` 还在不在, 如果在 返回一个 `shared_ptr`, 如果不在, 返回一个空的 `shared_ptr`
 
 ## unique_ptr
 
-> 一个 unique_ptr "拥有"其指向的对象。与 shared_ptr 不同，某个时刻，只能有一个 unique_ptr 指向一个给定对象（shared_ptr 允许多个指针指向同一个对象）。当 unique_ptr 被销毁时，它所指向的对象也被销毁。
+> 一个 unique_ptr "拥有"其指向的对象。与 shared_ptr 不同，**某个时刻**，只能有一个 unique_ptr 指向一个给定对象（shared_ptr 允许多个指针指向同一个对象）。当 unique_ptr 被销毁时，它所指向的对象也被销毁。
+
+* 和 `raw_pointer` 相比, 零 `overhead` . 并没有像 `shared_ptr` 一样还分配了一个 `mamager object`
+* 不支持赋值
+* 不支持拷贝
+* 支持移动拷贝
 
 ```c++
 unique_ptr<double> p1; //可以指向double 的 unique_ptr
@@ -101,9 +118,12 @@ p1 = p2; //错误：unique_ptr 不支持赋值
 p2.release() ; // p2放弃对指针的控制权，返回指针
 ```
 
+## make_shared
 
-
-## week_ptr
+```c++
+shared_ptr<Demo> p(new Demo); // 会两个分配内存, new Demo一次, 创建 manager object 一次
+shared_ptr<Demo> p(make_shared<Demo>());// 只会分配一次内存, 放 new Demo 和 manager object
+```
 
 
 
@@ -114,7 +134,9 @@ p2.release() ; // p2放弃对指针的控制权，返回指针
 [https://stackoverflow.com/questions/712279/what-is-the-usefulness-of-enable-shared-from-this](https://stackoverflow.com/questions/712279/what-is-the-usefulness-of-enable-shared-from-this)
 
 * 功能：使得 指向对象 `t` 的智能指针能够调用 `shared_from_this()` 构建更多的智能指针
+  * 使得 同一个 `managered object` 只有一个 `manager object`
 * 如果不是 `t` 的智能指针调用 `shared_from_this()` ，会报错。
+* 应用场景:  类方法中 调用其它方法的时候 传入了 `this`, 而且 其形参还是个  `shared_ptr` , 这会导致 创建两个 `manager object`. 这时候使用 `enable_shared_from_this` , 然后调用 `shared_from_this()` 得到 其 `shared_ptr` , 然后就可以随便传递咯.
 
 ```c++
 #include <memory>
@@ -122,6 +144,7 @@ p2.release() ; // p2放弃对指针的控制权，返回指针
  
 struct Good: std::enable_shared_from_this<Good> // note: public inheritance
 {
+  // 返回 this 指针的 shared_ptr, 共用此前的 manager object
     std::shared_ptr<Good> getptr() {
         return shared_from_this();
     }
@@ -152,9 +175,17 @@ int main()
     }
  
     // Bad, each shared_ptr thinks it's the only owner of the object
+  	// 这个为啥不能直接调用呢?????????
     std::shared_ptr<Good> bp1 = std::make_shared<Good>();
     std::shared_ptr<Good> bp2 = bp1->shared_from_this();
     std::cout << "bp2.use_count() = " << bp2.use_count() << '\n';
 } // UB: double-delete of Bad
 ```
 
+
+
+
+
+## 参考资料
+
+http://www.umich.edu/~eecs381/handouts/C++11_smart_ptrs.pdf
