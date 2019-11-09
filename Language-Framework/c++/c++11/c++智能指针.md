@@ -174,9 +174,8 @@ int main()
         std::cout << e.what() << '\n';    
     }
  
-    // Bad, each shared_ptr thinks it's the only owner of the object
-  	// 这个为啥不能直接调用呢?????????
     std::shared_ptr<Good> bp1 = std::make_shared<Good>();
+    // shared_from_this, 私有成员函数
     std::shared_ptr<Good> bp2 = bp1->shared_from_this();
     std::cout << "bp2.use_count() = " << bp2.use_count() << '\n';
 } // UB: double-delete of Bad
