@@ -68,3 +68,118 @@ with fluid.scope_guard(new_scope):
 numpy.array(new_scope.find_var("data").get_tensor())
 ```
 
+
+
+# 输入流水线
+
+* `reader`
+  * `paddle` 中 `reader` 的定义仅仅是是一个 `Python iterator`, 一次返回一个 样本的 `iterator`
+
+```python
+def reader_creator_random_image_and_label(width, height, label):
+    def reader():
+        while True:
+            yield numpy.random.uniform(-1, 1, size=width*height), label
+    return reader
+
+reader = reader_creator_random_image_and_label(32, 32, 1) #迭代器, 一调用就yield
+```
+
+* `paddle.batch()`
+  * 迭代器作为参数, 构建 `batch`
+
+```python
+mnist_train = paddle.dataset.mnist.train()
+mnist_train_batch_reader = paddle.batch(mnist_train, 128)
+```
+
+* 自定义 `batch_reader` 
+  * 这玩意和自定义 `reader` 是一个逻辑的
+
+```python
+def custom_batch_reader():
+    while True:
+        batch = []
+        for i in xrange(128):
+            batch.append((numpy.random.uniform(-1, 1, 28*28),)) # note that it's a tuple being appended.
+        yield batch
+
+mnist_random_image_batch_reader = custom_batch_reader
+```
+
+
+
+* 如何将 `reader` 和 模型的输入对应起来
+
+```python
+image_layer = paddle.layer.data("image", ...)
+label_layer = paddle.layer.data("label", ...)
+
+# 通过 train 将 batch reader 与 data_layer 对应起来
+batch_reader = paddle.batch(paddle.dataset.mnist.train(), 128)
+paddle.train(batch_reader, {"image":0, "label":1}, 128, 10, ...)
+```
+
+
+
+### data reader 装饰器
+
+> 装饰 data reader, 给予其更强大的功能
+
+```python
+# 预取数据装饰器
+buffered_reader = paddle.reader.buffered(paddle.dataset.mnist.train(), 100)
+
+# random_shuffle, 缓存512个, 然后 shuffle, 这个和 预取的顺序应该是怎么样的
+reader = paddle.reader.shuffle(paddle.dataset.mnist.train(), 512)
+```
+
+
+
+### DataLoader
+
+> 异步数据读取
+
+* 三类数据源
+  * `set_sample_generator()`, 要求数据源返回的数据格式为 `[image1, label1]`
+  * `set_sample_list_generator()` , 要求数据源返回的数据格式为 `[(img1, lable1), (img2, label2), ....]` , 单样本构成的 `list`
+    * 这玩意怎么用啊, 一次给模型几个???
+  * `set_batch_generator()`, 要求数据源返回的数据格式为 `[batch_imgs, batch_labels]` , 返回的是个 `batch` 数据
+
+```python
+import paddle
+import paddle.fluid as fluid
+
+ITERABLE = True
+USE_CUDA = True
+USE_DATA_PARALLEL = True
+
+if ITERABLE:
+    # 若DataLoader可迭代，则必须设置places参数
+    if USE_DATA_PARALLEL:
+        # 若进行多GPU卡训练，则取所有的CUDAPlace
+        # 若进行多CPU核训练，则取多个CPUPlace，本例中取了8个CPUPlace
+        places = fluid.cuda_places() if USE_CUDA else fluid.cpu_places(8)
+    else:
+        # 若进行单GPU卡训练，则取单个CUDAPlace，本例中0代表0号GPU卡
+        # 若进行单CPU核训练，则取单个CPUPlace，本例中1代表1个CPUPlace
+        places = fluid.cuda_places(0) if USE_CUDA else fluid.cpu_places(1)
+else:
+    # 若DataLoader不可迭代，则不需要设置places参数
+    places = None
+
+# 使用sample级的reader作为DataLoader的数据源
+data_loader1 = fluid.io.DataLoader.from_generator(feed_list=[image1, label1], capacity=10, iterable=ITERABLE)
+data_loader1.set_sample_generator(fake_sample_reader, batch_size=32, places=places)
+
+# 使用sample级的reader + fluid.io.batch设置DataLoader的数据源
+data_loader2 = fluid.io.DataLoader.from_generator(feed_list=[image2, label2], capacity=10, iterable=ITERABLE)
+sample_list_reader = fluid.io.batch(fake_sample_reader, batch_size=32)
+sample_list_reader = fluid.io.shuffle(sample_list_reader, buf_size=64) # 还可以进行适当的shuffle
+data_loader2.set_sample_list_generator(sample_list_reader, places=places)
+
+# 使用batch级的reader作为DataLoader的数据源
+data_loader3 = fluid.io.DataLoader.from_generator(feed_list=[image3, label3], capacity=10, iterable=ITERABLE)
+data_loader3.set_batch_generator(fake_batch_reader, places=places)
+```
+

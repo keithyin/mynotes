@@ -574,6 +574,40 @@ if __name__ == '__main__':
 
 
 
-## 参考资料
+# 使用input-pipeline 的最佳实践
+
+* tensorflow 的输入流水线包含
+  * 数据处理 和 模型训练 的流水线
+  * 数据处理 内部 的流水线
+
+```python
+# 数据处理 与 模型训练的 流水线.   这个 prefetch 操作是有个 background 线程 来执行.
+dataset = dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+```
+
+
+
+```python
+# 数据处理内部的 流水线, 并行化 map 操作 (data transformation)
+dataset = dataset.map(map_func=parse_fn) # 串行
+dataset = dataset.map(map_func=parse_fn, num_parallel_calls=tf.data.experimental.AUTOTUNE) # 流水线
+```
+
+
+
+```python
+# 并行化数据解析, 如果数据在 remote 或者需要 解码
+dataset = tf.data.TFRecordDataset(files)
+# 换成
+dataset = files.interleave(
+    tf.data.TFRecordDataset, cycle_length=FLAGS.num_parallel_reads,
+    num_parallel_calls=tf.data.experimental.AUTOTUNE)
+```
+
+
+
+# 参考资料
 
 [https://www.tensorflow.org/programmers_guide/datasets#consuming_tfrecord_data](https://www.tensorflow.org/programmers_guide/datasets#consuming_tfrecord_data)
+
+https://www.tensorflow.org/guide/data_performance
