@@ -179,6 +179,8 @@ $$
 
 
 
+https://www.reddit.com/r/MachineLearning/comments/57ec9z/discussion_is_my_understanding_of_double/
+
 
 ## A3C， Asynchronous Methods for Deep Reinforcement Learning
 
@@ -222,13 +224,13 @@ $$
 ## TRPO (Trust Region Policy Optimization)
 
 *  The core idea is to avoid parameter updates that change your policy too much, as enforced by a constraint on the KL divergence between the distributions predicted by the old and the new policy on a batch of data (instead of conjugate gradients the simplest instantiation of this idea could be implemented by doing a line search and checking the KL along the way).
-*  ​
+*  
 
 
 ## exploration policy
 
 * $\varepsilon-greedy$
-* ​
+* 
 
 
 

@@ -16,8 +16,10 @@ int main(){
 ```
 
 * 开始线程：在 C++ 中，开始一个线程非常简单，当创建一个线程实例的时候，线程就自动的开始了。
-* `.join()`, 强制当前线程等待 调用线程执行完毕。如果不使用这个 方法的话，结果是未定义的，因为一旦主线程结束，该进程下的其它线程也会强制结束。
-* `.detach()`: detach 了之后，就变成了 daemon thread，**主线程结束，detach()的线程也会结束**
+* 显式的等待其结束: 
+  * `.join()`, 强制当前线程等待 调用线程执行完毕。如果不使用这个 方法的话，结果是未定义的，因为一旦主线程结束，该进程下的其它线程也会强制结束。
+* 让其自生 **一起灭**
+  * `.detach()`: detach 了之后，就变成了 daemon thread，**主线程结束，detach()的线程也会结束**
 
 
 
@@ -31,6 +33,10 @@ int main(){
 
 **如何传递参数**
 
+* 传值
+* 传引用 (`std::ref(i)`) 
+* 类方法内部调用类方法 `作为多线程的初始函数` , 要传 `this` 为啥?
+
 ```c++
 void CallableObj(double d, std::string const& s);
 // 直接传到 thread 的 构造函数中就可以了。
@@ -38,7 +44,6 @@ std::thread t(CallableObj, 3.14, "pi");
 ```
 
 * Note that even though **CallableObj** takes a **string** as the second parameter, the string literal is passed as a **char const\*** and converted to a **string** only in the context of the new thread
-* ​
 
 ```c++
 std::thread t(CallableObj, 3.14, "pi");
@@ -57,6 +62,10 @@ std::thread t(func, std::ref(i));
 ```
 
 * 当传递 reference 给函数时，需要注意的事情是 **reference 变量的生存周期**
+
+
+
+
 
 
 
