@@ -206,6 +206,13 @@ std::future<int> the_val = std::async(func, arg);// 异步执行, 不会阻塞
 the_val.get(); //阻塞, 直到异步任务完成.
 ```
 
+* `class std::promise, class std::future`
+  * 一个发送数据, 一个接收数据, 成对出现.
+
+```c++
+
+```
+
 
 
 
