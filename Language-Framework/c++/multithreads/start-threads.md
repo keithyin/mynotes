@@ -65,10 +65,6 @@ std::thread t(func, std::ref(i));
 
 
 
-
-
-
-
 # 如何区分线程
 
 * C++ 中每个线程都有一个唯一 id，可以通过 `std::this_thread::get_id()` 获得。
@@ -116,6 +112,9 @@ int main(){
   * 比如: 列表的 push, pop, top 单独操作都很安全. 但是将 top 和 pop 合并成一个 操作的时候可能就会发生危险, 因为不确定在 top 和 pop 之间会不会出现一个 push 操作, 导致 pop 出来的值并不是 top 时候的值.
 * `std::unique_lock(mutex, std::defer_lock)` 
 * `std::lock_guard(mutex, std::adopt_lock)` 
+
+> unique_lock VS lock_guard, 都是管理 mutex 资源的, 但是 unique_lock提供了更大的灵活性
+
 * `std::call_once`  (资源的延迟初始化)
   * 多线程情况下的资源初始化 (保证资源只初始化一次(函数只调用一次))
 
@@ -148,13 +147,64 @@ Myclass& getMyClass(){
 
 * 保护很少更新的数据结构 (read-write mutex)
   * 只有读的时候 是不会加锁的
-  * 
 
 
 
+# 线程同步
 
+> 相互通知一下.
 
+线程同步的方法
 
+* 可以使用 flag + 定时轮询的方式
+* 使用 `#include <condition_variable>` 中的 来进行主动通知
+  * 使得正在等待工作的线程休眠, 直到有数据要处理
+
+* `condition_variable::wait`
+  * 非通知情况下
+    * 条件判断 (首先在执行 wait 之前是加了锁的, 为了保证条件判断的正确性)
+    * 条件满足: 1)继续往后走
+    * 条件不满足: 1)释放 锁(为了生产者可以正常生产数据), 2) 阻塞 (这时候 锁是释放的, 阻塞在 condition_variable 上)
+  * 被通知
+    * 1) 被唤醒, 2) 给互斥元加锁, 3) 检查条件, 
+    * 如果条件满足, 1)返回
+    * 不满足: 1) 释放锁, 2)阻塞
+
+```c++
+std::mutex mux;
+std::queue<data_chunk> data_queue;
+std::condition_variable data_cond;
+
+void data_preparation_thread() {
+  while (more_data_to_prepare()) {
+    data_chunk const data = prepare_data();
+    std::lock_guard<std::mutex> lk(mut);
+    data_queue.push(data);
+    data_cond.notify_one();
+  }
+}
+
+void data_processing_thread() {
+	while (true) {
+    // 这边使用 unique_ptr 是为了提供更多的灵活性
+    // lock, try_lock, unlock, 这些 unique_lock 都有
+  	std::unique_lock<std::mutex> lk(mut);
+    data_cond.wait(lk, [](){return !data_queue.empty()});
+    data_chunk data = data_queue.front();
+    data_queue.pop();
+    lk.unlock();
+    process(data);
+  }
+}
+```
+
+* 等待一次性事件 (不需要循环等待的事件) `class std::future, std::async()`
+
+```c++
+std::future<int> the_val = std::async(func, arg);// 异步执行, 不会阻塞
+// 这里可以做一些其它的事情
+the_val.get(); //阻塞, 直到异步任务完成.
+```
 
 
 
