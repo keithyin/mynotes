@@ -102,13 +102,59 @@ int main(){
 
 # 保护共享数据, shared memory co-currency
 
-**Advantage**
+> 共享数据的保护由 mutex(互斥量) 实现
+>
+> * `#include<mutex>` : `class std::mutex, class std::lock_guard`
 
-* 线程之间通信的最快方式
+* `std::mutex` 互斥量
+* `std::lock_guard` : 互斥量的资源管理类, 创建时会调用 `mutex::lock()` , 析构时自动调用 `mutex::unlock()`, 减少了手动 `mutex` 资源管理的麻烦. 
+
+需要注意的几个点:
+
+* 被互斥量保护的数据结构, 千万不要一不小心将其 引用传出来.
+* 仅仅因为是在 数据结构的 某些操作上是安全的, 依旧可能导致 竟态发生
+  * 比如: 列表的 push, pop, top 单独操作都很安全. 但是将 top 和 pop 合并成一个 操作的时候可能就会发生危险, 因为不确定在 top 和 pop 之间会不会出现一个 push 操作, 导致 pop 出来的值并不是 top 时候的值.
+* `std::unique_lock(mutex, std::defer_lock)` 
+* `std::lock_guard(mutex, std::adopt_lock)` 
+* `std::call_once`  (资源的延迟初始化)
+  * 多线程情况下的资源初始化 (保证资源只初始化一次(函数只调用一次))
+
+```c++
+std::shared_ptr<some_resource> resource_ptr;
+std::once_flag resource_flag; // call_once 的标记
+
+void init_resource(){
+	resource_ptr.reset(new some_resource);
+}
+
+void func() {
+  // 多线程情况下resource_flag 和 call_once保证 init_resource 只会被调用一次
+	std::call_once(resource_flag, init_resource);
+  resource_flag->do_something();
+}
+```
+
+* static 局部变量的初始化:
+  * 时机: 第一次调用的时候
+  * C++11: 保证在多线程的情况下, 保证正确的初始化 (在一个线程上初始化, 并且初始化未完成之前, 其它执行 该 static 语句的代码会被阻塞).
+
+```c++
+class Myclass;
+Myclass& getMyClass(){
+	static Myclass myclass; //保证初始化是安全的.
+  return myclass;
+}
+```
+
+* 保护很少更新的数据结构 (read-write mutex)
+  * 只有读的时候 是不会加锁的
+  * 
 
 
 
-**RACE**
+
+
+
 
 
 
