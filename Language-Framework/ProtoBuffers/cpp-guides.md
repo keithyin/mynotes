@@ -53,8 +53,8 @@ message AddressBook {
   * `has_name()` : 
   * `clear_name()`
   * `name()` : 访问字段
-  * `set_name()`
-  * `mutable_name()`
+  * `set_name()` : 直接设置值
+  * `mutable_name()` : 返回指针. 通过指针修改设置值
   * `release_name()`
 * 对于 `optional string email`
   * `has_email()`
@@ -65,7 +65,10 @@ message AddressBook {
   * `release_email()`
 * 对于 `repeated PhoneNumber phones`
   * `phones_size()`
-  * ​
+  * `inline ::tutorial::Person_PhoneNumber* add_phones();`
+  * `inline ::tutorial::Person_PhoneNumber* mutable_phones(int index);` : 返回要修改的 `phone` 的指针 用于对其进行修改
+  * `inline ::google::protobuf::RepeatedPtrField< ::tutorial::Person_PhoneNumber >* mutable_phones();` 返回可迭代指针
+  * 
 
 ```c++
 // 内嵌类型会这么处理，拿出来，加个前缀
@@ -210,10 +213,6 @@ class Person : public ::google::protobuf::Message {
 [https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message#Message.GetDescriptor.details](https://developers.google.com/protocol-buffers/docs/reference/cpp/google.protobuf.message#Message.GetDescriptor.details)
 
 
-
-```c++
-
-```
 
 
 

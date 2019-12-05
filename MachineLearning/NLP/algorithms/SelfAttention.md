@@ -31,6 +31,73 @@ Learning **long-range dependencies** is a key challenge in many sequence transdu
 
 
 
+**detail**
+
+* Encoder 模型结构
+
+```python
+"""
+x = input + postion_encoding (求和操作, 开始的时候加个position_encoding, 后面的层就不用care 了)
+  LOOP 
+    SELF_ATTN
+      y = layer_norm(x)
+      y = self_attention
+        注意句子长度的mask, 训练时候在attn_weights上加dropout, 随机drop掉一些东西
+        multi_head的时候将原始hidden_size给split了, 最终cat之后再来一个等维度变换
+      x = x + y
+    FFN
+      y = layer_norm(x), filter 是用来升维的? 这个目的是啥??
+      y = 然后开始 position_wise 的ffn, 两层, hidden->filter_size->hidden_size
+      x = x + y
+
+x = layer_norm(x)
+"""
+```
+
+* Decoder模型结构
+
+```python
+"""
+1. 要保证decoder self-attention的auto-regressive性质
+2. encoder的memory_state作为k-v, decoder的self-attention的结果作为key
+流程:
+	self-attention计算key
+	attention计算注意力
+	ffn再来一次变换,   loop over
+"""
+```
+
+* 在哪里用了 `dropout`
+
+```python
+"""
+1. attn_weights 用了个dropout
+2. 每个layer 的 residual 之后 都会dropout
+3. encoder 和 decoder 的输入会 dropout
+"""
+```
+
+* 激活函数
+
+```python
+"""
+似乎也就 ffn 的隐层用了 relu
+"""
+```
+
+
+
+* lr-schedule
+  * 前 warmup step 的时候使用的是 $x*warmup^{-1.5}$
+  * 之后使用的是 $x^{-.5}$ 
+  * 小到大,大到小
+
+$$
+lr=\frac{1}{\sqrt{d_{model}}}\min(x^{-.5},x*warmup^{-1.5})
+$$
+
+
+
 # ALBERT
 
 * 想要解决什么问题
