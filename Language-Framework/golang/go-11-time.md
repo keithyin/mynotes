@@ -14,7 +14,7 @@
 // func Parse(layout, value string) (Time, error), layout表示 后面时间的格式!!!!
 time_obj, err := time.Parse("2006-01-02", "2018-11-07")
 
-// 2018-11-07 19:05:00 +0800 CST
+// 2018-11-07 19:05:00 +0800 CST, 表示东8区时间
 time_obj, err = time.Parse("2006-01-02 03:04PM -0700", "2018-11-07 07:05PM +0800")
 
 // 2018-11-07 19:05:00 +0800 CST
@@ -42,3 +42,10 @@ time_string := time_obj.Format("2006year 01month 02day")
 // 所以 UST 时间为 03:23:12
 ```
 
+**时间计算**
+* 今天,明天, 后天, 昨天, 前天, 大前天
+```go
+// func (t Time) AddDate(years int, months int, days int) Time
+currentTime := time.Now()
+yestday := currentTime.AddDate(0, 0, -1)  // 数值可正可负, 用来表示日期加还是减
+```
