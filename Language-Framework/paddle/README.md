@@ -3,14 +3,16 @@
 * `Variable`
 * `Parameter` : `persistable=True` 的 `Variable`, 不同的 `iteration` 之间, 状态会被保留, `Parameter` 是在 `global block` 下创建的
 
-
-
 * `fluid.Program()` : 执行的最小单位, 可以看做为子图
   * `fluid.default_startup_program()` : 模型变量的初始化 由此 `program` 负责
   * `fluid.default_main_program()`: 其它 op 由此 `program` 负责
   * 创建的`Parameter`都在当前 `program` 的 `global_block()` 下
 * `Block` : c++ 中作用域的概念, 一个 `Program` 由多个 `Block` 构成
   * `if else Block`, `switch case Block`, `while Block`
+  * 所以整体结构为: 
+    * 整体的计算图由多个Program构成
+    * Program中有很多Block
+    * Block中存在很多operation
 * `fluid.Executor(place=fluid.CPUPlace())`
   * `Executor` 核心执行模块, 负责编译 `program` 并执行, 一次执行整个 `program` , 这个和 `tensorflow` 有区别, `tensorflow` 每次只是执行和 `fetch` 相关的子图
 
@@ -72,7 +74,7 @@ numpy.array(new_scope.find_var("data").get_tensor())
 
 # 输入流水线
 
-* `reader`
+* `reader` (函数迭代器)
   * `paddle` 中 `reader` 的定义仅仅是是一个 `Python iterator`, 一次返回一个 样本的 `iterator`
 
 ```python
@@ -85,7 +87,7 @@ def reader_creator_random_image_and_label(width, height, label):
 reader = reader_creator_random_image_and_label(32, 32, 1) #迭代器, 一调用就yield
 ```
 
-* `paddle.batch()`
+* `paddle.batch()`    (纯python实现, 也是函数迭代器)
   * 迭代器作为参数, 构建 `batch`
 
 ```python
@@ -93,7 +95,7 @@ mnist_train = paddle.dataset.mnist.train()
 mnist_train_batch_reader = paddle.batch(mnist_train, 128)
 ```
 
-* 自定义 `batch_reader` 
+* 自定义 `batch_reader`  (也是个函数迭代器)
   * 这玩意和自定义 `reader` 是一个逻辑的
 
 ```python
@@ -124,7 +126,7 @@ paddle.train(batch_reader, {"image":0, "label":1}, 128, 10, ...)
 
 ### data reader 装饰器
 
-> 装饰 data reader, 给予其更强大的功能
+> 装饰 data reader, 给予其更强大的功能, 都是纯python实现
 
 ```python
 # 预取数据装饰器
@@ -181,5 +183,66 @@ data_loader2.set_sample_list_generator(sample_list_reader, places=places)
 # 使用batch级的reader作为DataLoader的数据源
 data_loader3 = fluid.io.DataLoader.from_generator(feed_list=[image3, label3], capacity=10, iterable=ITERABLE)
 data_loader3.set_batch_generator(fake_batch_reader, places=places)
+```
+
+
+
+**其它输入流水线工具**
+
+```python
+image = fluid.layers.data(name='image', shape=[1, 28, 28], dtype='float32')
+label = fluid.layers.data(name='label', shape=[1], dtype='int64')
+reader = fluid.layers.create_py_reader_by_data(capacity=64,
+                                               feed_list=[image, label])
+reader.decorate_paddle_reader(
+    paddle.reader.shuffle(paddle.batch(mnist.train(), batch_size=5), buf_size=500))
+```
+
+
+
+## paddle输入流水线的N种操作
+
+1. `placeholder + run 时候的 feedlist`
+2. 
+3. `py_reader`
+   * 如果输入比较复杂, 又包含`lod-tensor`, 又不包含 `lod-tensor`, 估计还是需要指定 `placeholder`
+
+```python
+import paddle
+import paddle.fluid as fluid
+import paddle.dataset.mnist as mnist
+
+def network(image, label):
+  # 用户自定义网络，此处以softmax回归为例
+    predict = fluid.layers.fc(input=image, size=10, act='softmax')
+    return fluid.layers.cross_entropy(input=predict, label=label)
+
+# 定义 py_reader, 指定要么形状, 要么 feed_data_list, 可能还是需要 placehodler的.
+reader = fluid.layers.py_reader(capacity=64,
+                                shapes=[(-1,1, 28, 28), (-1,1)],
+                                dtypes=['float32', 'int64'])
+# 和真实的 数据绑定起来.
+reader.decorate_paddle_reader(
+    paddle.reader.shuffle(paddle.batch(mnist.train(), batch_size=5),
+                          buf_size=1000))
+
+# 图上加op. 开始搞
+img, label = fluid.layers.read_file(reader)
+loss = network(img, label) # 一些网络定义
+
+fluid.Executor(fluid.CUDAPlace(0)).run(fluid.default_startup_program())
+exe = fluid.ParallelExecutor(use_cuda=True, loss_name=loss.name)
+for epoch_id in range(10):
+    reader.start()
+        try:
+            while True:
+                exe.run(fetch_list=[loss.name])
+        except fluid.core.EOFException:
+            reader.reset()
+
+fluid.io.save_inference_model(dirname='./model',
+                              feeded_var_names=[img.name, label.name],
+                              target_vars=[loss],
+                              executor=fluid.Executor(fluid.CUDAPlace(0)))
 ```
 
