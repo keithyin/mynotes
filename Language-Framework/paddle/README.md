@@ -3,6 +3,10 @@
 * `Variable`
 * `Parameter` : `persistable=True` 的 `Variable`, 不同的 `iteration` 之间, 状态会被保留, `Parameter` 是在 `global block` 下创建的
 
+> 感觉`Parameter(Variable)` 是和 `block` 独立的东西. 甚至是和 `program` 独立的东西. `Program` 存的只是`op` 而已, 存的是 `Variable` 读,写 `op`. 真正的变量是在 `Scope` 中的.
+
+
+
 * `fluid.Program()` : 执行的最小单位, 可以看做为子图
   * `fluid.default_startup_program()` : 模型变量的初始化 由此 `program` 负责
   * `fluid.default_main_program()`: 其它 op 由此 `program` 负责
@@ -57,8 +61,7 @@ loss_data, = exe.run(compiled_prog,
 * `fluid.ParamAttr(name=None, initializer=None, learning_rate=1.0, regularizer=None, trainable=True, gradient_clip=None, do_model_average=False)` [link](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/fluid_cn/ParamAttr_cn.html#paramattr)
   * 参数共享由 `name` 相同所实现. 
 
-* `fluid.Scope()` : 存放 `Variable` 的地方, 包含了name与Variable的映射
-  * 为啥在 `inference` 的时候需要搞个 `Scope` 呢?
+* `fluid.Scope()` : 应该是存了所有的 `persistable` 的变量, 可以确定的是
 
 ```python
 import numpy
@@ -68,6 +71,251 @@ new_scope = fluid.Scope()
 with fluid.scope_guard(new_scope):
      fluid.global_scope().var("data").get_tensor().set(numpy.ones((2, 2)), fluid.CPUPlace())
 numpy.array(new_scope.find_var("data").get_tensor())
+```
+
+```python
+import paddle.fluid as fluid
+import numpy as np
+main_prog = fluid.Program()
+startup_prog = fluid.Program()
+with fluid.program_guard(main_prog, startup_prog):
+    data = fluid.layers.data(name="img", shape=[64, 784], append_batch_size=False)
+    w = fluid.layers.create_parameter(shape=[784, 200], dtype='float32', name='fc_w')
+    b = fluid.layers.create_parameter(shape=[200], dtype='float32', name='fc_b')
+    hidden_w = fluid.layers.matmul(x=data, y=w)
+    hidden_b = fluid.layers.elementwise_add(hidden_w, b)
+place = fluid.CPUPlace()
+exe = fluid.Executor(place)
+exe.run(startup_prog)
+
+for block in main_prog.blocks:
+    for param in block.all_parameters():
+        pd_var = fluid.global_scope().find_var(param.name)
+        pd_param = pd_var.get_tensor()
+        print("load: {}, shape: {}".format(param.name, param.shape))
+        print("Before setting the numpy array value: {}".format(np.array(pd_param).ravel()[:5]))
+        pd_param.set(np.ones(param.shape), place)
+        print("After setting the numpy array value: {}".format(np.array(pd_param).ravel()[:5]))
+```
+
+
+
+
+
+
+
+# 解析 fluid.layers.fc
+
+```python
+def fc(input,
+       size,
+       num_flatten_dims=1,
+       param_attr=None,
+       bias_attr=None,
+       act=None,
+       is_test=False,
+       name=None):
+
+    helper = LayerHelper("fc", **locals())
+
+    dtype = helper.input_dtype()
+
+    mul_results = []
+    for input_var, param_attr in helper.iter_inputs_and_params():
+        input_shape = input_var.shape
+        param_shape = [
+            reduce(lambda a, b: a * b, input_shape[num_flatten_dims:], 1)
+        ] + [size]
+
+        w = helper.create_parameter(
+            attr=param_attr, shape=param_shape, dtype=dtype, is_bias=False)
+        tmp = helper.create_variable_for_type_inference(dtype)
+        helper.append_op(
+            type="mul",
+            inputs={"X": input_var,
+                    "Y": w},
+            outputs={"Out": tmp},
+            attrs={"x_num_col_dims": num_flatten_dims,
+                   "y_num_col_dims": 1})
+        mul_results.append(tmp)
+
+    if len(mul_results) == 1:
+        pre_bias = mul_results[0]
+    else:
+        pre_bias = helper.create_variable_for_type_inference(dtype)
+        helper.append_op(
+            type="sum",
+            inputs={"X": mul_results},
+            outputs={"Out": pre_bias},
+            attrs={"use_mkldnn": False})
+    # add bias
+    pre_activation = helper.append_bias_op(pre_bias, dim_start=num_flatten_dims)
+    # add activation
+    return helper.append_activation(pre_activation)
+
+
+```
+
+
+
+**LayerHelper**
+
+```python
+class LayerHelper(LayerHelperBase):
+    def __init__(self, layer_type, **kwargs):
+        self.kwargs = kwargs
+        name = self.kwargs.get('name', None)
+        if name is None:
+            self.kwargs['name'] = unique_name.generate(layer_type)
+
+        super(LayerHelper, self).__init__(
+            self.kwargs['name'], layer_type=layer_type)
+		# 这里可以看到, op 是添加到 main_program.current_block() 上的
+    def append_op(self, *args, **kwargs):
+        return self.main_program.current_block().append_op(*args, **kwargs)
+
+    def multiple_input(self, input_param_name='input'):
+        inputs = self.kwargs.get(input_param_name, [])
+        ret = []
+        if isinstance(inputs, list) or isinstance(inputs, tuple):
+            for inp in inputs:
+                ret.append(self.to_variable(inp))
+        else:
+            ret.append(self.to_variable(inputs))
+        return ret
+
+    def input(self, input_param_name='input'):
+        inputs = self.multiple_input(input_param_name)
+        if len(inputs) != 1:
+            raise "{0} layer only takes one input".format(self.layer_type)
+        return inputs[0]
+
+    @property
+    def param_attr(self):
+        return ParamAttr._to_attr(self.kwargs.get('param_attr', None))
+
+    @property
+    def bias_attr(self):
+        return ParamAttr._to_attr(self.kwargs.get('bias_attr', None))
+
+    #TODO (jiabin): reconstruct this in LayerObjHelper and avoid dependency of param_attr
+    def multiple_param_attr(self, length):
+        param_attr = self.param_attr
+        if isinstance(param_attr, ParamAttr):
+            param_attr = [param_attr]
+
+        if len(param_attr) != 1 and len(param_attr) != length:
+            raise ValueError("parameter number mismatch")
+        elif len(param_attr) == 1 and length != 1:
+            tmp = [None] * length
+            for i in six.moves.range(length):
+                tmp[i] = copy.deepcopy(param_attr[0])
+            param_attr = tmp
+        return param_attr
+
+    def iter_inputs_and_params(self, input_param_name='input'):
+        inputs = self.multiple_input(input_param_name)
+        param_attrs = self.multiple_param_attr(len(inputs))
+        for ipt, param_attr in zip(inputs, param_attrs):
+            yield ipt, param_attr
+
+    def input_dtype(self, input_param_name='input'):
+        inputs = self.multiple_input(input_param_name)
+        dtype = None
+        for each in inputs:
+            if dtype is None:
+                dtype = each.dtype
+            elif dtype != each.dtype:
+                raise ValueError("Data Type mismatch: %d to %d" %
+                                 (dtype, each.dtype))
+        return dtype
+		# parameter 是放在 main_program 的 global_block 中的
+    def get_parameter(self, name):
+        param = self.main_program.global_block().var(name)
+        if not isinstance(param, Parameter):
+            raise ValueError("no Parameter name %s found" % name)
+        return param
+
+    #TODO (jiabin): reconstruct this in LayerObjHelper and avoid dependency of bias_attr
+    def append_bias_op(self, input_var, dim_start=1, dim_end=None):
+        """
+        Append bias operator and return its output. If the user does not set
+        bias_attr, append_bias_op will return input_var
+
+        :param input_var: the input variable. The len(input_var.shape) is
+        larger or equal than 2.
+        :bias_initializer: an instance of a subclass of Initializer used to
+        initialize the bias
+        :param dim_start:
+        :param dim_end: the shape of the bias will be
+        input_var.shape[dim_start:dim_end]. The bias is broadcasted to other
+        dimensions and added to input_var to get the output
+        """
+        size = list(input_var.shape[dim_start:dim_end])
+        bias_attr = self.bias_attr
+        if not bias_attr:
+            return input_var
+
+        b = self.create_parameter(
+            attr=bias_attr, shape=size, dtype=input_var.dtype, is_bias=True)
+        tmp = self.create_variable_for_type_inference(dtype=input_var.dtype)
+        self.append_op(
+            type='elementwise_add',
+            inputs={'X': [input_var],
+                    'Y': [b]},
+            outputs={'Out': [tmp]},
+            attrs={'axis': dim_start})
+        return tmp
+
+    #TODO (jiabin): reconstruct this in LayerObjHelper and avoid dependency of act
+    def append_activation(self, input_var):
+        act = self.kwargs.get('act', None)
+        if act is None:
+            return input_var
+        if isinstance(act, six.string_types):
+            act = {'type': act}
+        else:
+            raise TypeError(str(act) + " should be unicode or str")
+
+        if 'use_cudnn' in self.kwargs and self.kwargs.get('use_cudnn'):
+            act['use_cudnn'] = self.kwargs.get('use_cudnn')
+        if 'use_mkldnn' in self.kwargs:
+            act['use_mkldnn'] = self.kwargs.get('use_mkldnn')
+        act_type = act.pop('type')
+
+        tmp = self.create_variable_for_type_inference(dtype=input_var.dtype)
+        self.append_op(
+            type=act_type,
+            inputs={"X": [input_var]},
+            outputs={"Out": [tmp]},
+            attrs=act)
+        return tmp
+
+    #TODO (jiabin): should we remove this since it has never be used
+    def _get_default_initializer(self, dtype):
+        if dtype is None or dtype_is_floating(dtype) is True:
+            return Xavier()
+        else:
+            # For integer and boolean types, initialize with all zeros
+            return Constant()
+
+    #TODO (jiabin): reconstruct this in LayerObjHelper and avoid dependency of kwargs
+    def is_instance(self, param_name, cls):
+        param = self.kwargs.get(param_name, None)
+        if not isinstance(param, cls):
+            raise TypeError("The input {0} parameter of method {1} must be {2}",
+                            param_name, self.layer_type, cls.__name__)
+
+```
+
+
+
+# 几个上下文管理器
+
+```python
+# 重置唯一名字计数器, 在相同的 program 中, 会起到参数复用的效果?
+with fluid.unique_name.guard():
+    with fluid.program_gurad(test_program, fluid.Program()):
 ```
 
 
