@@ -322,6 +322,8 @@ with fluid.unique_name.guard():
 
 # 输入流水线
 
+[数据预处理](https://www.paddlepaddle.org.cn/documentation/docs/zh/user_guides/howto/prepare_data/reader_cn.html#batch-reader-readerbatch-size)
+
 * `reader` (函数迭代器)
   * `paddle` 中 `reader` 的定义仅仅是是一个 `Python iterator`, 一次返回一个 样本的 `iterator`
 
@@ -343,8 +345,9 @@ mnist_train = paddle.dataset.mnist.train()
 mnist_train_batch_reader = paddle.batch(mnist_train, 128)
 ```
 
-* 自定义 `batch_reader`  (也是个函数迭代器)
+* 自定义 `batch_reader`  (也是个函数迭代器) : **一次返回一个`batch` 的 `reader` **
   * 这玩意和自定义 `reader` 是一个逻辑的
+  * [batch_reader VS reader ](https://www.paddlepaddle.org.cn/documentation/docs/zh/user_guides/howto/prepare_data/reader_cn.html#readermini-batch)
 
 ```python
 def custom_batch_reader():
@@ -359,7 +362,7 @@ mnist_random_image_batch_reader = custom_batch_reader
 
 
 
-* 如何将 `reader` 和 模型的输入对应起来
+* 如何将 `reader` 和 模型的输入对应起来, **这种方式在实际使用中用的很少**
 
 ```python
 image_layer = paddle.layer.data("image", ...)
@@ -388,7 +391,7 @@ reader = paddle.reader.shuffle(paddle.dataset.mnist.train(), 512)
 
 ### DataLoader
 
-> 异步数据读取
+> 异步数据读取, reader加上装饰器之后shuffle东西的的话应该也是异步的吧.
 
 * 三类数据源
   * `set_sample_generator()`, 要求数据源返回的数据格式为 `[image1, label1]`
@@ -418,8 +421,9 @@ else:
     # 若DataLoader不可迭代，则不需要设置places参数
     places = None
 
-# 使用sample级的reader作为DataLoader的数据源
+# 使用sample级的reader作为DataLoader的数据源, 这里是data_loader 与 计算图的绑定
 data_loader1 = fluid.io.DataLoader.from_generator(feed_list=[image1, label1], capacity=10, iterable=ITERABLE)
+# 这里是数据与data_loader的绑定
 data_loader1.set_sample_generator(fake_sample_reader, batch_size=32, places=places)
 
 # 使用sample级的reader + fluid.io.batch设置DataLoader的数据源
@@ -451,9 +455,9 @@ reader.decorate_paddle_reader(
 ## paddle输入流水线的N种操作
 
 1. `placeholder + run 时候的 feedlist`
-2. 
+2. `reader` 与 `paddle.train`
 3. `py_reader`
-   * 如果输入比较复杂, 又包含`lod-tensor`, 又不包含 `lod-tensor`, 估计还是需要指定 `placeholder`
+   * 如果输入比较复杂, 包含`lod-tensor`和非 `lod-tensor`, 估计还是需要指定 `placeholder`
 
 ```python
 import paddle
@@ -492,5 +496,38 @@ fluid.io.save_inference_model(dirname='./model',
                               feeded_var_names=[img.name, label.name],
                               target_vars=[loss],
                               executor=fluid.Executor(fluid.CUDAPlace(0)))
+```
+
+4. `DataFeeder`
+
+```python
+import numpy as np
+import paddle
+import paddle.fluid as fluid
+
+place = fluid.CPUPlace()
+
+def reader():
+    yield [np.random.random([4]).astype('float32'), np.random.random([3]).astype('float32')],
+
+main_program = fluid.Program()
+startup_program = fluid.Program()
+
+with fluid.program_guard(main_program, startup_program):
+      data_1 = fluid.layers.data(name='data_1', shape=[1, 2, 2])
+      data_2 = fluid.layers.data(name='data_2', shape=[1, 1, 3])
+      out = fluid.layers.fc(input=[data_1, data_2], size=2)
+      # ...
+
+feeder = fluid.DataFeeder([data_1, data_2], place)
+reader = feeder.decorate_reader(
+      paddle.batch(paddle.dataset.flowers.train(), batch_size=16), multi_devices=False)
+
+exe = fluid.Executor(place)
+exe.run(startup_program)
+for data in reader():
+    outs = exe.run(program=main_program,
+                   feed=feeder.feed(data),
+                   fetch_list=[out]))
 ```
 
