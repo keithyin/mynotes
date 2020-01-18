@@ -277,6 +277,70 @@ clean:
 
 **CMake:** 用来生成 Makefile。
 
+### 基本概念
+
+* `CmakeLists.txt` : 
+  * Input text files that contain the project parameters and describe the flow control of the build process in simple CMake language.
+* `CMakeModules`
+  * Special cmake file written for the purpose of finding a certain piece of software and to set it's libraries, include files and definitions into appropriate variables so that they can be used in the build process of another project. (e.g. FindJava.cmake, FindZLIB.cmake, FindQt4.cmake)
+
+**两个tree**
+
+* `Source tree` 包含
+  * cmake input files (`(CmakeLists.txt`)
+  * 代码源文件 `.cpp` , 代码头文件 `.h`
+* `Binary tree` 包含
+  * Native build system files (Makefiles)
+  * Output from build process:
+    * Libraries 
+    *  Executables 
+    * Any other build generated file
+* 如果是 `in-source` 编译, `source-tree` 和 `binary-tree` 在同一个文件夹下; 如果是 `out-source` 编译, 他俩在不同的文件夹下.
+
+**几个宏**
+
+* `CMAKE_MODULE_PATH` : Path to where the CMake modules are located
+* `CMAKE_INSTALL_PREFIX`: Where to put files when calling 'make install'
+* `CMAKE_BUILD_TYPE` : Type of build (Debug, Release, ...)
+* `BUILD_SHARED_LIBS`: Switch between shared and static libraries
+* 这些值可以在`CmakeList.txt` 文件中指定, 也可以在命令行中指定
+  * `by prefixing a variable's name with '-D':`  `cmake -DBUILD_SHARED_LIBS=OFF`
+
+**如何使用 cmake (out-of-source) 编译**
+
+* 构建编译文件夹 : `mkdir build & cd build` 
+* 配置: `cmake [options] <source-tree>`
+* 编译: `make`
+* 安装 : `make install`
+* 后两个可以整合成一个操作, 只用最后一个就行了.
+
+**基础语法**
+
+* `add_library(target_name source_file)` : 编译成一个静态连接库
+* `add_executable(target_name source_file)` : 编译成一个可执行文件
+* `target_link_libraries(executable_name some_lib)` : 将可执行文件链接到一个 `library` 中.
+  * 需要链接静态库的时候使用
+  * 对每个 目标设置链接
+* `link_libraries(lib1 lib2)` : 所有的 `target` 都链接同一组 `libs`
+* 命令 : `command(arg1 arg2 ...)`
+* 列表: `A;B;C` ,使用分号分隔
+* 变量: `${var}`
+* `include_directories(dir1 di2)` : 头文件目录
+* `aux_source_directories(source)` :
+* `add_custom_target`
+* `add_denpendices(target1 dep1 dep2)` : target1 依赖于 dep1, dep2
+* `add_definitions(-Wall -ansi)`
+
+
+
+**工具方法**
+
+* `set(var value)` : 设置变量的值
+* `find_file`
+* `find_library()`
+* `find_program()`
+* `find_package()`
+
 
 
 ### 最简单一版
@@ -381,3 +445,5 @@ add_executable(AtenDemo1 ${SOURCE_FILES})
 [https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html](https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html) 
 
 [https://cmake.org/cmake-tutorial/](https://cmake.org/cmake-tutorial/)
+
+[http://www.elpauer.org/stuff/learning_cmake.pdf](http://www.elpauer.org/stuff/learning_cmake.pdf)
