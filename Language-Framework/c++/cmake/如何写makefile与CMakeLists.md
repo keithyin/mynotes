@@ -277,6 +277,101 @@ clean:
 
 **CMake:** 用来生成 Makefile。
 
+* 编译流水线
+  * `CmakeLists.txt` 
+  * `Makefile`
+  * `.obj, .o`
+  * `.exe, .dll, .lib, .a, .o, .dylib`
+
+### cmake 工作流
+
+```
+myapp
+	build
+	trunk
+		CmakeLists.txt
+```
+
+* 拥有上面一个目录树
+
+```shell
+cd myapp/build
+cmake ../trunk
+make
+```
+
+* 如何展示更多的`cmake` build 信息
+
+```shell
+SET( CMAKE_VERBOSE_MAKEFILE on )
+# 或者
+$ make VERBOSE=1
+
+$ export VERBOSE=1
+$ make
+```
+
+
+
+**添加其它source**
+
+<img src="../imgs/cmake-1.png" style="zoom:30%;" />
+
+**改变编译参数**
+
+* `cmake` 通常使用默认的 预处理器, 编译器, 和链接器
+* 如何修改 `preprocessor` : ADD_DEFINITIONS and REMOVE_DEFINITIONS
+* 编译器设置:  CMAKE_C_FLAGS and CMAKE_CXX_FLAGS variables
+
+
+
+**控制流**
+
+```cmake
+if(expression)
+...
+else(expression)
+...
+endif(expression)
+
+# 处理list
+foreach(loop_var)
+...
+endforeach(loop_var)
+
+while(condition)
+...
+endwhile(condition)
+```
+
+
+
+**管理 debug 和 release build**
+
+* `SET(CMAKE_BUILD_TYPE Debug)`
+* As any other variable, it can be set from the command line: cmake ­DCMAKE_BUILD_TYPE=Release ../trunk
+* Specify debug and release targets and 3rdparty libs:  (<font color='red'>并不知道说的啥</font>)
+  * TARGET_LINK_LIBRARIES(wakeup RELEASE \${wakeup_SRCS}) 
+  * TARGET_LINK_LIBRARIES(wakeupd DEBUG $ {wakeup_SRCS})
+
+
+
+**需要依赖其它的库**
+
+* 如果第三方库的 `.h` 和 其库在 `PATH/LD_LIBRARY_PATH` (标准文件夹) 中, 在 `CmakeLists.txt` 无需其它操作
+* 如果没有在标准文件夹中
+  * 头文件: 使用 `INCLUDE_DIRECTORIES`
+  * libraries: 使用 `find_library` , 然后链接其结果
+
+**查找已经安装的软件**
+
+* `FIND_PACKAGE( Qt4 REQUIRED )`
+* Cmake includes finders (FindXXXX.cmake) for ~130 software packages, many more available in Internet
+*  If using a non­CMake FindXXXX.cmake, tell Cmake where to find it by setting the CMAKE_MODULE_PATH variable
+*  Think of FIND_PACKAGE as an #include
+
+
+
 ### 基本概念
 
 * `CmakeLists.txt` : 
@@ -286,6 +381,7 @@ clean:
 
 **两个tree**
 
+* 关注的问题: Where to place object files, executables and libraries?
 * `Source tree` 包含
   * cmake input files (`(CmakeLists.txt`)
   * 代码源文件 `.cpp` , 代码头文件 `.h`
@@ -316,7 +412,12 @@ clean:
 
 **基础语法**
 
-* `add_library(target_name source_file)` : 编译成一个静态连接库
+* `add_library(target_name source_file)` : 编译成一个静态链接库
+  *  creates an static library from the listed sources
+  * `add_library(target_name SHARED source_files)` : 添加`Shared` 表明了是创建一个动态链接库
+  * 静态链接库  与 动态链接库
+    * 静态链接库:  on linking, add the used code to your executable
+    * 动态链接库:  on linking, tell the executable where to find some code it needs
 * `add_executable(target_name source_file)` : 编译成一个可执行文件
 * `target_link_libraries(executable_name some_lib)` : 将可执行文件链接到一个 `library` 中.
   * 需要链接静态库的时候使用
@@ -325,6 +426,10 @@ clean:
 * 命令 : `command(arg1 arg2 ...)`
 * 列表: `A;B;C` ,使用分号分隔
 * 变量: `${var}`
+  * 不需要声明, 通常情况下不需要指定类型
+  * `set(var value)` : 负责创建和修改变量的值
+  * SET can do everything but LIST makes some operations easier
+  * Use `SEPARATE_ARGUMENTS` to split space-separated arguments (i.e. a string) into a list (semicolon­-separated)
 * `include_directories(dir1 di2)` : 头文件目录
 * `aux_source_directories(source)` :
 * `add_custom_target`
@@ -348,7 +453,7 @@ clean:
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 
-# set the project name
+# set the project name, 这个命令并非强制使用, 但是最好还是用着
 project(Tutorial)
 
 # add the executable
