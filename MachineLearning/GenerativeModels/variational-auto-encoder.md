@@ -4,9 +4,7 @@
 
 [一个很好的博客地址](https://towardsdatascience.com/intuitively-understanding-variational-autoencoders-1bfe67eb5daf)
 
-
-
-
+[又一篇博客](https://jaan.io/what-is-variational-autoencoder-vae-tutorial/)
 
 
 
