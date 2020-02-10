@@ -37,6 +37,9 @@
   shared_ptr<string> p1; // shared_ptr that can point at a string
   string* s_p1; //normal ptr
   shared_ptr<list<int> > p2; // shared_ptr that can point at a list of ints
+  
+  // 如何判断 shared_ptr 是否为空(还未被初始化) , 直接 if 中搞就行了.
+  if (p1) {}
   ```
 
 * `shared_ptr<T> p(q)`
