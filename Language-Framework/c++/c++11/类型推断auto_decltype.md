@@ -8,7 +8,17 @@
 
 ```c++
 auto v3 = v1+v2; // 会自动推断 v3 的类型
+
+auto i=0, *p = &i; // 可以推断出, auto 为 int
+
 ```
+
+* 变量类型标识:
+  * 常量: 分 `top-level const` 和 `low-level const` 
+  * 引用: `auto` 推断的时候会忽略引用.
+* 对于指针来说,  一般我们会区分 指针是常量(`top-level const`), 还是指针指向的值是常量(`low-level const`)
+  * `top-level const` : `auto` 推断时会忽略, 为什么会忽略, 因为即使推断了也是没有意义.
+  * `low-level const` : `auto` 推断时会保留
 
 
 
