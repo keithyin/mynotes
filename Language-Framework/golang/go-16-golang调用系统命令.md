@@ -56,5 +56,9 @@ func main() {
 
 
 
+### 如何执行管道命令
+
+https://studygolang.com/topics/1299
+
 
 
