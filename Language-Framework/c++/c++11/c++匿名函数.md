@@ -76,47 +76,94 @@ f();
 
 
 
-```c++
-// 用引用捕获，会修改 所在函数的局部变量
-void test_lambda(){
-    int i = 1;
-    cout<<"before lambda, the value of i is "<< i <<endl; // 1
-    auto lam = [&i]{ i = 2;}; //引用捕获，函数体内部的 i 就是引用。在 lambda 中改变 i 会引起外面的改变。
-    lam();
-    cout<<"after lambda, the value of i is "<<i<<endl; // 2
-}
-
-// 使用 mutable 来更改值捕获的值,默认情况下，捕获的值是不允许更改的，当然更改了捕获的值，也不会修改
-// 所在函数的值。
-void test_mutable(){
-  int v1 = 2;
-  auto f = [v1]() mutable{return ++v1;};
-}
-```
-
-
-
 * 值捕获 **不会更改 lambda 所在函数的局部变量**, 
-* **用 mutable** 仅仅是将 read-only 的值捕获过来的变量 变得可写！！
+  * **用 mutable** 将 read-only 的值捕获过来的变量 变得可写, 然后还会保存其状态
+  * 不会修改之前的栈上的值, 这个和 引用捕获不一样.
 
 ```c++
-void lambda_demo() {
-    using namespace std;
+int main() {
     int a = 1;
-    int b = 1;
-    int &c = b;
-
-    auto func = [a, c]() mutable -> void { // 只有设置 mutable 才能在值捕获的时候 改变捕获变量 
-        a = a + 1;
-        c = c+1;
-        cout << "a in the lambda " << a << endl; // 2
-        cout << "c in the lambda " << c << endl; // 2
+    int b = 2;
+    auto func = [a, b]() mutable {
+        a += 1;
+        b += 1;
+        std::cout << "lambda a=" << a << ", lambda b=" << b << std::endl;
     };
     func();
-    cout << "a out the lambda " << a << endl; // 1
-    cout << "c out the lambda " << c << endl; // 1
+    func();
+    std::cout << "a=" << a << ", b=" << b << std::endl;
+    return 0;
+}
+/*
+lambda a=2, lambda b=3
+lambda a=3, lambda b=4
+a=1, b=2
+*/
+
+```
+
+* 引用捕获, 
+  * 修改的状态会被保存
+  * 原来栈中的数据也会跟着改变
+
+```c++
+#include <functional>
+#include <iostream>
+
+std::function<void()> get_lambda(int &a, int &b) {
+    auto func = [&a, &b]() {
+        a += 1;
+        b += 1;
+        std::cout << "lambda a=" << a << ", lambda b=" << b << std::endl;
+    };
+    return func;
 }
 
+int main() {
+    int a = 1;
+    int b = 2;
+    auto func = get_lambda(a, b);
+    func();
+    func();
+    std::cout << "a=" << a << ", b=" << b << std::endl;
+    return 0;
+}
+/*
+lambda a=2, lambda b=3
+lambda a=3, lambda b=4
+a=3, b=4
+*/
+```
+
+* 如果引用的变量, 栈被销毁, 则会导致行为不确定
+
+```c++
+#include <functional>
+#include <iostream>
+
+std::function<void()> get_lambda(int a, int b) {
+    auto func = [&a, &b]() {
+        a += 1;
+        b += 1;
+        std::cout << "lambda a=" << a << ", lambda b=" << b << std::endl;
+    };
+    return func;
+}
+
+int main() {
+    int a = 1;
+    int b = 2;
+    auto func = get_lambda(a, b);
+    func();
+    func();
+    std::cout << "a=" << a << ", b=" << b << std::endl;
+    return 0;
+}
+/*
+lambda a=32767, lambda b=-356927439
+lambda a=32767, lambda b=-356927439
+a=1, b=2
+*/
 ```
 
 

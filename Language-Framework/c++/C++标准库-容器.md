@@ -1,3 +1,9 @@
+* 除非对象是右值的, 否则所有的 stl 容器存储的都是对象的副本
+* 当从容器中获取一个对象的时候, 得到的将是一个容器对象的引用.
+* 迭代器所指向的对象必须是可交换的.
+
+
+
 # 非关联容器
 
 * [array](http://en.cppreference.com/w/cpp/container/array) 静态连续 数组
@@ -28,7 +34,7 @@
   - 具体实现是, 如果超过了当前的容量, 会重新进行内存分配,  然后将之前的值搞过去
 - 可以动态调整大小
   - 2倍速增大, `1/4` 速度减小 (`似乎是这样, 不大确定`)
-- 不存在包含引用的 `vector`, **不能存储引用**
+- 不存在包含引用的 `vector`, **不能存储引用** , 但是可以存储对应对象的 `指针` 或者 `shared_ptr`
 
 **API 简介：**
 
@@ -79,6 +85,23 @@ for (auto &a : vec) {
   a = new_val; // 可以改值。
 }
 ```
+
+```c++
+std::vector<std::string> words;
+
+// 这里是创建了一个临时对象, 然后会调用 移动版的 push_back 函数
+words.push_back(std::string("hello"));
+
+// 这时 编译器会 生成一个临时的 string 对象, 然后 会调用移动版的 函数
+words.push_back("hello");
+
+// 直接 inplace 执行构造函数, emplace_back 传的参数是 构造函数所需要的参数
+words.emplace_back("hello");
+```
+
+
+
+
 
 ### deque
 
@@ -307,6 +330,35 @@ e.equal_range(k); // 返回一个迭代器 pair，表示关键字 等于 k 的�
 - [stack](http://en.cppreference.com/w/cpp/container/stack)
 - [queue](http://en.cppreference.com/w/cpp/container/queue)
 - [priority_queue](http://en.cppreference.com/w/cpp/container/priority_queue)
+
+### priority_queue
+
+* 高优在前, 优先级如何计算需要我们定义
+
+```c++
+std::priority_queue<std::string> words;//声明一个空的
+
+std::string words[] = {"one", "two", "three"};
+std::priority_queue<std::string> words {std::begin(words), std::end(words)};
+
+// 第一个是 数据类型, 第二个是用什么 方式存储, 第三个是 优先级的判别方法
+std::priority_queue<std::string, std::vector<std::string>, std::greater<std::string>> words = words {std::begin(words), std::end(words)};
+
+
+```
+
+* `std::greater` 会使用对象的 `operator>()` 进行比较
+* `std::less` 会是用 对象的 `operator<()` 进行比较
+* 内部计算, 元素比较, `compare(a, b)`, 如果返回 `true` , a 就往后站
+
+
+
+# heap
+
+* 不是容器, 而是一种特别的数据组织方式
+* `priority_queue` 其实是堆的一个简单封装
+
+
 
 
 
