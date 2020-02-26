@@ -357,6 +357,53 @@ std::priority_queue<std::string, std::vector<std::string>, std::greater<std::str
 
 * 不是容器, 而是一种特别的数据组织方式
 * `priority_queue` 其实是堆的一个简单封装
+* 创建堆
+
+```c++
+//创建堆
+std::vector<double> numbers{1.0, 4.2, 6.3, 0.1};
+// 对随机访问迭代器指定的一段元素进行重新排列, 默认是用 < , 生成一个大顶堆
+std::make_heap(std::begin(numbers), std::end(numbers));
+
+// 普通数组也可以make_heap, 通过传入第三个参数, 使用 > 号, 所以生成的是一个小顶堆
+std::make_heap(std::begin(numbers), std::end(numbers), std::greater<>());
+```
+
+* 插入元素
+  * 先往原始容器中使用 **`push_back`** 添加元素!!!!
+  * 然后再调用`push_heap` 重排 (一定是`push_back`添加元素哦, 因为 `push_heap` 会认为最后一个是新加的.)
+
+```c++
+std::vector<double> numbers{1.0, 4.2, 6.3, 0.1};
+std::make_heap(std::begin(numbers), std::end(numbers));
+numbers.push_back(19.0);
+std::push_heap(std::begin(numbers), std::end(numbers))
+```
+
+* 移除元素
+  * 先调用`pop_heap` , 会将第一个元素移动到最后, 并且保证剩下的依旧是一个堆
+  * 然后可以使用容器的 `pop_back` 方法来 移除
+
+```c++
+std::vector<double> numbers{1.0, 4.2, 6.3, 0.1};
+std::make_heap(std::begin(numbers), std::end(numbers));
+std::pop_heap(std::begin(numbers), std::end(numbers));
+numers.pop_back();
+```
+
+* 工具函数, 确定是不是堆: `std::is_heap`
+
+
+
+# 如果容器中保存的是指针, 在使用 priority_queue的时候如何指定比较函数呢
+
+```c++
+auto comp = [](const shared_ptr<string> &wp1, const shared_ptr<string> &wp2){return *wp1 < *wp2;};
+
+// 第三个模板参数 传入 比较的参数签名.
+std::priority_queue<shapred_ptr<string>, std::vector<shared_ptr<string>, decltype(comp)> words(comp, some_vector);
+
+```
 
 
 
