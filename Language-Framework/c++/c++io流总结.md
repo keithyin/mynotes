@@ -142,7 +142,30 @@ cout<<"hi"<<ends; //像缓冲区插入空格，然后刷新
 
 
 
+# wide-character & char
 
+* `iostream`
+  * `istream, wistream`
+  * `ostream, wostream`
+  * `iostream, wiostream` 读写流
+* `fstream`
+  * `ifstream, wifstream`
+  * `ofstream,wofstream`
+  * `fstream, wfstream` 读写
+* `sstream`
+  * `istringstream, wistringstream`
+  * `ostringstream, wostringstream`
+  * `stringstream, wstringstream`
+  * 使用 `sstream` 好处: 可以用 `>>, <<` 进行转换哦
+
+* 带 `w` 的是可以操作 `wchar_t`
+
+
+
+* 输入流常用方法
+  * `getline`, `>>(会根据类型进行转换的)` 
+* 输出流常用方法
+  * `<<` 
 
 
 
