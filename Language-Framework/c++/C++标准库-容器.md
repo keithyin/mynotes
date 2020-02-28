@@ -341,6 +341,14 @@ e.equal_range(k); // 返回一个迭代器 pair，表示关键字 等于 k 的�
 - [queue](http://en.cppreference.com/w/cpp/container/queue)
 - [priority_queue](http://en.cppreference.com/w/cpp/container/priority_queue)
 
+### stack
+
+* 添加元素: `push(someVal)`
+* 删除元素 `pop()`
+* 读取栈顶元素, `top()`
+
+
+
 ### priority_queue
 
 * 高优在前, 优先级如何计算需要我们定义
