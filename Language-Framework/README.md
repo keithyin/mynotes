@@ -1713,5 +1713,41 @@ case "$num" in
 esac
 ```
 
+### bbr加速
+
+```shell
+# 查看当前 内核信息 (bbr需要4.9+)
+uname -a
+
+# 启用 elrepo 源
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+rpm -Uvh http://www.elrepo.org/elrepo-release-7.0-3.el7.elrepo.noarch.rpm
+
+# 安装linux主线版本内核
+yum --enablerepo=elrepo-kernel install kernel-ml -y
+
+# 安装之后, 查看内核表, 如果有 > 4.9+ 的就说明成功了
+rpm -qa | grep kernel
+
+# 查看所有可引导的内核列表
+egrep ^menuentry /etc/grub2.cfg | cut -f 2 -d \'
+
+# 设置引导
+grub2-set-default 0
+
+# 重启
+reboot
+
+# 重登服务器, 看 内核是否更换成功
+uname -a
+
+# 搞定 bbr
+echo "net.core.default_qdisc=fq" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_congestion_control=bbr" >> /etc/sysctl.conf
+sysctl -p
+sysctl -n net.ipv4.tcp_congestion_control
+lsmod | grep bbr
+```
+
 
 
