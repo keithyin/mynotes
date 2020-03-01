@@ -1,4 +1,4 @@
-### 随机数
+# 随机数
 
 http://www.cplusplus.com/reference/random/
 
@@ -31,4 +31,8 @@ static void Shuffle(std::vector<int> &values) {
 auto dice = std::bind ( distribution, generator );
 int wisdom = dice()+dice()+dice();
 ```
+
+### uniform_int_distribution
+
+* `std::uniform_int_distribution<int> distribution(0, i);` 生成的是 `[0, i]` 闭区间的值哦.
 
