@@ -29,3 +29,36 @@ public:
 ```
 虚机制使用虚表实现：
 含有虚函数的类都有一个虚表，对象里有一个虚指针，指向这个虚表。
+
+
+
+# RTTI
+
+> 运行时类型识别
+
+* 提供两个操作符
+  * `dynamic_cast`
+    * 安全的转成 `base_type` 或这 `derived type` , 转不过去就 `nullptr` 了
+  * `typeid`
+    * 如果没法搞 虚函数 , 那就只能用 `typeid` 了,  但是这种方法比较容易出错(`error-prone`)
+    * The typeid operator allows a program to ask of an expression: `What type is your object?`
+
+```c++
+Base *bp = dp; // both pointers point to a Derived object
+// compare the type of two objects at run time
+if (typeid(*bp) == typeid(*dp)) {
+// bp and dp point to objects of the same type
+}
+// test whether the run-time type is a specific type
+if (typeid(*bp) == typeid(Derived)) {
+// bp actually points to a Derived
+}
+
+// test always fails: the type of bp is pointer to Base
+if (typeid(bp) == typeid(Derived)) {
+// code never executed
+}
+```
+
+
+

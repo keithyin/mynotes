@@ -1,6 +1,12 @@
-# C++ template
+#  C++ template
 
+* 解决的问题是
 
+  * 在写代码的时候, 不知道要处理的是什么类型,  比如说 写容器的时候, 我们可以往容器里面塞各种各样的类型. 但是在我们编写容器类的时候, 我们并不知道要往里面放什么类型, 只有当我们用容器类的时候, 才知道往里面放什么类型.
+  * OOP也是这样, 在我们 **写**一个接口的时候, 并不知道谁会用它, 只有真实在代码中调用的时候, 才知道是谁调用的.
+
+  * 模板: 编译时才知道
+  * OOP虚机制: 运行时才知道 (**编译时不知道**)
 
 > 模板程序应当尽量减少对函数形参类型的依赖
 >
@@ -32,9 +38,11 @@ int compare(const T &v1, const T&v2){
 
 
 
-**非类型模板参数：** 
+### 非类型模板参数
 
 > 模板参数列表中不仅可以放置类型形参，还可以放置非类型参数的形参。一个非类型参数表示一个值 而不是一种类型。我们通过一个特定的 类型名 而非 关键字 typename 或 class 来指定
+>
+> 这玩意有啥意义呢 ? 为啥不通过传参? 对于数组是有意义的, 因为数组需要在编译的时候知道其大小.
 
 ```c++
 template <unsigned N, unsigned M>
@@ -43,6 +51,19 @@ template <unsigned N, unsigned M>
   }
 ```
 
+### inline 应该放哪里?
+
+```c++
+// 正确!!
+template <typename T> inline T min(T a, T b);
+```
+
+
+
+
+
+
+
 
 
 ## 类模板
@@ -50,6 +71,7 @@ template <unsigned N, unsigned M>
 > 编译器不能为 类模板 推断模板参数类型
 
 ```c++
+// 模板的定义和实现应该在同一 .hpp 文件中.
 template <typename T> class Blob{
   //类里面的属性方法都能用 类型 T
   public:
@@ -181,3 +203,42 @@ template<> void Foo<int>::Bar(){
 * 保存的是表达式对象，`call` 是一个参数
 * 表达式对象构建出来一个二叉树。复杂表达式类负责构建二叉树
 * Constant 和 Variable 是叶子节点，`call` 是一个参数
+
+
+
+# traits
+
+## `type_traits`
+
+* `#include <type_traits>`
+* 作用: 用作类型转换 (不同于 那几个 `cast` 函数)
+
+```c++
+remove_reference;
+add_const;
+add_lrvalue_reference;
+remove_pointer;
+add_pointer;
+make_signed;
+make_unsigned;
+remove_extent;
+remove_all_extents;
+```
+
+```c++
+// decltype(*beg) 推断出来的类型是个引用类型, 因为*beg 是个引用.
+template<typename It>
+auto fcn(It beg, It end)->decltype(*beg) {
+	return *beg;
+}
+
+// 如果不想返回引用怎么办呢? remove_reference就好了.
+// ::type 是模板类的一个静态成员
+// typename 用来表征 ::type 搞出来的值是个 类型!!!
+template<typename It>
+auto fcn(It beg, It end)-> 
+	typename remove_reference<decltype<*beg>::type {
+	return *beg; 
+}
+```
+
