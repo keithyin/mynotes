@@ -1,10 +1,12 @@
+读  "stl源码剖析" 总结 
+
 # traits指的是什么
 
 traits, 中文翻译"特性", 刚一看到这个词一脸懵逼...  特性?? 和 类的成员变量(有时也会称之为 属性) 是啥关系. 直到看到两个例子之后, 才对 `traits` 这个词有了真正的了解.
 
 目前了解到的两种 `traits` 是
 
-* `iterator_traits`
+* `iterator_traits` : 在 `<iterator>` 头文件下
 * `__type_traits`
 
 # `iterator_traits`
@@ -168,6 +170,10 @@ void func(T t){
 # 总结
 
 `traits` 表示的应该为抽象的抽象. 我们现在编程的抽象为 `class` , `iter` ,... `traits` 表示的则是 `class` 的一些通用性质, 比如上面提到的.  
+
+
+
+# 模板重载
 
 
 
