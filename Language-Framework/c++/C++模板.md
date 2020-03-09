@@ -200,6 +200,10 @@ template<> void Foo<int>::Bar(){
 
 
 
+
+
+
+
 ## Expression Template
 
 [link](http://shoddykid.blogspot.com/2008/07/expression-templates-demystified.html)
@@ -246,3 +250,72 @@ auto fcn(It beg, It end)->
 }
 ```
 
+
+
+# 模板参数推断
+
+> 默认情况下, 编译器使用 调用模板函数时 传入的 参数来决定 模板参数. 这个过程被称之为 模板参数推断.
+>
+>  During template argument deduction, the compiler uses types of the arguments in the call to find the template arguments that generate a version of the function that **best matches** the given call.
+
+推断规则:
+
+* `top-level const` 被忽略
+  * `top-level const` : ie: 指针本身是 const, `low-level const` , 指针所指向的对象是 `const`
+* `low-level const` 可以被推断出来
+* `const 转换` : 非 `low-level const` 的指针或引用,  可以传递给一个 `low-level const` 的函数形参
+* `array 或者 function-to-pointer` 转换:  如果函数的形参不是一个引用类型, then the normal pointer conversion will be applied to arguments of array or function type. An array argument will be converted to a pointer to its first element. Similarly, a function argument will be converted to a pointer to the function’s type
+  * 注意: `parameter: 形参` ,`argument 实参`
+* 以下转换不会执行: 数值类型转换, `derived-to-base`, 用户自定义的转换; 这些都不会被执行.
+
+```c++
+template <typename T> T fobj(T, T);
+template <typename T> T fref(const T&, const T&);
+string s1("a value");
+const string s2("another value");
+fobj(s1, s2); // calls fobj(string, string); top-level const is ignored
+fref(s1, s2); // calls fref(const string&, const string&), 这里因为 `const 转换存在` 所以才合理
+
+// uses premissible conversion to const on s1
+int a[10], b[42];
+fobj(a, b); // calls f(int*, int*)
+
+// error: array types don't match, 因为是引用, 所以推断出来的类型应该是 int[10]和int[42]
+// 这两个数组类型是不 match 的.
+fref(a, b); 
+
+template <typename T> compare(T a, T b);
+long a;
+compare(a, 1024);// 会翻译成 compare(long ,int) , 所以会报错 
+```
+
+* 当将一个函数模板赋值给一个函数指针的时候, 编译器会根据函数指针的签名来推断函数模板参数
+
+```c++
+template <typename T> int compare(const T&, const T&);
+// pf1 points to the instantiation int compare(const int&, const int&)
+int (*pf1)(const int&, const int&) = compare;
+
+// overloaded versions of func; each takes a different function pointer type
+void func(int(*)(const string&, const string&));
+void func(int(*)(const int&, const int&));
+func(compare); // error: which instantiation of compare?因为函数重载导致的 模板参数推断的二义性.
+```
+
+
+
+## 尾返回类型
+
+```c++
+// a trailing return lets us declare the return type after the parameter list is seen
+template <typename It>
+auto fcn(It beg, It end) -> decltype(*beg) // 为什么写在后面, 因为*beg是在编译器看到 形参列表时候才知道其存在的.
+{
+// process the range
+return *beg; // return a reference to an element from the range
+}
+```
+
+
+
+ 

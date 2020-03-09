@@ -182,6 +182,64 @@ template <class ForwardIterator>
 
 
 
+## 二分查找
+
+* 数据按照 **逻辑上的** 从小到大排列
+* 逻辑上的小定义为 `element<value == true` 或者 `comp(element, value) == true` 
+
+```c++
+template< class ForwardIt, class T >
+bool binary_search( ForwardIt first, ForwardIt last, const T& value );
+
+template< class ForwardIt, class T, class Compare >
+bool binary_search( ForwardIt first, ForwardIt last, const T& value, Compare comp );
+
+// 注意 Compare 的签名为 bool(const T&, const T&);
+
+
+// binary_search 的可能实现方式
+template<class ForwardIt, class T, class Compare>
+bool binary_search(ForwardIt first, ForwardIt last, const T& value, Compare comp)
+{
+    first = std::lower_bound(first, last, value, comp);
+    // 因为是 lower_bound, 所以 *first<=value 
+  	// 现在只要 value>=*first 就能说明value == *first, 
+  	// !comp(value, *first) 就是 value>=*first 的含义.
+    return (!(first == last) && !(comp(value, *first))); 
+}
+```
+
+```c++
+#include <iostream>
+#include <algorithm>
+#include <vector>
+
+bool compare(const int &a, const int& b) {
+    return a<b; // 如果这里改成 a>b 的话, 就不行了.
+}
+ 
+int main()
+{
+    std::vector<int> haystack {1, 3, 4, 5, 9};
+    std::vector<int> needles {1, 2, 3};
+ 
+    for (auto needle : needles) {
+        std::cout << "Searching for " << needle << '\n';
+        if (std::binary_search(haystack.begin(), haystack.end(), needle, compare)) {
+            std::cout << "Found " << needle << '\n';
+        } else {
+            std::cout << "no dice!\n";
+        }
+    }
+}
+```
+
+
+
+
+
+
+
 # 计数
 
 ### `std::count`
