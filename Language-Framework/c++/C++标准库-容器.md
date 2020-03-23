@@ -138,9 +138,9 @@ words.emplace_back("hello");
 > 注意:这个有序, 并不是插入的顺序, 而是大小顺序, 因为是用红黑树存储的, 所以遍历是大小的顺序出来的.
 
 - [set](http://en.cppreference.com/w/cpp/container/set) 
-- [map](http://en.cppreference.com/w/cpp/container/map)
-- [multiset](http://en.cppreference.com/w/cpp/container/multiset)
-- [multimap](http://en.cppreference.com/w/cpp/container/multimap)
+- [map](http://en.cppreference.com/w/cpp/container/map) : 对于已经存在 `key` 再往里塞 不会导致 `value` 更新
+- [multiset](http://en.cppreference.com/w/cpp/container/multiset) : 
+- [multimap](http://en.cppreference.com/w/cpp/container/multimap) : 对于已经存在的 `key` ,再往里塞, 两个都会保存, 需要确认一下用什么数据结构保存的. 有可能内部用了个 `vector` 保存
 
 **无序** (使用 hash 方式存储), 
 
@@ -155,7 +155,7 @@ words.emplace_back("hello");
 
 **特点**
 
-* `map` : `key-value`，保存的是键值对，通过 `key` 来找 `value` 是非常快的。
+* `map` : `key-value`，红黑树索引,  `unordered_map` 是 `hash_map`
   * `key` 需要定义 `<` 运算符。
   * 存放的数据是通过 `key` 排序好的
   * 比 `unordered_map` 速度要慢，因为要排序
