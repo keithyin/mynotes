@@ -47,3 +47,33 @@
   * `C++` 最初采用的方式 直接将 `base class subobject` 的 `member data` 直接放在 `derived class object` 中.
   * `C++2.0` 使用 了 `virtual base class`
 
+
+
+### 存储一个对象需要多大的内存空间
+
+* `nonstatic data members` 总和大小
+* 加上需要 `aligment` 的需求而填补的空间. 可能存在于 members 之间, 也可能存在于集合的边界. `aligment` 通常是将内存的数值调整到某数的倍数. 在 32 位的计算机上, 通常 aligment 位 4bytes(32bits), 已使 bus 的运输量达到最高效率.
+* 加上为了支持 `virtual` 机制而由内部产生的额外负担.
+
+
+
+### 对于指针的理解
+
+* 指针的**类型** 会教导编译器如何解释某个特定地址中的内存内容及大小
+* `void*` 指针只有一个地址, 而不能通过它操作所指的 `object`, 因为我们不知道 `void*` 指针涵盖多少空间
+* `cast` 其实是一种编译指令, 大部分情况下, 它并不会改变一个指针所含的真正地址, 它只影响 `被指出之内存的大小和其内容` 的解释方式. 
+
+
+
+```c++
+class Bear: public ZooAnimal {
+public:
+  void rotate(){}
+ private:
+  int cell_block_;
+};
+Bear bear;
+Bear* pb = &bear;
+ZooAnimal* pa = &bear;
+```
+

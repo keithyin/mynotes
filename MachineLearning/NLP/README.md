@@ -84,9 +84,30 @@ article or (more recently) determiner ： 冠词
 # BLEU-2 = (3/5*1/4)^(1/2) * brevity
 ```
 
+* https://towardsdatascience.com/bleu-bilingual-evaluation-understudy-2b4eab9bcfd1
+* https://towardsdatascience.com/evaluating-text-output-in-nlp-bleu-at-your-own-risk-e8609665a213
+* 计算过程
+  * 通常结果取的是多个 `-gram` 的平均值, 比如`1-gram`, `2-gram`, `3-gram`, `4-gram`的平均值
+  * 一个是 modified precision
+  * 第二个是 brevity penalty
+  * 然后一个大公式.
+    * $BP$: brevity penalty, 如果翻译的长度大于 reference的长度取值1, 否则取值$e^{(1-r/c)}$
+    * $N$ : 表示有 N个 reference, $w_n$ 表示每个 reference 的权重
+    * $p_n$ : 就是 modified precision (n-gram 的 score 了)
 
+$$
+BLEU=BP*\exp\Bigr(\sum_{n=1}^Nw_n*\log p_n \Bigr)
+$$
 
-
+* 如何计算 modified precision
+  * 将candidate 和 reference 进行 n-gram 切分
+  * 然后统计每个n-gram出现的频数
+  * 要计算一个除法, 其中分母是 candidate 中 n-gram 的个数(不是去重后的哦)
+  * 分子为 $\sum_{v\in cantidate} \min(candidate_v, \max(r1_v, r2_v,...))$
+    * $v$ : 为 candidate 中的 n-gram(去重一下)
+    * $candidate_v$ 为 $v$ 在 $candidate$ 中出现的频次
+    * $rn_v$ : 为 $v$ 在第n 个 reference 中出现的频次.
+  * 这么一除就计算得到了modified-precision
 
 
 
@@ -99,5 +120,5 @@ article or (more recently) determiner ： 冠词
 * semantic：语义
 * part-of-speech tagging : 词性标注
   * 动词/名词/副词.... 
-* ​Noun Phrase ： 名词性短语
+* Noun Phrase ： 名词性短语
 
