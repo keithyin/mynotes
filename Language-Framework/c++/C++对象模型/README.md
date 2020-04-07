@@ -75,5 +75,124 @@ public:
 Bear bear;
 Bear* pb = &bear;
 ZooAnimal* pa = &bear;
+
+ZooAnimal za = bear; // 这会引起切割, 同样也不会触发虚机制
+
+grep "cmatch=(669" feedas.log.20200331* | grep "47920-dz" | awk -F'uc_freq' '{print $2}' | awk -F'|' '{++pv; winfo+=$2; user+=$3; title+=$6;}END{print pv,winfo/pv,user/pv,title/pv}'
+
 ```
+
+
+
+# 第二章: 构造函数语义学
+
+> 继承, 多继承, 虚机制, 多继承的虚机制
+>
+> 构造函数: 构造函数, 拷贝构造函数, 移动构造函数, 析构函数
+
+* `explicit` : 防止单一参数的 `constructor` 被当做一个 `conversion` 运算符
+* `memberwise initialization?`
+* `named return value?`
+
+## Default Constructor
+
+* 默认构造函数 在需要的时候被 编译器生产出来
+  * 谁需要: 编译器需要的时候
+  * 搞出来做什么事情: 
+* 这里要分清: 编译器的责任 和 程序员的责任.
+
+```c++
+class Foo {public: int val;};
+void foo_bar() {
+	Foo bar; // 程序要求 bar's members 都被清0
+}
+```
+
+
+
+* nontrivial default constructor 的四种情况
+  * **类中有**  带有 `defalult constructor` 的 `member class object` 
+    * (这个default contructor可以是implicit生成的?)
+    * 在 真正被调用的时候才会被 合成构造函数
+    * 如果在真正调用的时候合成, 如何解决链接时候 函数重复实现的问题呢? 使用 inline 的方式. (`default (constructor, copy constructor, destructor, assignment copy operator) ` 都用 inline 的方式.)
+    * 这时候编译器合成出来`default contructor` 的作用是: 负责调用 `member class object` 的 `default contructor` 
+  * **类中有** 带有 `default constructor` 的 `base class`
+    * 作用: 用来调用 `base class` 的 `defalult constructor` , 如果是多继承, 调用的顺序是 声明的顺序
+  * 带有 `Virtual Function` 的 `class`
+    * 作用: 为了正确的设置 `vptr` 的值, 使虚机制正常工作.
+  * 带有一个 `virtual base class` 的 `class` (虚继承?)
+* 如果自定义了 `constructor` : 会在自定义的代码中插入 对于 `father ....` 的一些构造操作.
+
+
+
+## Copy Constructor 的构造操作
+
+> C++标准同样将 copy constructor 分为两种, 一种是 trivial, 一种是 non-trivial
+>
+> * 只有 non-trivial 的才会自动生成.
+> * 决定是否是 trivial 的, 是 class 是否表现出 bitwise copy sementics
+>
+> 
+>
+> 有三种情况, 会以一个`object` 的内容作为另一个`class object` 的初值
+
+```c++
+class X {};
+void foo(X x) {}
+X foo_bar(){ return X;}
+X x;
+X xx = x; // 1. 直接赋值
+
+foo(x); // 2. 对象作为参数传给函数
+X xxx = foo_bar(); // 3. 函数返回一个 class object 时.
+```
+
+* 自定义`Copy Constructor`
+
+```c++
+X::X(const X &x){}
+Y::Y(const Y &y, int i=0){} // 可以是多个参数的形式, 之后的参数需要提供一个默认值
+```
+
+* 如果用户没有自定义, 那么编译器将会自动生成一个 `memberwise initialization` 的复制构造函数
+* 如果class是 `bitwise copy semantics` , 那么编译器是不会合成 `copy constructor` 的.
+
+```c++
+class Word {
+  int cnt;
+  char* str;
+}; // 这种情况下是不需要合成一个 default 的copy constructor 的, 因为 bitwise copy 足够
+
+class Word2 {
+	int cnt;
+  string str;
+};// 这时候编译器为了正确的 调用str 的copy constructor, 所以需要给 Word2 合成一个copy constructor
+
+```
+
+* 什么时候 一个`class` 不展现出 `bitwise copy semantics` 呢?
+  * `class` 内含一个 `member object` , 且 后者的 `class` 声明了一个 `copy constructor(编译器合成的, 自己定义的都可以)` 
+  * `class` 继承一个 `base class` , 且后者存在一个 `copy constructor(不论是显示声明 还是 合成)` 时
+  * 当 `class` 声明了一个或多个 `virtual functions` 时
+  * `class` 继承链上有 `virtual functions` 时
+* 为什么 `virtual functions` 要特殊对待呢? 有 `virtual functions` 的类 的对象只是多了一个 `vptr` 而已. 这个东西的复制构造 考虑一下可能会存在什么样的问题.
+
+```c++
+class Father{}; // 内部会有一些 虚函数
+class Son: Father{};
+
+void draw(const Father& obj){obj.draw();}
+
+void main(){
+  Son son;
+  /* father 的 vptr 不应该指向 Son 的 virtual table, 但是如果是 bitwise 的复制的话就会发生这种情况
+  所以说 Father 应该被合成出来 copy constructor, 用来正确的设置 自身的 vptr
+	*/
+	Father father = son; //这里赋值的话会发生切割行为
+  draw(son);
+  draw(father); 
+}
+```
+
+* `virtual base class` 如何处理?
 
