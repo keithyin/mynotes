@@ -1,6 +1,39 @@
 # 设计模式总结
 
+编码七大原则:
 
+* 单一职责原则
+* 接口隔离原则
+* 依赖倒置原则
+* 里氏替换原则
+* 开闭原则 (最终原则,  以上原则都是为该原则服务的)
+* 迪米特法则
+* 合成复用原则
+
+
+
+什么是设计模式: **解决某类通用问题** 的 **符合编码七大原则** 的设计规则
+
+* 创建型模式:
+
+  *  用来创建对象的 
+  * `provide object creation mechanisms that increase flexibility and reuse of existing code.`
+    * 单例模式, 工厂模式(简单工厂, 工厂模式, 抽象工厂模式), 原型模式, 建造者模式(只考虑构建对象, 构建对象具有流程)
+
+* 结构型模式:
+
+  *  `explain how to assemble objects and classes into larger structures, while keeping the structures flexible and efficient. `
+
+  * > 将一个对象, 塞到另一个对象中的方法
+
+    * 适配器模式, 桥接模式, 装饰者模式, 组合模式, 外观模式, 享元模式, 代理模式
+
+* 行为型模式: 
+
+  * 对象之间的通信, 谁负责干啥的指导方法
+  * `take care of effective communication and the assignment of responsibilities between objects.`
+    * 模板方法模式, 命令模式, 访问者模式, 迭代器模式, 观察者模式, 中介者模式, 备忘录模式, 解释器模式, 状态模式, 策略模式, 责任链模式.
+  * 
 
 ## 设计原则总结
 
