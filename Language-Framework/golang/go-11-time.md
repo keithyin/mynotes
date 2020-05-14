@@ -122,6 +122,22 @@ func printSplit(count int) {
 
 
 
+## 时区
+
+* golang 中的时间是有时区的, 在进行 时间之间的计算的时候会考虑到时区的信息
+
+* `"20200513 05:00 +0800"`: 这个串说明: `20200513 05:00` 是东八区的 时间!!!!
+
+```go
+time.Now() // 得到一个当前时间, 本地时区
+time.Now().In(time.UTC) // 时区转换
+time.Now().Location() // 该时间的时区
+// 以 time.Local 时区来解释时间 2000010100
+ymdh, _ = time.ParseInLocation("2006010215", "2000010100", time.Local)
+```
+
+
+
 ## 时间高级操作
 
 

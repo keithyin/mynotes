@@ -446,6 +446,30 @@ endwhile(condition)
 * `find_program()`
 * `find_package()`
 
+## Target 与 Object
+
+* cmake 中 有 `target` 的概念, 这个概念源自 `makefile`, 在 `cmake` 中, 我们可以将 `target` 看做 `object(面向对象编程中的对象)` .
+
+```cmake
+# 构造器: constructors
+add_executable()
+add_library()
+
+# 一堆成员变量: target properties
+
+# 成员函数, 用来重写 target 的属性值的
+get_target_property()
+set_target_properties()
+get_property(TARGET)
+set_property(TARGET)
+target_compile_definitions()
+target_compile_features()
+target_compile_options()
+target_include_directories()
+target_link_libraries()
+target_sources()
+```
+
 
 
 ### 最简单一版
