@@ -138,6 +138,12 @@ template <class T = int> class Numbers{
 
 ## 控制实例化
 
+* 模板会在使用的地方实例化, 这一特性意味着相同的实例可能出现在多个 `.o` 文件中. 在一个大系统中, 这就导致了额外开销
+* 控制实例化就是为了解决同一个实例同时在多个 `.o` 文件中的问题
+* 有了控制实例化: 模板的声明和实现可以分离到 `.h` 和 `.cpp` 文件中了.
+  * 在 模板实现的 `.cpp` 文件中, 使用 `template  declaration`
+  * 在使用模板的 `.h / .cpp` 文件中, `extern template declaration`
+
 ```c++
 extern template declaration; // 实例化声明
 template declaration;        // 实例化定义
@@ -195,6 +201,15 @@ template<> void Foo<int>::Bar(){
 
 
 ## 模板重载
+
+* 这里考虑的是当一个同名模板的形参分别为 `const T&, T&, T*, const T*` 时, 啥时候该调用谁的问题
+* 规则
+  * 如果有非模板函数, 优先选非模板函数
+  * 如果都是模板函数, 选择更特例化的
+
+```c++
+
+```
 
 
 
@@ -274,7 +289,10 @@ template <typename T> T fref(const T&, const T&);
 string s1("a value");
 const string s2("another value");
 fobj(s1, s2); // calls fobj(string, string); top-level const is ignored
-fref(s1, s2); // calls fref(const string&, const string&), 这里因为 `const 转换存在` 所以才合理
+
+// calls fref(const string&, const string&), 这里因为 `const 转换存在` 所以才合理
+// s1 : 非 low-level const 可以传递给 low-level const 函数形参
+fref(s1, s2); 
 
 // uses premissible conversion to const on s1
 int a[10], b[42];
@@ -300,6 +318,38 @@ int (*pf1)(const int&, const int&) = compare;
 void func(int(*)(const string&, const string&));
 void func(int(*)(const int&, const int&));
 func(compare); // error: which instantiation of compare?因为函数重载导致的 模板参数推断的二义性.
+```
+
+* 左值引用与右值引用
+
+```c++
+// 模板形参是一个左值引用, 只能传递给它一个左值
+template<typename T> void f1(T&);
+f1(i);//i 是 int, T 被推断为 int
+f1(ci); // ci是 const int, T 被推断为 const int
+f1(5); // 错误: 传递给 一个 & 的实参必须是左值.
+
+
+// 模板形参是 const T&, 啥都能传
+template<typename T> void f2(const T&);
+f2(i);//i 是 int, T 被推断为 int
+f2(ci); // ci是 const int, T 被推断为 int
+f2(5); // const T& 可以绑定 右值, T被推断为 int
+
+//模板形参是 T&&
+template<typename T> void f3(T&&);
+f3(43); // 可以传右值, T为 int
+```
+
+* 引用折叠 与 右值引用参数
+  * 两个例外规则: 
+    * 当一个左值传递给一个 右值的引用形参, 编译器推断模板类型参数为实参的 左值引用类型
+    * 引用折叠:
+      *  `X& &, X& &&, X&& &` 都会折叠为 `X&` 
+      * `X&& &&` 会折叠为 `X&&`
+
+```c++
+
 ```
 
 
