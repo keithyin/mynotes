@@ -283,7 +283,7 @@ clean:
   * `.obj, .o`
   * `.exe, .dll, .lib, .a, .o, .dylib`
 
-### cmake 工作流
+## cmake 工作流
 
 ```
 myapp
@@ -370,9 +370,7 @@ endwhile(condition)
 *  If using a non­CMake FindXXXX.cmake, tell Cmake where to find it by setting the CMAKE_MODULE_PATH variable
 *  Think of FIND_PACKAGE as an #include
 
-
-
-### 基本概念
+## 基本概念
 
 * `CmakeLists.txt` : 
   * Input text files that contain the project parameters and describe the flow control of the build process in simple CMake language.
@@ -382,16 +380,16 @@ endwhile(condition)
 **两个tree**
 
 * 关注的问题: Where to place object files, executables and libraries?
-* `Source tree` 包含
+* `Source tree` 包含, **这个是我们所写的代码的 目录树**
   * cmake input files (`(CmakeLists.txt`)
   * 代码源文件 `.cpp` , 代码头文件 `.h`
-* `Binary tree` 包含
+* `Binary tree` 包含, **这个是编译后的结果所在的 目录树**
   * Native build system files (Makefiles)
   * Output from build process:
     * Libraries 
     *  Executables 
     * Any other build generated file
-* 如果是 `in-source` 编译, `source-tree` 和 `binary-tree` 在同一个文件夹下; 如果是 `out-source` 编译, 他俩在不同的文件夹下.
+* 如果是 `in-source` 编译, `source-tree` 和 `binary-tree` 在同一个文件夹下; 如果是 `out-source` 编译, 他俩在不同的文件夹下.  **目前所见的都是采用的 out-source 编译方式**
 
 **几个宏**
 
@@ -412,16 +410,23 @@ endwhile(condition)
 
 **基础语法**
 
-* `add_library(target_name source_file)` : 编译成一个静态链接库
-  *  creates an static library from the listed sources
-  * `add_library(target_name SHARED source_files)` : 添加`Shared` 表明了是创建一个动态链接库
+* `add_library(target_name source_file)` : 
+  * 编译成一个静态链接库, 下面 `Target & Object` 中解释道, 这命令实际是构建一个对象.
+  * creates an static library from the listed sources
+  * `add_library(target_name SHARED source_files)` : 
+    * 添加`Shared` 表明了是创建一个动态链接库. 下面 `Target & Object` 中解释道, 这命令是在给对象添加属性.
   * 静态链接库  与 动态链接库
     * 静态链接库:  on linking, add the used code to your executable
     * 动态链接库:  on linking, tell the executable where to find some code it needs
+  * `cmake -D BUILD_SHARED_LIBS=TRUE` 这个会设置 `add_library` 的默认为 `SHARED`
+
+
+
 * `add_executable(target_name source_file)` : 编译成一个可执行文件
-* `target_link_libraries(executable_name some_lib)` : 将可执行文件链接到一个 `library` 中.
+* `target_link_libraries(executable_name some_lib)` : 编译链接指示, 将其它的库链接到当前的 target 中
+  * 如果 `some_lib` 是静态库的话, 就是静态链接, 如果 `some_lib` 是动态库的话, 就动态链接.
   * 需要链接静态库的时候使用
-  * 对每个 目标设置链接
+  * 对每个目标设置链接
 * `link_libraries(lib1 lib2)` : 所有的 `target` 都链接同一组 `libs`
 * 命令 : `command(arg1 arg2 ...)`
 * 列表: `A;B;C` ,使用分号分隔
@@ -430,7 +435,7 @@ endwhile(condition)
   * `set(var value)` : 负责创建和修改变量的值
   * SET can do everything but LIST makes some operations easier
   * Use `SEPARATE_ARGUMENTS` to split space-separated arguments (i.e. a string) into a list (semicolon­-separated)
-* `include_directories(dir1 di2)` : 头文件目录
+* `include_directories(dir1 di2)` : 设置可查找的头文件目录.
 * `aux_source_directories(source)` :
 * `add_custom_target`
 * `add_denpendices(target1 dep1 dep2)` : target1 依赖于 dep1, dep2
@@ -445,6 +450,15 @@ endwhile(condition)
 * `find_library()`
 * `find_program()`
 * `find_package()`
+* `message(STATUS ....)` : 控制台打印一些信息
+
+## CmakiList.txt中可以使用的工具变量
+
+```cmake
+${CMAKE_CURRENT_SRC_DIR} # cmake文件所在的目录
+```
+
+
 
 ## Target 与 Object
 
@@ -462,23 +476,38 @@ get_target_property()
 set_target_properties()
 get_property(TARGET)
 set_property(TARGET)
+
+# 设置一些宏, 可以在代码中使用的这种. 可以 PUBLIC, PRIVATE, INTERFACE
 target_compile_definitions()
 target_compile_features()
 target_compile_options()
+# 设置 target 的 include_directories, 方便其它的 target 使用 该 target
 target_include_directories()
 target_link_libraries()
 target_sources()
 ```
 
+## PUBLIC PRIVATE INTERFACE
 
+```cmake
+target_include_directories(some_target PUBLIC ${CMAKE_CURRENT_SRC_DIR}/src)
 
-### 最简单一版
+# 这样的话, some_target 的代码中是可以使用  VERSION 得到 3 这个值
+target_compile_definitions(some_target PUBLIC VERSION=3)
+```
+
+* `PUBLIC` : 含义是, 如果其它 `target` 链接了这个 `target` 的话, 也会自动设置这个 `include dir`
+* `PRIVATE`: 含义是, 这个只是当前 `target` 独享, 并不会 `populate` 给其它 `target`
+* `INTERFACE`: 含义是, 自己当前 不用,  但是会 `populate` 给其它 `link` 这个 `target` 的
+
+## 最简单一版
 
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 
 # set the project name, 这个命令并非强制使用, 但是最好还是用着
-project(Tutorial)
+# 设置的名字可以通过 ${PROJECT_NAME} 取得, version 可以通过 ${PROJECT_VERSION} 取得
+project(Tutorial VERSION 1.0.0)
 
 # add the executable
 add_executable(Tutorial tutorial.cxx)
@@ -503,7 +532,6 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -std=c++11)
 
 * library :
 * package : 
-* 
 
 
 
