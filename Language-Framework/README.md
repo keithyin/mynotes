@@ -1,18 +1,34 @@
 # 令人头疼的编码问题
 
-> * Unicode 是一个符号集，包含世界上所有的 文本符号
+> * Unicode 是一个符号集，包含世界上所有的文本符号
 >   * 文本符号：书面上可以看到的符号。各种的数学符号，文字都是
-> * UTF-8,GB2312： 是个具体的 **编/解 码** 方法，由于计算机中只能存储 `01`，所以编码方法是用来声明，Unicode中的符号在计算机中该怎么存储，即 符号--> 字节流 的映射。解码就是来说明，字节流-->符号的映射。
+> * unicode中的两个基本 术语
+>   * code point
+>     * code points 是 unicode 基本组成结构，code point 仅仅是一个int 到一个 字符的映射。这个int实际类型是`uint32`，其含义可以是 一个 字母（`a`, `b`, ...）,一个附加符号(diacritic, á头上就是一个附加符号)，一个smiley(😁)等等。。
+>     * 注意：
+>   * Grapheme Clusters
+>     * 这个是人类阅读文本的基本单元
+>     * 一组语义上有关系的 code points，比如：一个附加符号加上一个字符 就变成了á 模样。目前unicode将大部分常见的 多个 code points 构成的 表示 用一个 code point 来表示了，用来解决代码中边界划分的问题。毕竟有些字符一个code point，有些字符多个code point，有点难处理。
+> * UTF-8,GB2312：是将code point 压缩的方法，一个code point是32bit，可以某种压缩方式将其压缩的更小。
 >   * '你' : 使用 UTF8编码的话，在计算机中存储的就是 `\xe4\xbd\xa0`(16进制)
 >   * '你'：使用 gbk 编码的话：在计算机中存储的就是 `\xc4\xe3`(16进制)
+> * UTF-X：utf8，utf16，utf32
+>   * X其实表示是 code unit的bit大小，utf8编码的codeunit就是uint8类型的值，8bit表示一个code-unit
+>   * UTF8使用 1 到 4个 code unit 来表示一个 code point
+>   * UTF16使用 1 到 2个 code unit 来表示一个 code point
+>   * UTF32使用 1 个 code unit 来表示一个 code point
 
+https://en.wikipedia.org/wiki/Combining_Diacritical_Marks
 
+https://stackoverflow.com/questions/50403342/how-do-i-properly-use-stdstring-on-utf-8-in-c
+
+https://www.cnblogs.com/malecrab/p/5300503.html
+
+https://blog.csdn.net/sdscscs22/article/details/53895416
 
 ## python 中的编码
 
 对 **Unicode 和 UTF8/GBK** 有了了解之后，现在来看 python
-
-
 
 **python 中有两种 string（字符串）**
 
@@ -52,6 +68,38 @@ a_utf8_byte_str.decode("gbk")    # 这就会报错了
 
 
 [https://www.jianshu.com/p/53bb448fe85b](https://www.jianshu.com/p/53bb448fe85b)
+
+## C++ 中的编码
+
+https://blog.csdn.net/qq_31175231/article/details/83865059
+
+* 相关的库有
+  * `<locale>`: 	提供 `wstring_convert`
+  * `<codecvt>`: 提供 `codecvt_utf8`, 和一些其它的编码转化
+
+```c++
+int main() {
+    std::string cin_str;
+    std::cout << "请输入：";
+    std::cin >> cin_str;
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+  	// conv.from_bytes(): 将 utf8 string 转成 code point
+  	// conv.to_bytes(): 将 code point 转成 utf8 string
+    std::u32string str = conv.from_bytes(cin_str);
+
+    std::cout << sizeof(std::u32string) << std::endl;
+    for (auto& item : str) {
+        std::cout << item << std::endl;
+        std::cout << sizeof(item) << std::endl;
+    }
+    return 0;
+}
+```
+
+
+
+
+
 
 
 # 协程
