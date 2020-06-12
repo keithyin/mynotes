@@ -371,6 +371,57 @@ int main()
 
 ##future
 
+* 使用`future`等待一次性事件
+
+* 两个`future`: `<future>`头文件，`std::future<>, std::shared_future<>`, 这两个所对应的语义是`std::unique_ptr, std::shared_ptr`. 独享事件或者共享事件
+* `std::async` 的行为是可以手动控制的。
+  * `std::launch::async`: 表示该函数必须在自己的线程上运行（默认）
+  * `std::launch::deferred`: 函数的调用会延迟到 `future` 调用 `wait` 或者` get`
+  * `std::async(std::launch::deferred, func, params)`
+
+```c++
+#include <future>
+int find_answer_to_ltuae();
+void do_other_stuff();
+
+int main() {
+  // 开启一个异步线程，函数的返回值会给到 the_answer
+  std::future<int> the_answer = std::async(find_answer_to_ltuae);
+  do_other_stuff();
+  // 当调用 get 的时候， 会阻塞等待 异步线程完成。
+  int answer = the_answer.get();// get之后再get就没有值了，shared_future也是一样
+}
+```
+
+* `class std::packaged_task<>` : 将异步函数执行和返回的`future`封装起来，可以拿着随便移动（`std::move`）。 
+  * 对象被调用的时候是异步执行
+
+```c++
+std::packaged_task<int()> task{task_func};
+std::future<int> task_future = task.get_future();
+```
+
+* `promise` & `future`, 这是一对，当 `promise` 设置值的时候，`future` 就会收到值，就像是 `golang` 中 `channel`
+
+```c++
+std::promise<int> ch_in;
+std::future<int> ch_out = ch_in.get_future();
+ch_in.set_value(10);
+std::cout << ch_out.get() << std::endl;
+```
+
+* 为 `future` 保存异常
+  * 当 `async` 调用的函数产生异常，该异常会被保存在 `future`中，在调用 `get` 的时候触发。`packaged_task`同理
+  * 使用 `promise`的时候，可以`promise.set_exception()`，这样，该异常也会保存在 `future` 中，调用`get`的时候触发
+
+```c++
+
+```
+
+
+
+
+
 
 
 ## condition_variable
