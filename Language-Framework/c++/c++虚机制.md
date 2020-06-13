@@ -54,3 +54,43 @@ int main(){
 
 
 **无论在什么地方调用虚函数，编译器都会把`VPTR`拿出来走一波。**
+
+
+
+# 带有虚函数的基类一定要将析构设置为虚函数
+
+```c++
+#include <iostream>
+
+using namespace std;
+
+class base {
+   public:
+    base() { cout << "Constructing base \n"; }
+    virtual ~base() { cout << "Destructing base \n"; }
+};
+
+struct SubField {
+    SubField() { cout << "Constructing SubField" << endl; }
+    ~SubField() { cout << "destruction SubField" << endl; }
+};
+
+class derived : public base {
+   public:
+    derived() { cout << "Constructing derived \n"; }
+    // ~derived() { cout << "destructing derived\n"; }
+
+   private:
+    SubField sf;
+};
+
+int main(void) {
+    derived *d = new derived();
+    base *b = d;
+  	// 如果base的析构不为虚函数，就会导致derived的析构函数不会被调用，就会使得b析构的不够彻底。
+    // 将 base 的析构设置为虚函数，一切就可以正常运行了。
+    delete b; 
+    return 0;
+}
+```
+
