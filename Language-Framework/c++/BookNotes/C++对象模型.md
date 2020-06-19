@@ -297,3 +297,26 @@ void bar(X &__result) {
 
 # 第三章：Data语义学
 
+* 多态
+  * 单继承多态
+    * 每个`class` 一个 `virtual_table`
+    * 每个`class object` **一个** `virtual_ptr`
+  * 多继承
+    * 多继承的类 可能有多个 `virtual table`
+    * `class object` 可能有多个 `virtual table`
+  * 
+
+# 第四章：Function语义学
+
+
+
+
+
+# 第五章：构造、析构、拷贝语义学
+
+* 构造函数的时候：构造函数如何扩张
+
+
+
+# 第六章：执行期语义学
+
