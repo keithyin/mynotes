@@ -31,7 +31,7 @@ int main() {
 }
 ```
 
-然后在 linux 上，可以使用以下命令来编译 此文件
+然后在 `linux` 上，可以使用以下命令来编译 此文件
 
 ```shell
 g++ -o file_name -std=c++11 -pthread file_name.cc 
@@ -169,7 +169,11 @@ result += v1[i] * v2[i];
 
 
 
-### mutex
+### mutex & recursive_mutex
+
+* `mutex`: 锁（互斥量）
+* `recursive_mutex`: 递归锁，同一个线程内，可以对其进行多次加锁。释放的时候，也需要进行多次解锁
+  * 常用于递归代码中。所以名字为`recursive_mutex`
 
 ```c++
 #include <iostream>
@@ -191,6 +195,20 @@ void dot_product(const std::vector<int> &v1, const std::vector<int> &v2, int &re
 }
 ```
 
+### 读写锁
+
+* 使用`boost::shared_mutex`
+  * 写互斥，读共享
+  * 写的时候使用`std::lock_guard`, 读的时候使用`boost::shared_lock`
+
+```c++
+#include <boost/thread/shared_mutex.hpp>
+mutable boost::shared_mutex rw_mutex;
+
+std::lock_guard<boost::shared_mutex> w_lock(rw_mutex);
+boost::shared_lock<boost::shared_mutex> r_lock(rw_mutex);
+```
+
 
 
 ### atomic
@@ -208,23 +226,11 @@ int main(){
 
 
 
-### 读写锁
-
-* 使用`boost::shared_mutex`
-
-```c++
-#include <boost/thread/shared_mutex.hpp>
-mutable boost::shared_mutex rw_mutex;
-
-std::lock_guard<boost::shared_mutex> w_lock(rw_mutex);
-std::shared_lock<boost::shared_mutex> r_lock(rw_mutex);
-```
-
-
-
-
-
 ## 安全使用mutex
+
+* `RAII` 方式管理互斥量
+  * `lock_guard`
+  * `unique_guard`
 
 ### 正确的锁定和释放 lock_guard
 
@@ -249,6 +255,47 @@ uni_lock.unlock(); //手动释放
 uni_lock.lock(); // 手动加锁
 ```
 
+### unique_lock
+
+>  unique_lock内部持有mutex的状态：locked,unlocked。unique_lock比lock_guard占用空间和速度慢一些，因为其要维护mutex的状态。
+>
+>  构造函数中加锁，析构函数中解锁。 
+>
+>  当然也可以灵活操作。可以在创建对象的时候加个其他参数，这样在构造函数中就不会加锁了。
+
+```c++
+// unique_lock example
+#include <iostream>       // std::cout
+#include <thread>         // std::thread
+#include <mutex>          // std::mutex, std::unique_lock
+
+std::mutex mtx;           // mutex for critical section
+
+void print_block (int n, char c) {
+  // critical section (exclusive access to std::cout signaled by lifetime of lck):
+  std::unique_lock<std::mutex> lck (mtx);
+  for (int i=0; i<n; ++i) { std::cout << c; }
+  std::cout << '\n';
+}
+
+int main ()
+{
+  std::thread th1 (print_block,50,'*');
+  std::thread th2 (print_block,50,'$');
+
+  th1.join();
+  th2.join();
+
+  return 0;
+}
+```
+
+```
+Possible output (order of lines may vary, but characters are never mixed):
+**************************************************
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+```
+
 
 
 ### 初始化过程中保护共享数据
@@ -268,12 +315,6 @@ SomeClass& get_instance() {
   return instance;
 }
 ```
-
-
-
-
-
-
 
 ### 如何避免死锁
 
@@ -367,9 +408,7 @@ int main()
 
 * 等待某个事件的发生，一个线程在能完成其任务之前可能需要等待另一个线程完成任务
 
-
-
-##future
+## future
 
 * 使用`future`等待一次性事件
 
@@ -414,112 +453,12 @@ std::cout << ch_out.get() << std::endl;
   * 当 `async` 调用的函数产生异常，该异常会被保存在 `future`中，在调用 `get` 的时候触发。`packaged_task`同理
   * 使用 `promise`的时候，可以`promise.set_exception()`，这样，该异常也会保存在 `future` 中，调用`get`的时候触发
 
-```c++
-
-```
-
-
-
-
-
-
-
 ## condition_variable
 
-[https://www.cnblogs.com/haippy/p/3252041.html](https://www.cnblogs.com/haippy/p/3252041.html)
-
-> A *condition variable* is an object able to block the calling thread until *notified* to resume.
->
-> 当 cv的 wait 方法被调用时，它使用 `unique_lock (over mutex)` 来锁住线程。直到其它线程 调用 `notification method` 来将其唤醒。
-
-```c++
-// condition_variable example
-#include <iostream>           // std::cout
-#include <thread>             // std::thread
-#include <mutex>              // std::mutex, std::unique_lock
-#include <condition_variable> // std::condition_variable
-
-std::mutex mtx;
-std::condition_variable cv;
-bool ready = false;
-
-void print_id (int id) {
-  // unique_lock 这个创建对象的时候，就已经调用了 mtx.lock() 
-  std::unique_lock<std::mutex> lck(mtx); 
-  while (!ready)  // 如果标志位不为 true ，则等待！！！ 由 cv.wait(lck) 阻塞
-    cv.wait(lck); // 当 mtx locked 时， 该函数会 调用 lck.unlock() 释放锁。
-    // 在被唤醒时， lck 被设置为 进入 wait 之前的 状态！！！
-  std::cout << "thread " << id << '\n';
-}
-
-void go() {
-  std::unique_lock<std::mutex> lck(mtx);
-  ready = true;
-  cv.notify_all();
-}
-
-int main ()
-{
-  std::thread threads[10];
-  // spawn 10 threads:
-  for (int i=0; i<10; ++i)
-    threads[i] = std::thread(print_id,i);
-
-  std::cout << "10 threads ready to race...\n";
-  go();                       // go!
-
-  for (auto& th : threads) th.join();
-
-  return 0;
-}
-```
-
-
-
-## unique_lock
-
->  unique_lock内部持有mutex的状态：locked,unlocked。unique_lock比lock_guard占用空间和速度慢一些，因为其要维护mutex的状态。
->
->  构造函数中加锁，
->
->  析构函数中解锁。 当然也可以灵活操作。
-
-```c++
-// unique_lock example
-#include <iostream>       // std::cout
-#include <thread>         // std::thread
-#include <mutex>          // std::mutex, std::unique_lock
-
-std::mutex mtx;           // mutex for critical section
-
-void print_block (int n, char c) {
-  // critical section (exclusive access to std::cout signaled by lifetime of lck):
-  std::unique_lock<std::mutex> lck (mtx);
-  for (int i=0; i<n; ++i) { std::cout << c; }
-  std::cout << '\n';
-}
-
-int main ()
-{
-  std::thread th1 (print_block,50,'*');
-  std::thread th2 (print_block,50,'$');
-
-  th1.join();
-  th2.join();
-
-  return 0;
-}
-```
-
-```
-Possible output (order of lines may vary, but characters are never mixed):
-**************************************************
-$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-```
-
-
-
-# std::condition_variable
+* `condition_variable`: 条件变量，常用来建模生产者消费者模型。
+* `condition_variable` 语义上提供两个功能：
+  1. `wait` 的阻塞， 和 `notify` 的通知
+  2. 在`wait` 的时候顺便帮着管理了一下 `mutex`
 
 **头文件**
 
@@ -543,18 +482,33 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 std::mutex mtx;
 std::condition_variable cv;
 bool ready = false;
-
-void print_id (int id) {
+/*
+	作为一个消费者应该做的事情就是，
+	1. 加锁，准备访问共享数据
+	2. 判断共享数据是否可以访问，
+		如果可以访问就访问，
+		不可以访问就wait（阻塞着等通知），，这里就用到共享变量了（condition_variable）
+		如果有通知了之后（需要继续访问共享数据）
+*/
+void consumer (int id) {
   // unique_lock 这个创建对象的时候，就已经调用了 mtx.lock() 
   std::unique_lock<std::mutex> lck(mtx); 
-  /* 这个位置一般放置访问共享数据的代码*/
+  /* 这个位置一般放置访问共享数据的代码，
+  	因为这里一般放置的是
+  */
   while (!ready)  // 如果标志位不为 true ，则等待！！！ 由 cv.wait(lck) 阻塞
     cv.wait(lck); // 当 mtx locked 时， 该函数会 调用 lck.unlock() 释放锁。
     // 在被唤醒时， lck 被设置为 进入 wait 之前的 状态！！！
   std::cout << "thread " << id << '\n';
 }
 
-void go() {
+/*
+  作为一个生产者
+  1. 加锁， 准备生产
+  2. 生产完成，（通知等待在该 condition_variable 上的线程，然后解锁）
+  		私以为：这个 通知 和解锁操作 顺序是啥不影响。
+*/
+void productor() {
   std::unique_lock<std::mutex> lck(mtx);
   /*这个位置一般放置 访问共享数据的代码*/
   ready = true;
@@ -581,90 +535,35 @@ int main ()
 
 **wait(lck)** : 这个 lck 的意义就是，如果 wait 开始向下执行，就将 lck 设置成 lock 状态
 
-* 调用时，如果 `lck` 为 `locked` 则， 执行`lck.unlock()`
-* 被 notify 时： 会调用 `lck.lock()` 使得 `lck` 回到 调用 `wait` 之前的状态
+* 调用时：根据上述的`consumer`功能，此时 `lck` 必定是 `locked`， 执行`lck.unlock()`。
+  * 为什么被设计成执行`unlock`: 原因：既然数据没有准备好，那就把锁让出来 给 生产者来用
+* 被 notify 时： 会调用 `lck.lock()` 
+  * 为什么会设计成执行`lock`: 原因：被notify之后，当然是要操作共享数据啦，所以这里设计成为这样也是合理
 
 **wait(lck, pred)**
 
-* 只有当 pred 条件为 false 时调用 wait() 才会阻塞当前线程，并且在收到其他线程的通知后只有当 pred 为 true 时才会被解除阻塞
+* 调用时：
+  1. 检查 pred 条件，如果为true，直接返回，啥也不操作（不解锁lock，不阻塞）
+     * 如果条件为false，先解锁互斥元，然后阻塞该线程（等着被notify）
+* notify时
+  1. 解除阻塞
+  2. 互斥元加锁
+  3. 检查条件，如果条件为 `true` 返回
+     * 如果条件为 `false` ： 解锁互斥元，然后阻塞该线程（等着被notify）
 
 **notify_one**
 
-* 唤醒某个等待(wait)线程。如果当前没有等待线程，则该函数什么也不做，如果同时存在多个等待线程，则唤醒某个线程是不确定的
-
-
+* 唤醒 **当前** 某个等待(wait)线程。如果当前没有等待线程，则该函数什么也不做，如果同时存在多个等待线程，则唤醒某个线程是不确定的
 
 **notify_all**
 
-* 唤醒所有的等待(wait)线程。如果当前没有等待线程，则该函数什么也不做。
+* 唤醒 **当前** 所有的等待(wait)线程。如果当前没有等待线程，则该函数什么也不做（因为什么也做不了）。
 
 
 
-**对于 notify 之后，wait 会调用 lck.lock 的 验证代码**
-
-```c++
-// condition_variable example
-#include <iostream>           // std::cout
-#include <thread>             // std::thread
-#include <mutex>              // std::mutex, std::unique_lock
-#include <condition_variable> // std::condition_variable
-
-std::mutex mtx;
-std::condition_variable cv;
-bool ready = false;
-
-void print_id (int id) {
-    // unique_lock 这个创建对象的时候，就已经 mtx.lock 了
-    // 其它线程就阻塞在了 unique_lock 的构造函数中！！！
-    std::unique_lock<std::mutex> lck(mtx);
-    while (!ready) {  // 如果标志位不为 true ，则等待！！！ 由 cv.wait(lck) 阻塞
-        std::cout << "i am thread " << id << " waiting here" << std::endl;
-        cv.wait(lck); // 使用 unique_lock (over mutex) 来将其锁住
-    }
-    for (int i=0; i < 10; ++i)
-        std::cout << "thread " << id<< " value:" << i <<std::endl;
-}
-
-void go() {
-    std::unique_lock<std::mutex> lck(mtx);
-    ready = true;
-    cv.notify_all();
-}
-
-int main ()
-{
-    std::thread threads[10];
-    // spawn 10 threads:
-    for (int i=0; i<10; ++i)
-        threads[i] = std::thread(print_id,i);
-
-    std::cout << "10 threads ready to race...\n";
-    go();                       // go!
-
-    for (auto& th : threads) th.join();
-
-    return 0;
-}
-
-```
-
-
-
-
-
-
-
-## 参考资料
+# 参考资料
 
 [https://www.cnblogs.com/haippy/p/3237213.html](https://www.cnblogs.com/haippy/p/3237213.html)
-
-
-
-
-
-
-
-## 参考资料
 
 [http://www.bogotobogo.com/cplusplus/multithreaded4_cplusplus11.php](http://www.bogotobogo.com/cplusplus/multithreaded4_cplusplus11.php)
 
