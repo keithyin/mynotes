@@ -321,7 +321,8 @@ SomeClass& get_instance() {
 当一个操作需要两个及以上的锁的时候，就有可能发生死锁
 
 * 假设A操作需要锁a和锁b，B操作也需要锁a和锁b，但是两个操作申请锁的顺序不一致，A是先申请a，B是先申请b。如果有一次，A申请a的同时B也申请了b，那么这两个操作就永远不会执行。死锁了
-  * `std::lock` 同时锁定两个或更多的互斥元，该对象仅负责加锁，并不负责解锁，所以还需要与`lock_guard`或者`unique_lock` 一起使用。
+  * 为了避免死锁，常见的解决方案是 按照相同的顺序 锁定两个互斥元。这个方案有时候很直观，有时候却不是。所以我们需要一个更好的解决方案。
+  * 将多个加锁的操作合并为原子操作： `std::lock` 同时锁定两个或更多的互斥元，该对象仅负责加锁，并不负责解锁，所以还需要与`lock_guard`或者`unique_lock` 一起使用。
   * https://en.cppreference.com/w/cpp/thread/lock
 
 ```c++
@@ -365,6 +366,7 @@ void assign_lunch_partner(Employee &e1, Employee &e2)
     // other calls to assign_lunch_partner deadlocking us
     {
         std::lock(e1.m, e2.m);
+        // adopt_lock 告诉 lock_guard 不要在构造函数中加锁。
         std::lock_guard<std::mutex> lk1(e1.m, std::adopt_lock);
         std::lock_guard<std::mutex> lk2(e2.m, std::adopt_lock);
 // Equivalent code (if unique_locks are needed, e.g. for condition variables)
