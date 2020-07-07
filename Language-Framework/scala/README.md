@@ -1,0 +1,92 @@
+# scala 程序结构
+
+```scala
+// object ： 一个伴生对象，就可以理解成为一个对象
+// HelloScala 是一个对象的名字，底层真正对应的类名是HelloScala$
+// 对象是 HelloScala$ 类型的一个静态对象 MODULE$
+// 当编写一个 object HelloScala的时候，底层会生成两个.class文件，分别是HelloScala, HelloScala$， 即：会生成两个class 文件。
+// object HelloScala 对应的是 HelloScala$ 的一个静态对象（所以就是单例咯）
+object HelloScala{
+    // def 表示一个方法，是一个关键字
+    // main 表示方法的名字，表示程序的入口
+    // args: Array[String] 参数名字在前，类型在后
+    // Unit =  表示该函数的返回值为空
+    def main(args: Array[String]):Unit = {
+        
+    }
+}
+```
+
+## 字符串输出的三种方式
+
+```scala
+println("a" + b + "c")
+printf("%s, %d", "name", 15)
+// 类似 shell的 string语法
+println(s"$name, $age")
+// 大括号表示， 里面是一个表达式
+println(s"${age + 10}")
+```
+
+
+
+# 变量
+
+* scala 中：小数默认为 double，整数默认为 int
+* `val` ： 数值不可变，不可修改
+* `var`:  变量可以修改
+* scala中数据都是对象，没有原生类型
+* scala中数据类型分为两大类，AnyVal（值类型）,AnyRef(引用类型)，这两种也都是对象
+* AnyVal: 
+  * Byte, Short, Int, Long, FLoat, Double, Boolean, Char, StringOps, Uint
+* AnyRef:
+  * Scala Collections, All Java Classes, Other Scala Classes
+* 底层类
+  * Null：所有AnyRef的子类，只有一个值 null
+  * Nothing: 所有类的子类：在开发中，Noting的值可以赋值给任意类型的对象，常用于抛出异常
+  * 这个需要和object理解：object是所有类型的父类
+    * java中的object对应scala中的 Any
+* 因是转换：
+  * **低精度** 向 **高精度** 自动转换，高到低是需要手动转换的哦。
+
+```scala
+var a : Int = 100
+val b : Int = 100
+
+// 类型推导
+var num = 10 //推导为int类型，类型确定之后就不能修改了
+num.isInstanceOf[INt] //判断类型
+```
+
+```scala
+object HelloWorld {
+
+  def main(args: Array[String]): Unit = {
+    val dog = new Dog
+    dog.age = 18
+    dog.name = "hello"
+    // 该句报错，因为dog 是val，相当于是个C++ 的底层 const
+    dog = new Dog
+  }
+}
+
+class Dog {
+  // _ 在这里表示 默认值
+  var age: Int = _
+  var name : String = _
+}
+```
+
+
+
+# 方法
+
+* scala 中如果一个方法没有形参，那就可以省略其调用时的`()`
+* 
+
+
+
+# 异常处理
+
+* `throw new Exception`
+
