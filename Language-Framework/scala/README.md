@@ -107,7 +107,61 @@ println(`true`)
 ```
 
 * `_` 的 N 中功能
-    * 
+```scala
+import scala.io._ //引入该包下的所有东西
+```
+
+# 运算符
+* scala 支持代码块返回值
+
+```scala
+val res = {
+    90
+}
+```
+* 三元运算符 `val num if(5>4) 5 else 4`
+* 命令行输入`val val = StdIn.readLine()`
+
+# 分支控制
+* 没有 switch
+```scala
+if (expression) {
+
+} else if (expression2) {
+
+}
+
+// for 表达式, for 推导式
+// 1 to 3 :  两边都是 闭合
+// 1 until 3: 前闭 后 开
+// 也可以这样直接对集合进行遍历
+
+for(i <- 1 to 3){
+
+}
+
+// 循环守卫, 如果为 false 就直接跳过, 相当于 continue, scala 中没有 continue 和 break
+for (i <- 1 to 3 if i!=2) {
+
+}
+
+// for 引入变量
+for (i <- 1 to 3; j = 4-i) {
+
+}
+
+// 等价于
+for (i <- 1 to 3; ) {
+    j = 4-i
+    ...
+}
+
+// 嵌套循环, 等价于嵌套循环的
+for (i<-1 to 3; j <-1 to 3){
+}
+
+```
+* 模式匹配: match-case
 
 
 # 方法
