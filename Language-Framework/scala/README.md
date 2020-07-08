@@ -343,7 +343,6 @@ class Cat {
 * scala 一个文件可以包含多个类， 默认都是 public 的
 
 
-
 ## 方法
 
 * 方法和函数一致，在 class 里面是方法，在 object 里面是函数？
@@ -363,8 +362,8 @@ class Name[形参列表] { // 主构造器
 }
 
 
-// 这样 主构造器就私有化了
-class Person private (inName: String, inAge: Int) {
+// 这样 主构造器就私有化了, inName 是局部变量, 如果用 val 修饰一下, otherName 就是个 只读的私有属性了. 如果用 var 修饰, 就变成了可读写属性!
+class Person private (inName: String, inAge: Int, val otherName: String, var ootherName: String) {
     // 这部分底层实际上是包装到 一个构造函数里的
     var name: String = inName
     var age: Int = inAge
@@ -387,4 +386,27 @@ class Person private (inName: String, inAge: Int) {
 * 细节：
   * 主构造器：**实际上是将 除 函数的语句 都包装到一个 构造器里。**
   * 辅助构造器：第一行一定要调用主构造器（直接或者间接）
+  * BeanProperty: 对于属性 @BeanProperty 就自动生成了其 setXXX 和 getXXX 方法. 原来自动生成的方法也可以使用!
+  * 
+
+
+## 打包
+* 子包可以
+
+```scala
+package aa.bb.cc
+
+// 与上面的等价
+package aa.bb
+package cc
+
+// 一个文件中可以创建多个包, 每个包里面都可以写 class, trait, object
+package aa{
+    package bb {
+        package cc {
+        
+        }
+    }
+}
+```
 
