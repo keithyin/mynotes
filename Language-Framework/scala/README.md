@@ -390,8 +390,10 @@ class Person private (inName: String, inAge: Int, val otherName: String, var oot
   * 
 
 
-## 打包
-* 子包可以
+## 打包 & import
+* 子包可以直接使用父包的东西
+* 父包使用子包的, 必须要引入
+* anywhere can import
 
 ```scala
 package aa.bb.cc
@@ -409,4 +411,47 @@ package aa{
     }
 }
 ```
+* 解决java 中不能在 类外 定义对象的限制: 使用包对象来解决
+```scala
 
+// 每一个包都可以有一个包对象
+// 包对象的名字需要和子包的名字一致
+// 在包对象中可以定义变量和方法
+// 包对象中定义的 东西, 可以直接在包中使用了
+// 包对象只能在 父包中定义, 和包是同级的!!!
+// package object scala{}  创建包对象,里买可以搞事情了.
+package object scala {
+    
+}
+
+// 打包
+pakcage scala {
+    
+}
+
+import scala.collection.mutable._
+// 重命名 与 隐藏掉
+import scala.collecton.mutable.{HashTable=>JavaHashTable, List=>_, Other}
+
+```
+
+# 伴生类与伴生对象
+
+```scala
+// for non-static
+// default private
+// no public key-word
+class Clerk {
+    // default private
+    var name: String = _
+}
+
+// can access private property of the Cleak class
+// for static 
+object Clerk{
+
+}
+```
+
+
+# scala 集合包
