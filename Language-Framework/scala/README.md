@@ -124,6 +124,7 @@ val res = {
 
 # 分支控制
 * 没有 switch
+* for 循环
 ```scala
 if (expression) {
 
@@ -160,18 +161,230 @@ for (i <- 1 to 3; ) {
 for (i<-1 to 3; j <-1 to 3){
 }
 
+// 循环返回值, 将遍历过程中产生的值放到一个 vector 中去， 使用yield关键字
+val res = for(i<-1 to 10) yield i
+
+// yield + 代码块返回值
+val res2 = for(i<-1 to 10) yield {
+    if (i%2 == 0)
+    	i
+    else
+    	"not even"
+}
 ```
+* while 循环
+
+```scala
+while (expression) {
+    
+}
+```
+
+* 循环中断
+
+```scala
+// breakable 高阶函数，接收函数的函数
+// breakable(op: =>Unit) 接收一个没有形参，没有输出的函数，
+// breakable 对 op 抛出的异常 进行捕获处理
+// 当传入的是代码块的时候， 一般会将 小括号 转成 大括号
+breakable(
+    while (i < 20) {
+        n += 1
+        if (n == 18) {
+            break() //没有 break 关键字，只有个函数，该函数只是扔出一个异常
+        }
+    }
+)
+// 当传入的是代码块的时候， 一般会将 小括号 转成 大括号
+breakable{
+    while (i < 20) {
+        n += 1
+        if (n == 18) {
+            break() //没有 break 关键字，只有个函数，该函数只是扔出一个异常
+        }
+    }
+}
+```
+
+* 如何实现 continue
+  * 使用 if else
+  * 也可以使用循环守卫
+
 * 模式匹配: match-case
 
 
-# 方法
 
-* scala 中如果一个方法没有形参，那就可以省略其调用时的`()`
-* 
+# 函数式编程基础
+
+* 推荐递归解决问题
+* 方法和函数几乎可以等同：定义，使用，运行机制一样
+  * 函数的使用方式更加的灵活多样，（方法转函数）
+  * scala 中，函数是一等公民，函数也是对象，函数的创建不依赖类或者对象。java中的函数创建要依赖类，抽象类，或者接口。
+
+```scala
+object HelloWorld{
+    def main(args: Array[String]): Uint = {
+        val dog = new Dog
+        dog.sum(1, 2)
+        val f1 = dog.sum _ // 方法转函数
+        f1(1, 2)
+        
+        // 直接定义函数
+        val f2 = (n1: Int, n2: Int) => {
+            n1 + n2
+        }
+        f2(1, 2)
+    }
+}
+class Dog {
+    // 此处是方法， 这里还有默认值的 demo
+    def sum(n1: Int, n2: Int = 10): Int = {
+        n1 + n2
+    }
+}
+```
+
+* 函数的定义
+  * `def func_name(paraname: type):ReturnType = {func_body}`
+  * `def func_name(paraname: type) = {func_body}`: 表示自动推断返回值类型
+  * `def func_name(paraname: type){func_body}`: 表示没有返回值
+  * 如果没有return，默认认为执行的最后一句的值作为返回值
+  * 如果没有返回值，return不生效
+
+* 函数的调用机制：依旧是压栈出栈来完的
+* 细节总结：
+  * 函数如果没有形参，调用的时候可以不加括号
+  * 省略 `: Type` 会进行返回参数类型推断
+    * 使用返回值类型推断的时候 不要使用 `return` 进行返回
+  * 如果省略了 `: Type =` ： 表示该函数没有返回值，这时候即使写了 `return` 也是无效的。
+    * 如果使用`: Unit = ` ： 也是表示没有返回值，这时候即使写了 `return` 也是无效的。
+  * 如果不确定返回值类型，最好使用自动类型推断
+  * 可以方法内定义方法，函数内定义函数？
+    * 方法内定义的方法 的 **地位** 其实和普通的类方法一个级别的。
+  * scala 函数 形参默认是 **`val`** 的
+  * 递归程序不能使用类型推断！！！必须指定返回的数据类型
+  * 支持可变参数： `def sum(args: Int*)` 
+  * **过程**： 没有返回值的函数（方法）
+
+## 惰性函数
+
+* 尽可能延迟表达式求值。惰性集合在需要时提供其元素，无需预先计算他们。
+* 优点：可以将耗时的计算推迟到绝对需要的时候。
+* scala对惰性计算提供了原生的支持。
+* 当函数的返回值声明为 lazy 时，就成了惰性函数，在真正取值的时候才会被调用
+* 细节：
+  * lazy 只能修饰 val
+  * 
+
+```scala
+lazy val i = 100 // 这个变量值也是在使用的时候才会真正的分配
+lazy val res = func() //这时候并没有实际调用
+println(res) // 这时候才会真正调用！
+```
 
 
 
 # 异常处理
 
 * `throw new Exception`
+* `throw` 抛出异常，抛出的是一个 `Nothing` 类型, 可以看做 return 语句了。
+
+```scala
+try{
+    
+}catch{
+    // => 关键字： 表示后面是 异常处理代码。
+    case ex: ValueError => {}
+    case ex: Exception => {}
+}finally{
+    
+} 
+
+def test(): Nothing = {
+    throw new Exception("exception occured")
+}
+
+```
+
+* throw comment
+
+```scala
+@throws(classOf[NumberFormatException])
+def f11(a: String){
+    a.toInt
+}
+```
+
+
+
+# 面向对象基础
+
+```scala
+object Demo{
+    def main(args: Array[String]){
+        val cat = new Cat
+        // 这里实际调用的是 name_$eq 方法来设置值的。
+        cat.name = "hello"
+        println(cat.name) //这里实际上调用的是 cat.name()
+    }
+}
+
+class Cat {
+    // 默认是 private
+    // 同时会生成两个 public 方法 name()负责getter, name_$eq()，负责 setter
+    var name: String = "name" //一定是要给初始值的
+    var age: Int = _ // _ 表示默认值
+}
+```
+
+* 基本语法 `[修饰符] class 类名`，修饰符默认 public
+* 属性定义：`[修饰符] val name: Type = DefaultValue`
+  * 必须显示给初始值
+* scala 一个文件可以包含多个类， 默认都是 public 的
+
+
+
+## 方法
+
+* 方法和函数一致，在 class 里面是方法，在 object 里面是函数？
+
+## 构造器
+
+* scala 构造器包括 主构造器 和 辅助构造器
+
+```scala
+class Name[形参列表] { // 主构造器
+    def this(){      // 辅助构造器
+        
+    }
+    def this(){      // 辅助构造器
+        
+    }
+}
+
+
+// 这样 主构造器就私有化了
+class Person private (inName: String, inAge: Int) {
+    // 这部分底层实际上是包装到 一个构造函数里的
+    var name: String = inName
+    var age: Int = inAge
+    
+    age += 10
+    // 这样辅助构造器就私有化了
+    private def this(name: String){
+        this(name, 10)// 第一行一定要调用主构造器！！！！
+        
+    }
+    
+    override def toString: String = {
+        
+    }
+    // 这个地方同样被搞进了 一个构造函数里
+    name += "aa"
+}
+```
+
+* 细节：
+  * 主构造器：**实际上是将 除 函数的语句 都包装到一个 构造器里。**
+  * 辅助构造器：第一行一定要调用主构造器（直接或者间接）
 
