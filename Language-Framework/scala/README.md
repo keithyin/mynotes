@@ -85,6 +85,9 @@ class Dog {
 * Nothing: 主要只用来抛异常的
 * Any: 相当于 java 的 object
 * Char 与 Byte, Short 不能互相隐式转换, 三者可以混合计算, 计算的时候会转成 int 然后计算. Byte 和 Short 可以互相转换
+* 类型判断 `a.isInstanceOf[Int]`
+* 类型转换? `a.asInstanceOf[Int]`
+
 
 ## 强制类型转换
 * a.toInt, a.toInt(), 可能会导致精度降低或者溢出
@@ -94,6 +97,8 @@ val a: Int = 10
 val aStr: String = 10 + ""; // +个空串 就 ok 了
 aStr.to??
 ```
+
+
 
 # 标识符 (命名规范)
 
@@ -214,7 +219,7 @@ breakable{
 
 
 
-# 函数式编程基础
+# 函数式编程
 
 * 推荐递归解决问题
 * 方法和函数几乎可以等同：定义，使用，运行机制一样
@@ -282,6 +287,75 @@ lazy val res = func() //这时候并没有实际调用
 println(res) // 这时候才会真正调用！
 ```
 
+## 偏函数 partial function
+* 应用场景: 对于符合某个条件, 而非所有元素进行操作, (包在 大括号里的一堆 case)
+```scala
+val list = List(1, 2, 3, "hello")
+// Any 表示输入是 Any 类型, 返回是 Int 类型
+val parFunc = new PartialFunction[Any, Int] {
+    // 如果返回 true, 交给 apply 处理, 如果返回 false, 则不处理
+    override def isDefinedAt(x: Any) = x.isInstanceOf[Int]
+    override def apply(v1: Any) = {
+        v1.asInstanceOf[Int] + 1
+    }
+}
+// 这里不要使用 map, 使用 collect 哦
+list.collect(parFunc)
+
+// PartialFunction 的简写形式
+def f2:PartialFunction[Any, Int] = {
+    case i: Int => i + 1
+}
+
+// 更简写形式........
+list.collect{case i: Int => i + 1}
+```
+
+## 作为参数的函数
+
+```scala
+// _ 表示, 集合遍历出来的 每一个元素
+list.map(func(_))
+```
+
+## 匿名函数
+
+```scala
+// 函数表达式, (x: Double) => 3*x  , 说明是匿名函数, => 指示了匿名函数, = 是 函数使用的. 不需要返回类型!!
+// 函数 赋值个 一个变量
+val triple = (x: Double) => 3*x
+
+```
+* 匿名函数参数类型推断
+    * 参数类型可以推断时, 可以省略参数类型
+    * 当传入的函数, 只有单个参数时, 可以省去括号
+    * 如果变量只在 => 右边出现一次, 可以用 _ 来代替
+
+```
+list.map((x: Int)=> x+1)
+list.map(x => x+1)
+list.map(_ + 1)
+
+list.reduce((n1: Int, n2: Int) => n1 + n2)
+list.reduce((n1, n2)=> n1 + n2)
+list.reduce(_ + _)
+```
+
+## 高阶函数
+* 接收函数,  也可以返回一个函数
+
+```scala
+
+def test(f: Double => Double) = {
+
+}
+
+// 返回匿名函数, 这里还有一个闭包
+def test2(x: Int) = {
+    (y : Int) => x - y
+}
+
+```
 
 
 # 异常处理
@@ -865,4 +939,36 @@ tuple match {
 ```
 
 * 对象匹配
+> 如果 对象的 unpply 返回 Some集合 则认为匹配成功
+```scala
+object Square {
+    // 对象提取器: 
+    def unapply(z: Double): Option[Double] = Some(math.sqrt(z))
+    // 构造器
+    def apply(z: double): Double = z*z
+}
 
+val number: Double = 36.0
+number match {
+    // 会调用 Square 的 unapply 方法. 传入 unapply 的值是 number, 如果返回了 Some 就认为是匹配成功,  Some里面的值就赋值给了 n
+    case Square(n) => print(n)
+}
+
+```
+* for 循环中的模式匹配
+
+```scala
+for ( (k, 0) <- map) {
+    // 第二个元素是 0 的才会进去
+}
+```
+
+# 样例类
+```scala
+abstract class Amount
+
+// 会自动生成很多方法, 这玩意看起来就像是一个 脚手架, 构造器中的参数 默认是 val
+// 样例类对应的 伴生对象 也提供了 apply, unapply 方法. 会自动生成一堆方法.
+case class Dollar(value: Double) extends Amount
+```
+* 密封类: 只能在当前文件中定义.
