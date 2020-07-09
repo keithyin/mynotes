@@ -357,6 +357,26 @@ def test2(x: Int) = {
 
 ```
 
+## 函数科里化
+
+* 函数编程中，接收多个 参数的函数 都可以转化为接收 单个参数的函数，这个转化过程就是科里化。
+* 科里化只是证明了参数只需要一个参数而已。
+
+```scala
+def mul(x: Int)(y: Int) = x * y
+mul(10)(20)
+```
+
+
+
+```scala
+// 一个函数只是处理一件事情的思想
+
+```
+
+
+
+
 
 # 异常处理
 
@@ -508,6 +528,23 @@ import scala.collection.mutable._
 import scala.collecton.mutable.{HashTable=>JavaHashTable, List=>_, Other}
 
 ```
+
+## 隐式类
+
+* 动态给一个 类添加方法
+
+```scala
+// 动态给 string 添加方法
+implicit class People(s: String) {
+    def checkEq(ss: String)(f: (String, String)=> Boolean): Boolean = {
+        
+    }
+}
+```
+
+
+
+
 
 # 伴生类与伴生对象
 
