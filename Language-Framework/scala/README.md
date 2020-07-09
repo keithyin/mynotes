@@ -753,3 +753,116 @@ for (item <- videwdemo) {
 }
 ```
 
+# 操作符重载
+```scala
+class Dog {
+    def -(i: Int) {
+    
+    }
+    // dog++, 后置操作符重载
+    def ++() {
+        
+    }
+    // !dog   unary 一定要加上, 表示是 前置运算符
+    def unary_!() {
+    
+    }
+}
+
+// 中置操作符: a op b  等价于 a.op(b)
+```
+
+# 模式匹配
+* match case 模式匹配, 两个都是关键字
+* 如果都没有匹配上, 就会匹配 `case _`
+* 如果没有匹配上, 且没有 `case _` 那就回抛出异常
+* 
+
+```scala
+
+variable match {
+    case '+' => res = n1 + n2 // 默认是 break 的
+    case '-' => {
+        res = n1 - n2
+    }
+    case _ => res = n1
+}
+
+```
+* match 中的守卫
+```scala
+variable match {
+    case _ if (expression) => do something
+    case _ => do something
+    
+}
+
+varable match {
+    // 意味着 mychar varable, 这个一直是会匹配上的
+    case mychar => do something
+}
+
+// 可以有返回值哦
+val res = vari match {
+
+}
+
+```
+* 类型匹配
+
+```scala
+obj match {
+    // obj 给 a, 然后看 a 是不是 Int ? 
+    case a: Int => a
+    case b: Map[String, Int] => b
+    // 如果 _ 出现的不是最后一个, 表示的隐藏变量名, 而不是默认匹配
+    case _: Double => "double"
+    case _ => "nothing"
+}
+```
+
+* 数组匹配
+
+```scala
+
+arr match {
+    // 匹配只有一个元素, 且第一个元素为 0 的数组
+    case Array(0) => '0'
+    // 匹配有两个元素的数组, 并将两个元素 赋值给 x, y
+    case Array(x,y) => x + "=" + y
+    // 匹配 以 0 开头的数组
+    case Array(0, _*) =>
+    
+    case _ => ""
+}
+
+```
+
+* 列表匹配
+
+```scala
+list match {
+    // 只有 0 的
+    case 0 :: Nil => '0'
+    
+    case x::y::Nil => x + " " + y
+    // 0 打头的
+    case 0::tail => "0..."
+    case _ => "nothing"
+
+}
+```
+
+* 匹配元祖
+```scala
+tuple match {
+    // 第一个元素是 0 的二元组
+    case (0, _) => 
+    // 第二个元素是 0 的二元组
+    case (y, 0) =>
+}
+
+```
+
+* 对象匹配
+
