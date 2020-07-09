@@ -455,3 +455,301 @@ object Clerk{
 
 
 # scala 集合包
+
+* 同时支持 **可变集合** 和 **不可变集合** ， **不可变集合可以安全的并发访问**
+  * 不可变集合：集合本身不可变， 元素个数不可变，但是存储的值可以变换的。
+  * 可变集合：可动态增长
+* 两个主要的包
+  * `scala.collection.immutable`
+  * `scala.collection.mutable`
+* scala 默认采用不可变集合（几乎所有）。
+* 集合有三大类型： `Seq, Set, Map`
+
+## 数组
+
+```scala
+// 定长数组, scala中小括号进行索引， [泛型]
+val arr = new Array[Int](10)
+for (item <- arr) {
+    println(item)
+}
+// 可以修改
+arr(3) = 10
+
+// 第二种方式 定义数组，直接初始化数组，数组的类型和初始化的类型的是有关系的
+// 这里其实使用的 object Array
+var arr02 = Array("1", 1)
+for (index <- 0 until arr02.length) {
+    arr02(index)
+}
+```
+
+
+
+```scala
+// 变长数组
+val arr = ArrayBuffer[Int]()
+arr.append(7)
+arr.append(8)
+// 可变参数
+arr.append(7,9,0) 
+arr(0) = 10
+arr.remove(idx)
+
+// 到 定长 和 变长 之间的转换
+arr.toArray.toBuffer 
+```
+
+
+
+## 多维数组
+
+```scala
+// 创建
+val arr = Array.ofDim[Double](3,4)
+arr[1][1] = 10
+for (item <- arr) {
+    for (item2 <- item) {
+        
+    }
+}
+
+```
+
+
+
+## 元组
+
+```scala
+// 元祖最多能放 22 个元素
+// 类型 是 Tuple4
+val tuple1 = (1, 2, 3, 4, "HELLO")
+
+// 访问 元祖的第一个元素, 有两种方式
+tuple1._1 
+tuple1.productElement(0)
+
+// 遍历, 需要使用到迭代器
+for (item <- tuple1.productIterator) {
+    
+}
+```
+
+
+
+## List
+
+* `List` 只有 不可变的, 可变的是 `ListBuffer`
+* `Nil` 一个空集合
+
+```scala
+val list = List(1, 2, 3)
+val nullList = Nil // 空集合
+
+// 访问
+list(1)
+
+// 遍历
+for (item <- list) {
+    
+}
+
+// 追加元素， 原 list 没有变， 只是返回一个新的 list
+// 注意 + 的位置， 靠近 加的值
+val list2 = 4 +: list
+val list3 = list2 :+ 5
+
+// Nil 一定要放到最右边， 最右边的一定是一个集合。
+// 得到的结果是 从左到又 依次放到 Nil 集合中去
+val list5 = 1 :: 2 :: 3 :: list3 :: Nil
+// ::: list 内容展开然后放到 集合中去
+val list6 = 1 :: 2 :: 3 :: list3 ::: Nil
+```
+
+* ListBuffer: 可变的 list 集合
+
+```scala
+var lb = ListBuffer[Int](1,2,3)
+// 访问
+lb(2)
+
+// 遍历
+for (item <- lb) {
+    
+}
+
+// 添加
+lb += 10
+lb.append(11)
+lb ++= lb2 // 一个集合加到另外一个集合中去， 元素级别相加
+val lst2 = lst1 ++ lst3 // 同上
+val lst5 = lst :+ 5 // lst 不变
+val nullLb = new ListBuffer[Int]
+
+// 删除
+list.remove(10)
+```
+
+
+
+## 队列 Queue
+
+* 先入先出
+
+```scala
+val q = new mutable.Queue[Int]
+
+// 增加， 默认是增加到 队列的屁股后面的。
+q += 1
+
+q ++= list // 将 list 中的元素批量添加
+q += list // 将 list 整体加到 queue 中去
+
+// 入队列 与 出队列
+q.dequeue()
+q.enqueue(1,2,3)
+
+// 队列的 头 和 尾
+q.head // 第一个元素
+q.last // 最后一个元素
+q.tail // 返回除了第一个元素以外的所有元素 (返回的是一个队列)
+t1.tail.tail // 
+```
+
+
+
+## Map
+
+* 存的是 key-value
+* 常用的是可变的版本
+* 不可变的版本 是有序的。
+* map 的底层是  Tuple2 类型
+
+```scala
+val map = mutable.Map("a"->1, "b"->2)
+val map2 = new mutable.Map[String, Int]
+val map3 = mutable.Map(("A", 1), ("B", 2))
+// 访问, 
+val val1 = map2("a") // 如果不在里面， 会抛异常
+map2.contains("a") // 判断key 是否存在
+map2.get("a").get // 如果key存在 map2.get("a") 返回的是一个 Some， 这时候 再 get 一次即可， 如果key不存在，map2.get("a") 返回的是 None
+map2.getOrElse("a", default_value) // 有则返回， 否则 返回默认值
+// 遍历
+for ((k, v) <- map2) {
+    
+}
+
+for (k <- map2.keys) {
+    
+}
+
+for (v <- map2.values) {
+    
+}
+
+
+for (kv <- map2) {
+	// kv 是 Tuple2    
+}
+
+// 增加, 存在就更新， 不存在就添加， 如果是 immutable,Map， 值都不让改！！！
+map2("AA") = 20
+map2 += ("D"->4)
+map2 += ("D"->4, "E"->5)
+// 删除, 直接写 key 就可以了， key不存在 也不会报错
+map2 -= ("D", "E")
+
+```
+
+
+
+## Set
+
+```scala
+val set = Set(1, 2, 3)
+val mutableSet = mutable.Set(1, 2, 3)
+
+// 添加
+mutableSet += 4
+mutableSet += (4)
+
+// 删除
+mutableSet.remove(2)
+mutableSet -= 4
+
+// 遍历
+```
+
+
+
+# 集合操作
+
+* map 操作
+
+```scala
+// 高阶函数
+def test(f: Double => Double, ni: Double) {
+    f(n1)
+}
+
+// 无参的高阶函数
+def teset2(f: ()=>Unit) {
+    
+}
+
+def myPrint() {
+    println("hello world")
+}
+
+// 为什么要有 _ 这个神奇的操作， 因为 scala 中对于 无参的函数，可以不加 () 直接调用，所以如果想将一个 函数赋值一个变量的话，那就需要 后面显式的加上一个 _ 高速编译器，不要计算函数的值。
+val f1 = myPrint _
+```
+
+* `flatMap`: 如果遍历的元素是个集合， 那就继续展开
+
+* `reudceLeft, reduceRight` 从左开始算， 从右开始计算
+*  `foldLeft, foldRight`: 
+
+```scala
+val list3 = List(1, 2, 3, 4)
+// 等价于 list 3 左边 加上一个元素 5， 然后执行 reduce
+val l4 = list3.foldLeft(5)(_ - _)
+// 等价于 list3 右边 加上衣蛾元素 5， 然后执行 reduce
+val l5 = list3.foldRight(5)(_ - _)
+
+val l7 = (1 /: list3)(_ - _) // 等价于 list3.foldLeft(1)(_ - _)
+val l8 = (list3 :\ 1)(_ - _) // 等价于 list3.foldRight(1)(_ - _)
+
+```
+
+* `scanLeft, scanRight` : 保存中间结果 的 `fold...`
+
+```scala
+
+```
+
+* `zip`
+  * 两个list个数不一致，则会导致数据丢失
+
+```scala
+val list1 = List(1, 2, 3)
+val list2 = List(2, 3, 4)
+val list3 = list1.zip(list2) // [(1, 2), (2,3)] 出来的是 Tuple2
+```
+
+* 迭代器, `list.iterator()`
+  * `hasNext(), next()` 
+  * 迭代器可以直接放到 for loop 中去
+
+* `Stream`
+* `.view` 方法 : 懒加载机制！！
+
+```scala
+// 这时候时候并没有执行 filter
+val viewdemo = (1 until 10).view.filter(a => a%2 == 0)
+println(viewdemo) // 这时候也没有调用
+for (item <- videwdemo) {
+    // 遍历的时候才会真正的调用。
+}
+```
+
