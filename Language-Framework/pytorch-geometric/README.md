@@ -119,8 +119,8 @@ $$
 
 * 框架干了啥, 我们需要干啥
 * 需要继承重写的部分
-  * `message` : 表示 $\phi()$
-  * `udpate` : 表示 $\gamma()$
+  * `message` : 表示 $\phi ()$
+  * `udpate` : 表示 $\gamma ()$
   * `forward` : 里实现取 `embedding` 的操作是可以的
 
 ```python
@@ -177,3 +177,13 @@ class GCNConv(MessagePassing):
         return aggr_out
 ```
 
+
+
+## MessagePassing实现细节
+
+* 在 `pytorch-geometric` 里， `edge_index` （节点的连接关系）有两种表示方式， 一个是使用 `Tesnor` 表示，一种是使用 `SparseTensor` 表示。
+* 先看 `Tensor` 表示
+  * 在使用`Tensor` 表示的时候，`Tensor` 的shape 为 `(2, num_edges)` 即：使用边的连接来表示图，而非邻接矩阵。
+  * 在阅读`MessagePassing` 源码的时候，在 `__collect__` 里面
+* 我们看gcn论文的时候可以发现， 文章中是使用 邻接矩阵 来表示节点的相互连接关系的。
+* 
