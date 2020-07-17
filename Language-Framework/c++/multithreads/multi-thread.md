@@ -563,6 +563,94 @@ int main ()
 
 
 
+# 原子操作
+
+* 原子类型可以在 `<atomic>` 头文件中找到，**在这种类型上的所有操作都是原子的！！**
+
+  * ps: 使用 `mutex` 可以将某些操作 **模拟成原子** 的，但是原子类型上的操作 本身就是原子的。（原子类型具体怎么实现的先不用考虑）
+
+* 几乎每个原子类型都有一个 `is_lock_free()` 方法，这个方法返回 true 说明该原子类型是无锁的，如果返回false，说明该原子类型是通过 锁 模拟出来的？
+
+  * ps：这里讲的原子类型: std::atomic<> 类模板特化出来的任何类型 和 `std::atomic_flag`
+
+* `std::atomic_flag`: 只有以下两个方法
+
+  * `test_and_set()`
+  * `clear()`
+  * ps: 注意，该类没有 `is_lock_free` 哦， 因为它一定是 `lock_free` 的。
+
+* 标准的原子类型是 不可复制且不可赋值的（因为没有 复制构造函数 和 赋值运算符）
+
+  * 但是，他们支持从**相应的 内置类型 进行隐式转换并赋值**。
+  * 适当的地方还提供： `=, +=, -=, *=, |=, ++, -- ...etc` 。这些运算符还有对应的方法 `fetch_add, fetch_or, ...etc`
+
+* 原子操作的 赋值操作符 和 与其相对应的 方法 返回的值 要么是 存储的值 或者 是之前的值。因为返回的不是引用（c++许多赋值运算符的返回值是引用。），所以就避免了可能存在的 数据竞争的问题。
+
+* `std::atomic<>` 并不仅仅只是一堆特化。该模板还支持用户自定义类型。由于他是一个泛化的模板，所以其操作只限 `load(), store(), exchange(), compare_exchange_weak(), compare_exchange_strong()` 
+
+  * ps: `std::atomic<int>` 因为是 特化的，所以会有比 `std::atomic<>` 更多的方法！！！
+
+* `std::atomic<>`  类型的每个操作都可以指定一个额外的参数：`memory-order argument` ，这个参数可以指定一个我们所期望的 内存顺序语义。
+
+  |                                |                        |                        |                        |                        |                        |                        |
+  | ------------------------------ | ---------------------- | ---------------------- | ---------------------- | ---------------------- | ---------------------- | ---------------------- |
+  | `Store operations`             | `memory_order_relaxed` | `memory_order_release` | `memory_order_seq_cst` |                        |                        |                        |
+  | `Load operations`              | `memory_order_relaxed` | `memory_order_consume` | `memory_order_acquire` | `memory_order_seq_cst` |                        |                        |
+  | `Read-Modify-Write operations` | `memory_order_relaxed` | `memory_order_consume` | `memory_order_acquire` | `memory_order_release` | `memory_order_acq_rel` | `memory_order_seq_cst` |
+
+  * 默认情况下：对于所有的操作，都是 `memory_order_seq_cst` 。
+  * 需要注意的是，这个 `memory-order` 和之前提到的 原子上的操作都是原子的 是两个东西。两个是用来做不同事情的。
+
+* 为什么原子类型没有 赋值 和 拷贝操作呢？原因如下
+
+  * 原子类型上的操作都是原子的
+  *  赋值 和 构造 操作包含两个 原子对象，需要从一个原子中读，然后赋值给另一个原子。因为这是在**两个原子对象** 上的 **两个不同操作**，这种组合不能被原子化。 （为啥不能呗原子化呢？）
+  * 所以原子类型没有拷贝 和 赋值 操作
+
+
+
+## 使用 `std::atomic_flag` 实现一个自旋锁
+
+```c++
+class spinlock_mutex {
+    std::atomic_flag flag_;
+public:
+    spinlock_mutex(): flag_(ATOMIC_FLAG_INIT){}
+    void lock() {
+        // test_and_set, 将 flag 的值设置 为 true，并返回之前的值
+        while (flag.test_and_set(std::memory_order_acquire)){}
+    }
+    void unlock() {
+        //  将 flag 的值设置 为 false
+        flag.clear(std::memory_order_release);
+    }
+}
+```
+
+* 以上实现的锁可以在 `std::lock_guard` 中使用，当我们看到 `memory-order` 语义的时候，就能够明白这部分代码为什么能满足 `mutex` 的语义！！！
+* `mutex` 的语义是啥呢？mutex 内修改的值，对于后进入该mutex 的线程可见！！
+
+## `std::atomic<bool>`
+
+```c++
+std::atomic<bool> b(true);
+b = false;
+bool x = b.load(std::memory_order_require);
+b.store(true);
+x = b.exchange(false, std::memory_order_acq_rel);
+```
+
+* 新操作：`storing a new value (or not) depending on the current value`
+  * `compare_exchange_weak(), compare_exchange_strong()`
+
+
+
+## 同步操作 与 强制顺序
+
+
+
+
+
 # 参考资料
 
 [https://www.cnblogs.com/haippy/p/3237213.html](https://www.cnblogs.com/haippy/p/3237213.html)
