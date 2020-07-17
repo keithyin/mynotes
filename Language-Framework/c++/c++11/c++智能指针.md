@@ -139,19 +139,30 @@ shared_ptr<Demo> p(make_shared<Demo>());// 只会分配一次内存, 放 new Dem
 * 功能：使得 指向对象 `t` 的智能指针能够调用 `shared_from_this()` 构建更多的智能指针
   * 使得 同一个 `managered object` 只有一个 `manager object`
 * 如果不是 `t` 的智能指针调用 `shared_from_this()` ，会报错。
-* 应用场景:  类方法中 调用其它方法的时候 传入了 `this`, 而且 其形参还是个  `shared_ptr` , 这会导致 创建两个 `manager object`. 这时候使用 `enable_shared_from_this` , 然后调用 `shared_from_this()` 得到 其 `shared_ptr` , 然后就可以随便传递咯.
+* 应用场景:  
+    * 类方法中 调用其它方法, 如下面 Good 类中 JustADemo 调用了SomeFunc, SomeFunc 的形参是一个 shared_ptr, 实参是当前的对象(this). 如果 调用的对象本身是一个 shared_ptr, 如果直接将 this 传给 SomeFunc, 这就导致 this 被 两个 manager object 管理, 会导致 duoble free 的问题. 
+    * 这时候使用 `enable_shared_from_this` , 然后调用 `shared_from_this()` 得到 其 `shared_ptr` , 然后就可以随便传递咯. 这个 shared_ptr 和本身的就是同一个 manager object 了.
+    * 这里需要注意的是, 如果不是 shared_ptr 取调用 带有 `shared_from_this()` 方法时, 会报错. 
 
 ```c++
 #include <memory>
 #include <iostream>
- 
+
 struct Good: std::enable_shared_from_this<Good> // note: public inheritance
 {
   // 返回 this 指针的 shared_ptr, 共用此前的 manager object
     std::shared_ptr<Good> getptr() {
         return shared_from_this();
     }
+    
+    void JustADemo() {
+        SomeFunc(shared_from_this());
+    }
 };
+
+void SomeFunc(std::shared_ptr<Good> p) {
+    // do some thing
+}
  
 struct Bad
 {
