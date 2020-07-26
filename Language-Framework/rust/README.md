@@ -173,11 +173,17 @@ fn main() {
 
 # 所有权
 
-* rust 通过所有权机制 管理内存，编译器在 **编译的时候** 就会根据 **所有权规则** 对内存的使用进行检查
-* 堆和栈 （与C，C++一样）
-  * 如何判断 rust 的数据是分配在栈上 还是 堆上？
-    * 定长的变量是放在 栈上的，编译时，长度不固定的变量 是放在堆上的。
+* rust 通过 **所有权机制 管理内存**，编译器在 **编译的时候** 就会根据 **所有权规则** 对内存的使用进行检查
+* **所有权是谁的所有权** ：这里我的理解是　**堆 memory 的 所有权**，因为 栈memory的回收是不需要程序员考虑的，出栈了必定会被回收。
 * 作用域： {} 是一个作用域，这个和 C/C++ 一样。
+* 所有权规则
+  * Each value in Rust has a variable that’s called its *owner*.
+    * 有变量名的值 才有 owner，值的owner为变量名
+  * There can only be one owner at a time.
+    * 一个值在同一时刻 只能有一个 owner
+  * When the owner goes out of scope, the value will be dropped.
+    * owner 出了作用域之后，对应的 值 会被销毁
+  * 这里 值 表示的是 堆数据？？
 
 ```rust
 fn main() {
@@ -203,7 +209,12 @@ fn main() {
 
 ```
 
-* 移动
+## 移动： （move）
+
+* 这个移动其实和 c++ 中的概念是差不多的
+* 如何判断 移动后的变量是否可以使用？
+  * 如果 变量 是 堆内存的 owner，那么移动之后就不可再使用
+  * 如果变量 仅仅是 栈内存的 owner，那么移动后可以继续使用。所以这个移动操作 对于 栈上的数据来说，仅仅是 copy
 
 ```rust
 fn main() {
@@ -216,20 +227,16 @@ fn main() {
     let s2 = s1;
     println!(s2);
     println!(s1); // 这里会报错： borrowed after move
-}
-```
+    
+    let x = 5;
+    let y = x;
 
-* clone
-
-```rust
-fn main() {
-    let s1 = String::from("hello");
-    // 深拷贝咯
-    let s2 = s1.clone();
+    println!("x = {}, y = {}", x, y); // 这里就可以直接运行
 }
 ```
 
 * 栈上数据拷贝
+  * 具有 copy trait 的类型，在 `=` 之后都可以继续使用。
   * 常用 具有 copy trait 的类型有：
     * 整数，浮点型，bool，字符类型，元祖
 
@@ -271,9 +278,7 @@ fn main() {
 }
 ```
 
-
-
-* 说的所有权，说的是谁的所有权？
+* 所有权 与 函数
 
 ```rust
 fn gives_ownership() -> String {
@@ -293,13 +298,15 @@ fn main() {
 }
 ```
 
+## 引用
 
-
-
-
-# 引用
-
-* 使用引用，而非所有权转移
+* 语义： 
+  * 原始对象的引用，而非所有权转移
+  * 不能通过引用来修改原始对象：因为不具有所有权，所以不允许修改
+  * 形参与实参：形参 `param: &Type` , 实参传递的时候也必须是引用，对于非引用 `obj` 使用 `&obj`, 对于引用 `obj` 直接传就好了。如果将引用也看做一个类型的话，上述的规则就比较容易理解了。这点和 `c++` 不一样。
+* 语法
+  * `&obj` ： 获取对象的引用 （其实也就是指针。）
+  * `*(&obj)`: 解引用。目前不知道是干嘛用的。
 
 ```rust
 fn len(s: &String) -> usize {
@@ -329,9 +336,12 @@ fn main() {
 }
 ```
 
+## 借用 borrow / mutable reference
 
-
-* 借用（borrow）: 形参 和 实参 加个 `mut` 就可以了。借用是什么语义呢？
+* 语法：见代码片段
+* 语义：
+  * 在一个特定的scope中，一个对象 最多只能有一个 borrow
+  * 有了 mutable reference 之后，之前的 immutable reference 和 原始 obj 都不能被使用
 
 ```rust
 fn modify(s: &mut String) {
@@ -346,11 +356,13 @@ fn main() {
 }
 ```
 
+## Slice （a different kind of reference）
 
-
-# Slice
-
-
+* 语法：见代码片段
+* 语义：
+  * `slice` 不具有 ownership
+  *  Slices let you reference a contiguous sequence of elements in a collection rather than the whole collection.
+  * 
 
 ```rust
 fn main () {
@@ -363,7 +375,7 @@ fn main () {
     let h = &h[..]; // 从头到尾
     
     let h = "hhhh"; // 字面值就是一个 slice，不可变的引用。 结构体（len, begin, cap）
-    let h = [1, 2, 3, 4];  // 定义的一个数组
+    let h = [1, 2, 3, 4];  // 定义的一个数组， 也是一个 slice
     
     
 }
@@ -609,7 +621,111 @@ fn main() {
 // 6. 遍历：chars，bytes
 
 fn main() {
+    // 创建一个空字符串
+    let mut s0 = String::new();
+    s0.push_str("hello");
+    
+    // 创建一个有初始值的
+    let s1 = String::from("hello");
+    let s1 = "hello".to_string();
+    
+    // 更新字符串
+    let mut s2 = String::from("hello");
+    s2.push_str(" world");
+    s2.push('c'); // 添加一个字符
+    let s3 = s0 + &s2; // s0 的所有权会移交给 s3.
+    
+    let s_fmtted = format!("{}-{}-{}", s0, s1, s2); // format 宏 和 print！ 是一样的， 不会剥夺所有权。
+    
+    // 遍历
+    //chars
+    let s4 = String::from("你好");
+    for c in s4.chars() {
+        println!("{}", c) // 能把 你， 好，打印出来
+    }
+    for b in s4.bytes() {
+        println!("{}", b) //按照字节打印，打印的是每个字节的的值
+    }
+    
+    // String
+    
     
 }
 ```
+
+
+
+# HashMap
+
+```rust
+// 1. HashMap<K, V>
+// 2. 创建 hashmap
+// 3. 读取 
+// 4. 遍历
+// 5. 更新
+use std::collections::HashMap;
+
+fn main() {
+    let mut scores: HashMap<String, i32> = HashMap::new();
+    scores.insert(String::from("bob"), 10);
+    scores.insert(String::from("hh"), 11);
+    
+    let keys = vec!(String::from("hello"), String::from("world"));
+    let vals = vec!(10, 20);
+    let scores: HashMap<_, _> = keys.iter().zip(vals.iter()).collect();
+    
+    let v = scores.get(&String::from("hello"));
+    
+    // 遍历
+    for (key, value) in &scores {
+        println!("{}-{}", key, value);
+    }
+    println!("{:?}", scores);
+    
+    // 没有的时候才会插入
+    scores.entry(String::from("bb")).or_insert(4);
+    
+
+}
+```
+
+
+
+# 包
+
+* 包：`cargo` 的给一个功能，允许 构建，测试，分享create
+* create：一个模块的树形结构，形成库或二进制项目
+* 模块：通过 use 来使用，用来控制作用域和路径的私有性
+* 路径：一个命名例如结构体、函数或模块等项的方式。
+* 包与create
+  * 包提供一系列功能的一个或多个create
+  * create root 是 src/main.rs 或者是 src/lib.rs。如果只有 main.rs，则说明这个包只有一个 create。如果同时包含 main.rs 和 其他的 lib.rs，则说明有多个 create
+  * create 会将一个作用域的相关功能 分组到一起，使得该功能可以很方便的在多个项目之间共享
+* 使用模块控制作用域和私有性
+  * 创建一个 lib 可以通过 `cargo new --lib libname` 来进行创建
+  * 默认所有项（函数，方法，结构体，枚举，模块，常量） 都是私有的，需要使用 `pub` 才能暴露给外部
+
+```rust
+mod factory {
+    mod factory2 {
+        fn produce() {
+            
+        }
+    }
+}
+
+mod public_mod {
+    pub mod public_mode_inner {
+        pub produce() {
+            
+        }
+    }
+}
+
+fn main() {
+    factory::factory2::produce();
+}
+```
+
+
 

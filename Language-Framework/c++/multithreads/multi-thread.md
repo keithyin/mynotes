@@ -645,7 +645,217 @@ x = b.exchange(false, std::memory_order_acq_rel);
 
 
 
-## 同步操作 与 强制顺序
+## Memory Order
+
+### 程序的乱序执行
+
+* 程序是乱序执行的
+
+  * 同一线程中，彼此 **没有依赖关系** 的指令有可能会被乱序执行。有依赖关系的还是顺序执行的。
+  * 但是在单线程程序中，乱序执行并不会对程序执行的结果造成什么影响
+  * 这里主要关注读写执行，因为他们会产生外部可见的影响
+
+* 乱序执行的原因：
+
+  * 编译器优化：
+    * 编译器优化的目标保证的是 单线程运行的 正确性。
+    * 编译器优化的时候可能会打乱 源码 的指令顺序
+  * 处理器乱序执行：防止 l1 cache miss 导致 cpu 等待太久
+    * l1 cache 读取数据一般是 一个 cycle
+    * memory 读取数据一般就得是 100 个 cycle 了
+  * 存储系统
+    * 一般认为：一旦数据到 l2 cache，那么所有的cpu看到的数据就是一致的。
+    * cpu写指令结束后，数据只是放到了 store buffer 中，还没有进入 l2 cache，意味着不同cpu看到的数据可能不一致。
+  * on-chip network
+
+  ### 乱序执行的后果
+
+  ```c++
+  // 初始 x = y = 0
+  // 线程 1
+  
+  {
+      x = 1;  // 这里 x = 1，y=1 的顺序可能会被编译器（或者CPU）调换
+  	y = 1;
+  }
+  
+  // 线程2
+  
+  if (y == 1) {
+      assert (x == 1); //这里assert 可能会失败
+  }
+  ```
+
+  * if 的条件也是可以和之前的 代码 `out-of-order` 的
+
+  ```c++
+  // 源码
+  x = 1;
+  if (y == 0) {
+      do_something
+  }
+  
+  // 编译器优化后的代码（可能是）
+  register = (y == 0);
+  x = 1;
+  if (register) {
+      
+  }
+  ```
+
+  * if 里面的代码也有可能搞到 if 的外面去。。。
+
+  ```c++
+  // 源码
+  if (y == 0) {
+      read x;
+  }
+  
+  // 编译器优化后（可能是）
+  read x;
+  if (y == 0) {
+      x;
+  }
+  ```
+
+  
+
+  * 乱序执行不可避免
+  * 如果读写指令所涉及的变量不是 线程之间共享变量，那么乱序执行不会产生坏的影响
+  * 如果读写指令所涉及的变量是 线程间共享变量，程序员则需要告诉编译器和处理器。告诉的方式就是 锁 或者 原子操作
+    * 当临界区包含多条指令时，使用 锁
+    * 当临界区只包含一个整数 或者 指针操作时，使用原子变量
+
+
+
+### Acquire & Release 一致性
+
+* `acquire` ：表示的是 获取锁操作
+  * 之后的 **所有指令（读写）**，不会早于该指令执行 （这是为了保证 **源码中的临界区** 为 **执行时的临界区**）
+  * 后面的指令一定会乖乖的呆在后面
+* `release`: 表示的是 释放锁 操作
+  * 之前的**所有指令都已经执行完（尤其是写指令）** ，并且已经 **全局可见** 
+  * 前面的指令 一定会在 `release` 之前执行完。（这里是为了保证，临界区的修改结束之后，全局可见。）
+* `acquire & release`  编译器级别的实现
+  * acquire 和 release 操作的内部实现需要利用 memory barrier
+  * acquire 和 release 操作由汇编语言编写，因此可以排除编译器优化的影响，同时通过汇编语言也可以方便的嵌入 memory barrier 指令
+  * 当编译器看到 memory barrier 时，不会把 acquire 后面的指令挪到 acquire 前面，也不会把 release前面的指令移动到 release 后面。
+  * 编译器不能把一个函数调用后面的指令挪到该函数调用的前面，也不能将一个函数调用前面的指令挪到该函数调用的后面，因为编译器不知道该函数调用内部是否使用了 memory-barrier指令。
+* `acquire & release`  cpu级别的实现
+  * PowerPC 的 lwsync 指令是 memory barrier 指令，其工作原理是堵在 处理器流水线的入口，不让后续指令进入流水线，直到前面已经进入流水线的指令完成，并且 store buffer 清空。
+  * 逻辑上看，lwsync 保证它前面的指令不会被挪到它后面，它后面的指令不会被挪到它前面。因此是一个双向的 memory-barrier
+  * cpu流水线第一级是 取指令，当取到 lwsync 指令的时候，就堵着不让后面的指令进来。
+
+```c++
+/*cpu memory-barrier 如何 实现 acquire-release*/
+// 线程 1
+acquire;
+write x;
+lwsync;
+Ready = 1;
+
+// 线程2
+While(Ready != 1) {}
+lwsync;
+read x;
+release;
+```
+
+* 单独的 `memory barrier` 指令代价太大，原因如下
+  * 无论是编译器导致的 out-of-order 还是 cpu导致的 out-of-order 都是为了更好的优化代码
+  * `memory-barrier` 导致的后面的不能前，前面的不能往后，限制了编译器和CPU优化的能力
+
+* 合并的 `acquire` 和 `release` (解决 单独的 memory-barrier 指令代价大的问题)
+  * Inter IA64处理器将 Memory-Barrier指令和 `Ready` 读写指令进行合并，提供了 带 acquire 语义的读指令 `ld.acq` （`acquire_load`） 和 带 release 语义的写指令 `st.rel` （`release store`） 。
+  * 这样的好处是 增加了 编译优化的可能性。
+  * 锁的底层实现实际就是 `acquire-load` 和 `release-store`
+  * 原子变量默认情况下也是 `release-store` 和 `acquire-load` ？
+
+```c++
+// thread 1
+acquire;
+write x;
+st.rel ready 1; // release store
+read/write y; // 该条指令可以往前挪了，也可以保证 acquire-release 语义的正确性
+
+// thread 2
+read/write z; // 该条指令可以往后挪了，也可以保证 acquire-release 语义的正确性
+ld.acq r0, ready; // acquire load
+read x;
+release;
+```
+
+### Sequential Consistence
+
+* acquire-release 不保证全局序
+  * 以下代码 可能 都被打印出来。
+  * 原因是 `on-chip network` ： cpu 之间的消息传递有快有慢？？？？。
+
+```c++
+// x, y is std::atomic
+// thread 1
+x = 1;
+
+// thread 2
+y = 1;
+
+// thread3
+if (x == 1 && y == 0) {
+    print("x first");
+}
+
+// thread 4
+
+if (y == 1 && x == 0) {
+    print("y first")
+}
+```
+
+* Sequential Consistence
+  * on-chip network保证消息传播的序，即先**传播 x=1**  到所有的处理器，等到所有的处理器都收到 x =1 之后，再传播 y = 1；反之亦然。总之：**写操作串行的使用片上网络**，从而片上网络这一层有了全局序。
+  * 如果是 `std::atomic` 是 `sc` 那么上面代码永远不可能两个同时打印。
+
+
+
+### Relaxed Memory Order
+
+* x86上性能提升有限。不建议使用。
+
+* C++ 几种 `memory-order` 总结
+  * `memory_order_relaxed` : 用于 `load/store` 操作是原子的，但是没有顺序的保证 
+  * `memory_order_release`： 用于 `store`，表示 `release` 语义
+  * `memory_order_acquire` ：用于 `load`, 表示 `acquire` 语义
+  * `memory_order_acq_rel` ：用于 `load` 或者 `store`, 对于 `store` 表示 `release`, 对于 `load` 表示 `acquire` 语义
+  * `memory_order_seq_cst` ： 用于 `load/store`，表示顺序一致性
+  * `memory_order_consume`：用于 `load`，表示 `consume` 语义。 （不建议使用！）
+  * 其他的组合则是没有意义的。
+* **线程启动** 和 **线程 join** 里面都是有 `memory-barrier` 的。
+
+* `Relaxed Memory Order` 应用场景
+  * **只保证操作的原子性**， 不保证 `memory-order`
+  * 计数器
+  * 简单标志。
+
+### Singleton常见错误
+
+```c++
+// 错误示例
+MyClass *get_instance() {
+    if (p == nullptr) { // 在没有锁的情况下 访问了共享数据，导致 race
+        mutex.lock();
+        if (p == nullptr) {
+            p = new MyClass;
+        }
+        mutex.unlock();
+    }
+}
+
+// 原因详解, p = new Myclass 实际是拆成两部分实现的
+p = malloc(sizeof(MyClass)); // 这个时候 p 已经不是 nullptr 了。
+new(p) MyClass();
+```
+
+
 
 
 
