@@ -3,7 +3,8 @@
 * `Variable`
 * `Parameter` : `persistable=True` 的 `Variable`, 不同的 `iteration` 之间, 状态会被保留, `Parameter` 是在 `global block` 下创建的
 
-> 感觉`Parameter(Variable)` 是和 `block` 独立的东西. 甚至是和 `program` 独立的东西. `Program` 存的只是`op` 而已, 存的是 `Variable` 读,写 `op`. 真正的变量是在 `Scope` 中的.
+> 感觉`Parameter(Variable)` 是和 `block, program` 独立的东西. `Program 的 Block` 存的只是`op` 而已, 存的是 `Variable` 读,写 `op`. 真正的变量是在 `Scope` 中的.
+> `Scope` 代码在 python 追不到很深....
 
 
 
@@ -11,12 +12,14 @@
   * `fluid.default_startup_program()` : 模型变量的初始化 由此 `program` 负责
   * `fluid.default_main_program()`: 其它 op 由此 `program` 负责
   * 创建的`Parameter`都在当前 `program` 的 `global_block()` 下
+  
 * `Block` : c++ 中作用域的概念, 一个 `Program` 由多个 `Block` 构成
   * `if else Block`, `switch case Block`, `while Block`
   * 所以整体结构为: 
     * 整体的计算图由多个Program构成
     * Program中有很多Block
     * Block中存在很多operation
+    * 实际的参数 乖乖的 存在 Scope 里.... 和 Program 无关. 估计是通过名字来对应上的.
 * `fluid.Executor(place=fluid.CPUPlace())`
   * `Executor` 核心执行模块, 负责编译 `program` 并执行, 一次执行整个 `program` , 这个和 `tensorflow` 有区别, `tensorflow` 每次只是执行和 `fetch` 相关的子图
 
