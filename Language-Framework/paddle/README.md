@@ -97,6 +97,89 @@ for block in main_prog.blocks:
         pd_param.set(np.ones(param.shape), place)
         print("After setting the numpy array value: {}".format(np.array(pd_param).ravel()[:5]))
 ```
+# Scope
+* scope: (scope 是用来记录  变量名 与 变量 映射关系的地方 ) 用来表示变量名的作用空间, 可能是用在变量复用上的.
+	* scope_guard, 就是 c++ 的 大括号
+    * scope 是实际保存变量的地方, 一个 program 可以在不同的 scope 里运行, 应该是通过变量的名字 和 program 的变量 reader 结合起来的.
+```python
+import paddle
+from paddle import fluid
+import numpy as np
+
+def Model():
+    data = fluid.layers.data(name="data", shape=[1], dtype="float32")
+    label = fluid.layers.data(name="label", shape=[1], dtype="int64")
+
+    prediction = fluid.layers.fc(input=data, size=2, act='sigmoid')
+    loss = fluid.layers.cross_entropy(input=prediction, label=label)
+
+    loss = fluid.layers.mean(loss)
+    loss = fluid.layers.Print(loss, message="loss")
+    sgd = fluid.optimizer.SGD(learning_rate=0.001)
+    sgd.minimize(loss)
+
+    return data, label, loss
+
+
+firstscope = fluid.Scope()
+first_startup_program = fluid.Program()
+first_main_program = fluid.Program()
+
+with fluid.scope_guard(firstscope):
+    with fluid.program_guard(first_main_program, first_startup_program):
+        with fluid.unique_name.guard():
+            vars_of_interest = Model()
+first_use_vars = vars_of_interest[:2]
+
+secondscope = fluid.Scope()
+second_startup_program = fluid.Program()
+second_main_program = fluid.Program()
+with fluid.scope_guard(secondscope):
+    with fluid.program_guard(second_main_program, second_startup_program):
+        with fluid.unique_name.guard():
+            vars_of_interest = Model()
+
+second_use_vars = vars_of_interest[:2]
+
+
+exe = fluid.Executor(fluid.CPUPlace())
+
+exe.run(first_startup_program, scope=firstscope)
+exe.run(second_startup_program, scope=secondscope)
+
+exe.run(second_main_program, feed={second_use_vars[0].name: np.array([[10.], [11.], [
+        12.]], dtype=np.float32), second_use_vars[1].name: np.array([[1], [0], [1]], dtype=np.int64)}, scope=firstscope)
+```
+
+```python
+import paddle.fluid as fluid
+import numpy
+
+new_scope = fluid.Scope()
+with fluid.scope_guard(new_scope):
+
+    fluid.global_scope().var("data").get_tensor().set(numpy.ones((1, 2)), fluid.CPUPlace())
+
+# new_scope 中找不到, 就去 上一级的 scope 中找了
+data = numpy.array(new_scope.find_var("data").get_tensor())
+print(data)  # [[1. 1.]]
+```
+
+```python
+import paddle.fluid as fluid
+import numpy
+
+new_scope = fluid.Scope()
+with fluid.scope_guard(new_scope):
+
+    fluid.global_scope().var("data").get_tensor().set(numpy.ones((1, 2)), fluid.CPUPlace())
+    new_scope.var("data").get_tensor().set(numpy.zeros((1, 2)), fluid.CPUPlace())
+
+# new_scope 中能找到, 就取 new_scope 中的值了
+data = numpy.array(new_scope.find_var("data").get_tensor())
+print(data)  # [[0. 0.]]
+```
+
 
 # 为什么要 start_program & main_program
 
