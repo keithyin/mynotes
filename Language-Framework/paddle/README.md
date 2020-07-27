@@ -114,7 +114,22 @@ return self.main_program.global_block().create_parameter(
 
 * start_program 中只存放了 Parameter 的初始化 op, 他还干了其它工作?  未知....
 
+# 参数复用
 
+```python
+import paddle.fluid as fluid
+with fluid.unique_name.guard():
+    name_1 = fluid.unique_name.generate('fc')
+with fluid.unique_name.guard():
+    name_2 = fluid.unique_name.generate('fc')
+print(name_1, name_2)  # fc_0, fc_0
+
+with fluid.unique_name.guard('A'):
+    name_1 = fluid.unique_name.generate('fc')
+with fluid.unique_name.guard('B'):
+    name_2 = fluid.unique_name.generate('fc')
+print(name_1, name_2)  # Afc_0, Bfc_0
+```
 
 # 解析 fluid.layers.fc
 
