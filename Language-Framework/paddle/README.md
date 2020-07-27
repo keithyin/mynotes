@@ -98,9 +98,21 @@ for block in main_prog.blocks:
         print("After setting the numpy array value: {}".format(np.array(pd_param).ravel()[:5]))
 ```
 
+# 为什么要 start_program & main_program
 
+* start_program 里面存了 Parameter 的初始化 op, 而 main_program 中确没有. 这个可以从 LayerHelper.create_parameter 代码中看出
 
+```python
+self.startup_program.global_block().create_parameter(
+                dtype=dtype,
+                shape=shape,
+                type=type,
+                **attr._to_kwargs(with_initializer=True)) # 就是多了一个 with_initializer = True
+return self.main_program.global_block().create_parameter(
+		dtype=dtype, shape=shape, type=type, **attr._to_kwargs())
+```
 
+* start_program 中只存放了 Parameter 的初始化 op, 他还干了其它工作?  未知....
 
 
 
