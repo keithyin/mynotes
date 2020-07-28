@@ -433,7 +433,38 @@ with fluid.unique_name.guard('B'):
 print(name_1, name_2)  # Afc_0, Bfc_0
 ```
 
+# LoD Tensor
+* level-of-Detail (LoD): 比较适合 变长序列. 对于非变长的: lod_level=0
+* [LoD](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.5/user_guides/howto/basic_concept/lod_tensor.html#id2)
+```
+# 1-level
+3       1   2
+| | |   |   | |
 
+# 2-level
+3            1 2
+3   2  4     1 2  3
+||| || ||||  | || |||
+
+# lod 信息 [[3，1，2]/*level=0*/，[3，2，4，1，2，3]/*level=1*/]
+
+```
+```python
+# 1-level lod
+# 假设一个mini-batch中有3个句子，每个句子中分别包含3个、1个和2个单词。我们可以用(3+1+2)xD维Tensor 加上一些索引信息来表示这个mini-batch
+# 这个值 feed 进去 program 里面就好
+a = fluid.create_lod_tensor(np.array([[1.1], [2.2],[3.3],[4.4], [5.5], [6.6]]).astype('float32'), [[3, 1, 2]], fluid.CPUPlace())
+
+# 2-level lod
+a = fluid.create_lod_tensor(np.array([[1],[1],[1],
+                                  [1],[1],
+                                  [1],[1],[1],[1],
+                                  [1],
+                                  [1],[1],
+                                  [1],[1],[1]]).astype('int64') ,
+                          [[3,1,2] , [3,2,4,1,2,3]],
+                          fluid.CPUPlace())
+```
 
 # 输入流水线
 
