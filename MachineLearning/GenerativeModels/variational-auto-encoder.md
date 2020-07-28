@@ -85,7 +85,7 @@ $$
 **Path-Wise Estimator**
 
 * e.g. re-parameterization trick
-* 假设 $q(z|\lambda)$ 为一个高斯分布, 那么模型预测出来的就是 均值和 方差, $q(z)$ 的采样通过 $u ~ N(0, 1); z = (u+\mu) * \sigma$
+* 假设 $q(z|\lambda)$ 为一个高斯分布, 那么模型预测出来的就是 均值和 方差, $q(z)$ 的采样通过 $u \text{~} N(0, 1); z = (u+\mu) * \sigma$
 
 
 
