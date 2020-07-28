@@ -66,7 +66,8 @@ $$
 
 * 上面的式子就叫做 score function estimator， 或者 likelihood ratio 或者 REINFORCE  gradient。
 * $\mathbf z^i \sim q(\mathbf z; \lambda)$ , **采样计算梯度**
-* 这个算法基本不 work， 因为梯度估计的方差太大。
+* 这个算法基本不 work， 因为梯度估计的方差太大。 (具体指的是 求期望的那个式子的方差大)
+
 
 
 
