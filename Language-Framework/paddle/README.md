@@ -413,6 +413,8 @@ class LayerHelper(LayerHelperBase):
 
 
 # 几个上下文管理器
+* 不会影响 `fliud.layers.data()` 中名字, 里面的 `name` 参数设置成啥就是啥
+* 影响的是 op 的名字, tensor 的名字, 和 variable 的名字.
 
 ```python
 # 重置唯一名字计数器, 在相同的 program 中, 会起到参数复用的效果?
