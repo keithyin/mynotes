@@ -197,6 +197,12 @@ int main()
 
 
 
+# 如何正确的使用 智能指针
+
+https://www.modernescpp.com/index.php/c-core-guidelines-rules-to-smart-pointers
+
+https://stackoverflow.com/questions/2454214/is-it-a-good-practice-to-always-use-smart-pointers
+
 
 
 ## 参考资料
