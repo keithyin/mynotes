@@ -112,6 +112,16 @@ main_program.global_block().var(name) # 这些 var, 可以是模型参数, 可�
 main_program.global_block().all_parameters() # 返回模型参数
 ```
 
+```python
+for param in program.global_block().all_parameters():
+	name = param.name
+	var = scope.find_var(name)
+    if var is None:
+        print("var: %s is not in scope" % (name))
+        return
+    batch_size_tensor = var.get_tensor()
+    ori_array = np.array(batch_size_tensor)
+```
 
 # Scope
 * scope: (scope 是用来记录  变量名 与 变量 映射关系的地方 ) 用来表示变量名的作用空间, 可能是用在变量复用上的.
