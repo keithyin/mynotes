@@ -39,6 +39,21 @@ mul.o: mul.c
 	gcc -c mul.c
 ```
 
+一个Make 编译多个目标, all 一下即可
+```cmake
+all: bin/my_data_generator bin/my_data_generator_adfea
+
+bin/my_data_generator : bsvp_generator.cpp
+	/opt/compiler/gcc-4.8.2/bin/g++ bsvp_generator.cpp -std=c++11 -o bin/my_data_generator
+
+bin/my_data_generator_adfea:  bsvp_generator_adfea.cpp
+	/opt/compiler/gcc-4.8.2/bin/g++ bsvp_generator_adfea.cpp -std=c++11 -o bin/my_data_generator_adfea
+
+
+clean:
+	rm bin/my_data_generator
+	rm bin/my_data_generator_adfea
+```
 
 
 
