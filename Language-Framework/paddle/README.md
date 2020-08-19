@@ -100,10 +100,24 @@ for block in main_prog.blocks:
         pd_param.set(np.ones(param.shape), place)
         print("After setting the numpy array value: {}".format(np.array(pd_param).ravel()[:5]))
 ```
+
+# Block
+* program的基本构成单元
+
+常用api
+```python
+
+main_program.global_block().has_var(name)
+main_program.global_block().var(name) # 这些 var, 可以是模型参数, 可以 tensor (临时变量)
+main_program.global_block().all_parameters() # 返回模型参数
+```
+
+
 # Scope
 * scope: (scope 是用来记录  变量名 与 变量 映射关系的地方 ) 用来表示变量名的作用空间, 可能是用在变量复用上的.
 	* scope_guard, 就是 c++ 的 大括号
     * scope 是实际保存变量的地方, 一个 program 可以在不同的 scope 里运行, 应该是通过变量的名字 和 program 的变量 reader 结合起来的.
+    * 只存 persistable=True 的变量 ?
 ```python
 import paddle
 from paddle import fluid
