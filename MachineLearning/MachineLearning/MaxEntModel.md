@@ -26,7 +26,13 @@ $$
 $$
 
 * 其中 $f(x)=x$ 或者 $f(x)=x^2$ 或者 ......
-* 
+* objective:
+
+$$
+\max\Bigr( -\sum p_{model}(x)\log p_{model}(x)\Bigr)
+$$
+
+
 
 
 
