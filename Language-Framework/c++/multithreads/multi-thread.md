@@ -657,37 +657,41 @@ x = b.exchange(false, std::memory_order_acq_rel);
 
 * 乱序执行的原因：
 
-  * 编译器优化：
+  * 编译器优化:  
     * 编译器优化的目标保证的是 单线程运行的 正确性。
     * 编译器优化的时候可能会打乱 源码 的指令顺序
-  * 处理器乱序执行：防止 l1 cache miss 导致 cpu 等待太久
+  * 处理器乱序执行：防止 l1 cache miss 导致 cpu 等待太久  (体系结构的书会讲)
     * l1 cache 读取数据一般是 一个 cycle
-    * memory 读取数据一般就得是 100 个 cycle 了
+    * memory 读取数据一般就得是 100 个 cycle 了 
   * 存储系统
     * 一般认为：一旦数据到 l2 cache，那么所有的cpu看到的数据就是一致的。
     * cpu写指令结束后，数据只是放到了 store buffer 中，还没有进入 l2 cache，意味着不同cpu看到的数据可能不一致。
-  * on-chip network
+  * on-chip network:
+  * cpu core 之间的数据传输的速度导致, 相同时间 不同 cpu 看到的数据是不一样的.
+    * 有 l2 为啥还需要 cpu core 之间的数据直接传递?
 
+  
+  
   ### 乱序执行的后果
-
+  
   ```c++
   // 初始 x = y = 0
   // 线程 1
   
   {
-      x = 1;  // 这里 x = 1，y=1 的顺序可能会被编译器（或者CPU）调换
+    x = 1;  // 这里 x = 1，y=1 的顺序可能会被编译器（或者CPU）调换
   	y = 1;
   }
   
   // 线程2
   
-  if (y == 1) {
+if (y == 1) {
       assert (x == 1); //这里assert 可能会失败
-  }
+}
   ```
-
+  
   * if 的条件也是可以和之前的 代码 `out-of-order` 的
-
+  
   ```c++
   // 源码
   x = 1;
@@ -698,13 +702,13 @@ x = b.exchange(false, std::memory_order_acq_rel);
   // 编译器优化后的代码（可能是）
   register = (y == 0);
   x = 1;
-  if (register) {
+if (register) {
       
-  }
+}
   ```
-
+  
   * if 里面的代码也有可能搞到 if 的外面去。。。
-
+  
   ```c++
   // 源码
   if (y == 0) {
@@ -713,36 +717,61 @@ x = b.exchange(false, std::memory_order_acq_rel);
   
   // 编译器优化后（可能是）
   read x;
-  if (y == 0) {
+if (y == 0) {
       x;
-  }
+}
   ```
-
   
-
-  * 乱序执行不可避免
+  * **乱序执行不可避免**
   * 如果读写指令所涉及的变量不是 线程之间共享变量，那么乱序执行不会产生坏的影响
   * 如果读写指令所涉及的变量是 线程间共享变量，程序员则需要告诉编译器和处理器。告诉的方式就是 锁 或者 原子操作
     * 当临界区包含多条指令时，使用 锁
     * 当临界区只包含一个整数 或者 指针操作时，使用原子变量
+  * **有 write 才会有 race**
 
 
 
 ### Acquire & Release 一致性
 
-* `acquire` ：表示的是 获取锁操作
+* `acquire` ：表示的是 获取锁操作  (取得一把锁, 叫做 acquire)
   * 之后的 **所有指令（读写）**，不会早于该指令执行 （这是为了保证 **源码中的临界区** 为 **执行时的临界区**）
   * 后面的指令一定会乖乖的呆在后面
-* `release`: 表示的是 释放锁 操作
+  * 为什么是这个语义: 因为获得锁, 之后一定是要操作 共享变量了, 如果将后面的指令拿到 acquire 前面, 那就有悖锁的功能了.
+* `release`: 表示的是 释放锁 操作  (释放一把锁, 称之为 release)
   * 之前的**所有指令都已经执行完（尤其是写指令）** ，并且已经 **全局可见** 
   * 前面的指令 一定会在 `release` 之前执行完。（这里是为了保证，临界区的修改结束之后，全局可见。）
+  * 为什么是这个语义: 释放锁的时候,我们是期望修改已经全局可见了, 所以 release前面的指令不能移动到 release 的后面.
+
+
+
+### Acquire & Release 的庄严承诺
+
+```c++
+// thread 1
+acquire lock;
+write x;
+release lock; //庄严承诺: 当执行 release 操作时, x已经写入内存系统, 并且全局可见.
+// 执行 realse 操作时? 是执行之前就全局可见了, 还是执行中 全局可见, 还是执行后 全局可见.
+// release 时候到底干了啥?
+
+
+// thread 2
+acquire lock; //庄严承诺: 在执行 acquire 时, 后面的 read x 操作还没有开始. acquire 到底干了啥?
+read x;
+release lock;
+```
+
+
+
+### Acquire & Release 的实现
+
 * `acquire & release`  编译器级别的实现
   * acquire 和 release 操作的内部实现需要利用 memory barrier
   * acquire 和 release 操作由汇编语言编写，因此可以排除编译器优化的影响，同时通过汇编语言也可以方便的嵌入 memory barrier 指令
-  * 当编译器看到 memory barrier 时，不会把 acquire 后面的指令挪到 acquire 前面，也不会把 release前面的指令移动到 release 后面。
+  * 当编译器看到 memory barrier 时，不会把 acquire 后面的指令挪到 acquire 前面，也不会把 release前面的指令移动到 release 后面。 (**解决了 编译器的乱序!**)
   * 编译器不能把一个函数调用后面的指令挪到该函数调用的前面，也不能将一个函数调用前面的指令挪到该函数调用的后面，因为编译器不知道该函数调用内部是否使用了 memory-barrier指令。
-* `acquire & release`  cpu级别的实现
-  * PowerPC 的 lwsync 指令是 memory barrier 指令，其工作原理是堵在 处理器流水线的入口，不让后续指令进入流水线，直到前面已经进入流水线的指令完成，并且 store buffer 清空。
+* `acquire & release`  cpu级别的实现 (**cpu的执行就是流水线**)
+  * PowerPC 的 lwsync 指令是 memory barrier 指令，其工作原理是堵在 处理器流水线的入口，不让后续指令进入流水线，直到前面已经进入流水线的指令完成，**并且 store buffer 清空**, `lwsync` 才会放后面的指令进入流水线.
   * 逻辑上看，lwsync 保证它前面的指令不会被挪到它后面，它后面的指令不会被挪到它前面。因此是一个双向的 memory-barrier
   * cpu流水线第一级是 取指令，当取到 lwsync 指令的时候，就堵着不让后面的指令进来。
 
@@ -751,50 +780,76 @@ x = b.exchange(false, std::memory_order_acq_rel);
 // 线程 1
 acquire;
 write x;
-lwsync;
-Ready = 1;
+lwsync; // 堵着流水线, 不让后面的 指令进来, 直到 前面的写操作全局可见.
+Ready = 1; // release 操作通常和 一个写操作绑定在一起, 写的是一个 flag
 
 // 线程2
-While(Ready != 1) {}
-lwsync;
+While(Ready != 1) {} // acquire 通常和 一个 读操作绑定在一起, 读的也是 flag
+lwsync; //主要是堵着流水线, 不让 read x 跑道 while 前面. 问题来了? cpu 的乱序 会导致这么乱吗?
 read x;
 release;
 ```
 
 * 单独的 `memory barrier` 指令代价太大，原因如下
   * 无论是编译器导致的 out-of-order 还是 cpu导致的 out-of-order 都是为了更好的优化代码
-  * `memory-barrier` 导致的后面的不能前，前面的不能往后，限制了编译器和CPU优化的能力
-
+  * `memory-barrier` 导致的后面的不能前，前面的不能往后，限制了编译器优化的能力.
+* `lwsync` 导致前面的指令不能往前, 前面的指令不能往后
+  
 * 合并的 `acquire` 和 `release` (解决 单独的 memory-barrier 指令代价大的问题)
-  * Inter IA64处理器将 Memory-Barrier指令和 `Ready` 读写指令进行合并，提供了 带 acquire 语义的读指令 `ld.acq` （`acquire_load`） 和 带 release 语义的写指令 `st.rel` （`release store`） 。
-  * 这样的好处是 增加了 编译优化的可能性。
-  * 锁的底层实现实际就是 `acquire-load` 和 `release-store`
-  * 原子变量默认情况下也是 `release-store` 和 `acquire-load` ？
+  * Inter IA64处理器将 `Memory-Barrier`指令和 `Ready` 读写指令进行合并，提供了 带 acquire 语义的读指令 `ld.acq` （`acquire_load`） 和 带 release 语义的写指令 `st.rel` （`release store`） 。
+  * 这样的好处是 增加了 编译优化的可能性???。因为 `lwsync` 的语义在那地方摆着, 编译器会放弃 这部分的优化.
+  * 合并就是将
+    *  `lwsync; ready=1` 两个指令合并成为 `st.rel ready 1` 因为包含写操作称之为 `release store`
+    * `while(ready==1); lwsync` 两个指令合并成 `ld.acq r0, ready` ; 因为里面有读操作, 所以称为 `acquire load`
 
 ```c++
 // thread 1
 acquire;
 write x;
-st.rel ready 1; // release store
+st.rel ready 1; // release store, 这个提供的语义就是 before is before
 read/write y; // 该条指令可以往前挪了，也可以保证 acquire-release 语义的正确性
 
 // thread 2
 read/write z; // 该条指令可以往后挪了，也可以保证 acquire-release 语义的正确性
-ld.acq r0, ready; // acquire load
+ld.acq r0, ready; // acquire load  这个提供的语义就是 after is after
 read x;
 release;
 ```
+
+
+
+### C++ 中使用 Acquire & Release 语义
+
+```c++
+mutex.lock(); // ld.acq mutex
+//do something
+
+mutex.unlock(); // st.rel mutex
+
+
+std::atomic<bool> flag=0;
+while(!flag.compare_exchange_strong()); // ld.acq flag
+//do something
+flag = 0; //st.rel flag
+```
+
+* 原子操作: **读带有 acquire 语义**, **写带有 release 语义**.
+
+
 
 ### Sequential Consistence
 
 * acquire-release 不保证全局序
   * 以下代码 可能 都被打印出来。
   * 原因是 `on-chip network` ： cpu 之间的消息传递有快有慢？？？？。
+* 原子变量的操作都是原子的. 原子变量的操作可以附带 `memory-order` 的语义.
+  * 所以总结来看, 原子变量其实提供了两种功能: 操作是原子的, 提供了 memory-order 语义.
 
 ```c++
 // x, y is std::atomic
 // thread 1
-x = 1;
+x = 1;  
+// release store, 全局可见.x=1 之前的写操作全局可见了, 不意味着 x=1 全局可见了? 所以通过 x 的值可以判断有些数据是否 ready.
 
 // thread 2
 y = 1;
@@ -813,6 +868,7 @@ if (y == 1 && x == 0) {
 
 * Sequential Consistence
   * on-chip network保证消息传播的序，即先**传播 x=1**  到所有的处理器，等到所有的处理器都收到 x =1 之后，再传播 y = 1；反之亦然。总之：**写操作串行的使用片上网络**，从而片上网络这一层有了全局序。
+  * 导致问题出现的本质是, acquire 和 release 在 不同的 cpu core 上执行?
   * 如果是 `std::atomic` 是 `sc` 那么上面代码永远不可能两个同时打印。
 
 
@@ -854,8 +910,6 @@ MyClass *get_instance() {
 p = malloc(sizeof(MyClass)); // 这个时候 p 已经不是 nullptr 了。
 new(p) MyClass();
 ```
-
-
 
 
 
