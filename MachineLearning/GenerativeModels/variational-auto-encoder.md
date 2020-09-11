@@ -46,7 +46,7 @@ $$
 
 **SVI**
 
-* 先对 ELBO 积分，得到一个表达式，再求导
+* 先对 ELBO 积分，得到一个表达式，再求导 (首先问题是, 这个 积分能够求出来, 多数情况下是求不出来的)
 * Stochasitic 表示的是 样本采样的 随机性，mini-batch
 
 
@@ -66,7 +66,8 @@ $$
 
 * 上面的式子就叫做 score function estimator， 或者 likelihood ratio 或者 REINFORCE  gradient。
 * $\mathbf z^i \sim q(\mathbf z; \lambda)$ , **采样计算梯度**
-* 这个算法基本不 work， 因为梯度估计的方差太大。
+* 这个算法基本不 work， 因为梯度估计的方差太大。 (具体指的是 求期望的那个式子的方差大)
+
 
 
 
@@ -85,6 +86,7 @@ $$
 **Path-Wise Estimator**
 
 * e.g. re-parameterization trick
+* 假设 $q(z|\lambda)$ 为一个高斯分布, 那么模型预测出来的就是 均值和 方差, $q(z)$ 的采样通过 $u \text{~} N(0, 1); z = (u+\mu) * \sigma$
 
 
 

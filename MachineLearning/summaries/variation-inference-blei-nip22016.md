@@ -80,7 +80,7 @@ $$
 ![](../imgs/gradient-procedure.png)
 
 
-
+* 其中 $\log p(x, z) = \log p(x|z) + \log p(z)$ : $p(z)$ 为先验, $p(x|z)$ 为条件概率(生成模型)
 * noisy unbiased gradient with Monte Carlo
   * 因为存在 $z_s \sim q(z;v)$ 采样，所以叫 Monte Carlo
 

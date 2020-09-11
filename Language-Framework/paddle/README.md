@@ -3,7 +3,8 @@
 * `Variable`
 * `Parameter` : `persistable=True` 的 `Variable`, 不同的 `iteration` 之间, 状态会被保留, `Parameter` 是在 `global block` 下创建的
 
-> 感觉`Parameter(Variable)` 是和 `block` 独立的东西. 甚至是和 `program` 独立的东西. `Program` 存的只是`op` 而已, 存的是 `Variable` 读,写 `op`. 真正的变量是在 `Scope` 中的.
+> 感觉`Parameter(Variable)` 是和 `block, program` 独立的东西. `Program 的 Block` 存的只是`op` 而已, 存的是 `Variable` 读,写 `op`. 真正的变量是在 `Scope` 中的.
+> `Scope` 代码在 python 追不到很深....
 
 
 
@@ -11,12 +12,14 @@
   * `fluid.default_startup_program()` : 模型变量的初始化 由此 `program` 负责
   * `fluid.default_main_program()`: 其它 op 由此 `program` 负责
   * 创建的`Parameter`都在当前 `program` 的 `global_block()` 下
+  
 * `Block` : c++ 中作用域的概念, 一个 `Program` 由多个 `Block` 构成
   * `if else Block`, `switch case Block`, `while Block`
   * 所以整体结构为: 
     * 整体的计算图由多个Program构成
     * Program中有很多Block
     * Block中存在很多operation
+    * 实际的参数 乖乖的 存在 Scope 里.... 和 Program 无关. 估计是通过名字来对应上的.
 * `fluid.Executor(place=fluid.CPUPlace())`
   * `Executor` 核心执行模块, 负责编译 `program` 并执行, 一次执行整个 `program` , 这个和 `tensorflow` 有区别, `tensorflow` 每次只是执行和 `fetch` 相关的子图
 
@@ -98,11 +101,134 @@ for block in main_prog.blocks:
         print("After setting the numpy array value: {}".format(np.array(pd_param).ravel()[:5]))
 ```
 
+# Block
+* program的基本构成单元
+
+常用api
+```python
+
+main_program.global_block().has_var(name)
+main_program.global_block().var(name) # 这些 var, 可以是模型参数, 可以 tensor (临时变量)
+main_program.global_block().all_parameters() # 返回模型参数
+```
+
+```python
+for param in program.global_block().all_parameters():
+	name = param.name
+	var = scope.find_var(name)
+    if var is None:
+        print("var: %s is not in scope" % (name))
+        return
+    batch_size_tensor = var.get_tensor()
+    ori_array = np.array(batch_size_tensor)
+```
+
+# Scope
+* scope: (scope 是用来记录  变量名 与 变量 映射关系的地方 ) 用来表示变量名的作用空间, 可能是用在变量复用上的.
+	* scope_guard, 就是 c++ 的 大括号
+    * scope 是实际保存变量的地方, 一个 program 可以在不同的 scope 里运行, 应该是通过变量的名字 和 program 的变量 reader 结合起来的.
+    * 只存 persistable=True 的变量 ?
+```python
+import paddle
+from paddle import fluid
+import numpy as np
+
+def Model():
+    data = fluid.layers.data(name="data", shape=[1], dtype="float32")
+    label = fluid.layers.data(name="label", shape=[1], dtype="int64")
+
+    prediction = fluid.layers.fc(input=data, size=2, act='sigmoid')
+    loss = fluid.layers.cross_entropy(input=prediction, label=label)
+
+    loss = fluid.layers.mean(loss)
+    loss = fluid.layers.Print(loss, message="loss")
+    sgd = fluid.optimizer.SGD(learning_rate=0.001)
+    sgd.minimize(loss)
+
+    return data, label, loss
 
 
+firstscope = fluid.Scope()
+first_startup_program = fluid.Program()
+first_main_program = fluid.Program()
+
+with fluid.scope_guard(firstscope):
+    with fluid.program_guard(first_main_program, first_startup_program):
+        with fluid.unique_name.guard():
+            vars_of_interest = Model()
+first_use_vars = vars_of_interest[:2]
+
+secondscope = fluid.Scope()
+second_startup_program = fluid.Program()
+second_main_program = fluid.Program()
+with fluid.scope_guard(secondscope):
+    with fluid.program_guard(second_main_program, second_startup_program):
+        with fluid.unique_name.guard():
+            vars_of_interest = Model()
+
+second_use_vars = vars_of_interest[:2]
 
 
+exe = fluid.Executor(fluid.CPUPlace())
 
+exe.run(first_startup_program, scope=firstscope)
+exe.run(second_startup_program, scope=secondscope)
+
+exe.run(second_main_program, feed={second_use_vars[0].name: np.array([[10.], [11.], [
+        12.]], dtype=np.float32), second_use_vars[1].name: np.array([[1], [0], [1]], dtype=np.int64)}, scope=firstscope)
+```
+
+```python
+import paddle.fluid as fluid
+import numpy
+
+new_scope = fluid.Scope()
+with fluid.scope_guard(new_scope):
+
+    fluid.global_scope().var("data").get_tensor().set(numpy.ones((1, 2)), fluid.CPUPlace())
+
+# new_scope 中找不到, 就去 上一级的 scope 中找了
+data = numpy.array(new_scope.find_var("data").get_tensor())
+print(data)  # [[1. 1.]]
+```
+
+```python
+import paddle.fluid as fluid
+import numpy
+
+new_scope = fluid.Scope()
+with fluid.scope_guard(new_scope):
+
+    fluid.global_scope().var("data").get_tensor().set(numpy.ones((1, 2)), fluid.CPUPlace())
+    new_scope.var("data").get_tensor().set(numpy.zeros((1, 2)), fluid.CPUPlace())
+
+# new_scope 中能找到, 就取 new_scope 中的值了
+data = numpy.array(new_scope.find_var("data").get_tensor())
+print(data)  # [[0. 0.]]
+```
+
+
+# 为什么要 start_program & main_program
+
+* start_program 里面存了 Parameter 的初始化 op, 而 main_program 中确没有. 这个可以从 LayerHelper.create_parameter 代码中看出
+
+```python
+self.startup_program.global_block().create_parameter(
+                dtype=dtype,
+                shape=shape,
+                type=type,
+                **attr._to_kwargs(with_initializer=True)) # 就是多了一个 with_initializer = True
+return self.main_program.global_block().create_parameter(
+		dtype=dtype, shape=shape, type=type, **attr._to_kwargs())
+```
+
+* start_program 中只存放了 Parameter 的初始化 op, 他还干了其它工作?  未知....
+
+# 参数复用
+
+```python
+
+```
 
 # 解析 fluid.layers.fc
 
@@ -311,14 +437,60 @@ class LayerHelper(LayerHelperBase):
 
 
 # 几个上下文管理器
+* 不会影响 `fliud.layers.data()` 中名字, 里面的 `name` 参数设置成啥就是啥
+* 影响的是 op 的名字, tensor 的名字, 和 variable 的名字.
 
 ```python
 # 重置唯一名字计数器, 在相同的 program 中, 会起到参数复用的效果?
 with fluid.unique_name.guard():
     with fluid.program_gurad(test_program, fluid.Program()):
+
+import paddle.fluid as fluid
+with fluid.unique_name.guard():
+    name_1 = fluid.unique_name.generate('fc')
+with fluid.unique_name.guard():
+    name_2 = fluid.unique_name.generate('fc')
+print(name_1, name_2)  # fc_0, fc_0
+
+with fluid.unique_name.guard('A'):
+    name_1 = fluid.unique_name.generate('fc')
+with fluid.unique_name.guard('B'):
+    name_2 = fluid.unique_name.generate('fc')
+print(name_1, name_2)  # Afc_0, Bfc_0
 ```
 
+# LoD Tensor
+* level-of-Detail (LoD): 比较适合 变长序列. 对于非变长的: lod_level=0
+* [LoD](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.5/user_guides/howto/basic_concept/lod_tensor.html#id2)
+```
+# 1-level
+3       1   2
+| | |   |   | |
 
+# 2-level
+3            1 2
+3   2  4     1 2  3
+||| || ||||  | || |||
+
+# lod 信息 [[3，1，2]/*level=0*/，[3，2，4，1，2，3]/*level=1*/]
+
+```
+```python
+# 1-level lod
+# 假设一个mini-batch中有3个句子，每个句子中分别包含3个、1个和2个单词。我们可以用(3+1+2)xD维Tensor 加上一些索引信息来表示这个mini-batch
+# 这个值 feed 进去 program 里面就好
+a = fluid.create_lod_tensor(np.array([[1.1], [2.2],[3.3],[4.4], [5.5], [6.6]]).astype('float32'), [[3, 1, 2]], fluid.CPUPlace())
+
+# 2-level lod
+a = fluid.create_lod_tensor(np.array([[1],[1],[1],
+                                  [1],[1],
+                                  [1],[1],[1],[1],
+                                  [1],
+                                  [1],[1],
+                                  [1],[1],[1]]).astype('int64') ,
+                          [[3,1,2] , [3,2,4,1,2,3]],
+                          fluid.CPUPlace())
+```
 
 # 输入流水线
 
