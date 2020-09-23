@@ -15,3 +15,25 @@
 
 # String
 
+
+
+# 图
+
+## dynamic Connecity
+
+问题：Given N objects（用0~N-1来建模这些objects）
+
+两个操作：
+
+* Union：连接两个物体。
+* Find/Connected Query：判断两个objects之间有没有连接上。
+
+algo：Quick Find （too slow）
+
+* Integer Array of size N
+* p and q connected iff they have the same id。
+
+algo：Quick Union
+
+* Integer Array of size N：
+  * 这个 array 解释成为 一个 tree
