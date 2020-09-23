@@ -1,6 +1,6 @@
+https://www.desmos.com/calculator
+
 对 optimizer.pdf 的补充解释
-
-
 
 * 大batch-size 与 小 batch-size
 
@@ -16,6 +16,10 @@
   * 一般策略是learning rate decay
 
 # 模型参数初始化
+
+https://www.zhihu.com/search?type=content&q=%E5%8F%82%E6%95%B0%E5%88%9D%E5%A7%8B%E5%8C%96
+
+https://zhuanlan.zhihu.com/p/25931903
 
 好的初始化标准：
 
