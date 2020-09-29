@@ -244,8 +244,23 @@ f3(1,2);
 
 ## 右值与左值
 
-* 右值：**只能出现** 在 等式 右边的值。
+* 右值：**只能出现** 在 等式 右边的值。(即将被销毁的值(临时变量),  std::move 之后的值, 字面值常量)
 * 左值：**可以出现** 在 等式左边的值。
+
+## copy vs  move
+
+```c++
+class Foo{
+  char *buffer;
+}
+
+Foo obj1, obj2;
+
+// copy: obj1 分配空间, 然后 obj2 数据复制过去
+// move: obj1.buffer = obj2.buffer; obj2.buffer = nullptr; 如果 obj2是右值的时候, "=" 执行的就是 move
+obj1 = obj2; 
+
+```
 
 
 
@@ -302,11 +317,28 @@ int && obj2 = func_return_obj(); // 右值引用可以使得 析构函数到 obj
 
 
 
+```c++
+// 右值形参的陷阱
+void foo(std::string&& str) {
+  std::string s1 = str; // 这里要注意, 虽然形参是右值, 但是进入函数体之后 会被作为左值处理. 
+  std::string s2 = std::move(str); // 如果想要恢复右值功能, 还是需要显式move一下.
+}
+```
+
+
+
+
+
 ## move 函数
 
 虽然不能将 右值引用直接绑定到 一个 左值上，但是我们可以显示的将一个 左值转换成对应的 右值引用类型。
 
 * move 之后，可以对源对象进行 销毁，赋值。**但是不能直接用**
+* move **仅仅是做了强制类型转换**, 将值转成右值!!!!!!!
+* 一个对象被 move 之后进入一个神奇的状态: 
+  * 只能重新赋值 或者 调用析构函数, 其它的操作是违反编程规范的.
+* move仅仅是强制类型转换, move之后的行为是由 **move operator=** 决定的.
+* **函数的返回值 不需要 move**
 
 ```c++
 int ii = 111;
@@ -328,6 +360,10 @@ int && j = std::move(ii); // move 之后就变成了一个 右值, 就可以用 
   * 即：清理干净 源对象
 
 ```c++
+/* 移动构造函数的两段式写法
+1. 先move过来
+2. 将之前的 对象的进行 reset
+*/
 StrVec::StrVec(StrVec&& s) noexcept // 移动操作不应该抛出任何异常
   : elements(s.elements), first_free(s.first_free), cap(s.cap){
     // 顶 s 进入这样的状态--对其运行析构函数是安全的
@@ -336,6 +372,13 @@ StrVec::StrVec(StrVec&& s) noexcept // 移动操作不应该抛出任何异常
 ```
 
 ```c++
+/* 移动赋值运算符, 四段式写法
+1. 判断是不是自己给自己赋值
+2. 将自己给清空
+3. move过来
+4. 将之前的对象 reset
+*/
+
 StrVec &StrVec::operator=(StrVec &&rhs) noexcept
   {
     if (this!=&rhs){
@@ -354,6 +397,23 @@ StrVec &StrVec::operator=(StrVec &&rhs) noexcept
 **注意**
 
 * 如果没有定义右值构造函数，那么对于 `move` ，编译器将执行 `copy`
+
+
+
+## 完美转发
+
+* `T&&` 被称之为 forward reference.
+  * 传给 foo 一个 左值或左值引用: bar会收到  左值引用
+  * 传给 foo 一个 右值引用: bar接收到右值引用.
+
+```c++
+template <typename T>
+void foo(T&& value) {
+  bar(std::forward<T>(value));
+}
+```
+
+
 
 
 
