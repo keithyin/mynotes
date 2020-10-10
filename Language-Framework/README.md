@@ -13,6 +13,7 @@
 >   * '你' : 使用 UTF8编码的话，在计算机中存储的就是 `\xe4\xbd\xa0`(16进制)
 >   * '你'：使用 gbk 编码的话：在计算机中存储的就是 `\xc4\xe3`(16进制)
 > * UTF-X：utf8，utf16，utf32
+>   * Code unit : 该编码的基本构成单位
 >   * X其实表示是 code unit的bit大小，utf8编码的codeunit就是uint8类型的值，8bit表示一个code-unit
 >   * UTF8使用 1 到 4个 code unit 来表示一个 code point
 >   * UTF16使用 1 到 2个 code unit 来表示一个 code point
@@ -69,7 +70,7 @@ a_utf8_byte_str.decode("gbk")    # 这就会报错了
 
 [https://www.jianshu.com/p/53bb448fe85b](https://www.jianshu.com/p/53bb448fe85b)
 
-## C++ 中的编码
+##C++ 中的编码
 
 https://blog.csdn.net/qq_31175231/article/details/83865059
 
@@ -95,8 +96,9 @@ int main() {
     return 0;
 }
 ```
+##golang中的编码
 
-
+https://github.com/keithyin/mynotes/blob/master/Language-Framework/golang/go-07-%E6%96%87%E4%BB%B6%E5%A4%84%E7%90%86.md
 
 
 
