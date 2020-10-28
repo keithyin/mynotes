@@ -78,7 +78,7 @@ $$
 
 在高维情况下，牛顿迭代公式是：
 $$
-x_{t+1} = x_t - \Bigr[Hf(x_t)\Bigr]^{-1}f'(x_t)
+x_{t+1} = x_t - \Bigr[H_{f(x_t)}\Bigr]^{-1}f'(x_t)
 $$
 ![](../imgs/hessian-mmatrix.png)
 
@@ -88,7 +88,8 @@ $$
 
 **总结：**
 
-可以看出，牛顿法实际上并不是直接求 $f(x)=0, f'(x)=0$ 的解，而是通过将其泰勒展开，求展开的公式的解（即：估计的值的解）。
+* 可以看出，牛顿法实际上并不是直接求 $f(x)=0, f'(x)=0$ 的解，而是通过将其泰勒展开，求展开的公式的解（即：估计的值的解）。
+* 牛顿法解决了原始梯度下降方法的 step 如何确定的问题.
 
 
 
@@ -135,6 +136,8 @@ $$
 ## 参考资料
 
 [http://jacoxu.com/jacobian%E7%9F%A9%E9%98%B5%E5%92%8Chessian%E7%9F%A9%E9%98%B5/](http://jacoxu.com/jacobian%E7%9F%A9%E9%98%B5%E5%92%8Chessian%E7%9F%A9%E9%98%B5/)
+
+http://www.princeton.edu/~yc5/ele522_optimization/lectures/quasi_Newton.pdf
 
 
 
