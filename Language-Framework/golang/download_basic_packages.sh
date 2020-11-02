@@ -1,0 +1,11 @@
+# 创建$GOPATH/src/golang.org/x, 然后cd过去，下载该文件，执行
+git clone https://github.com/golang/tools.git
+git clone https://github.com/golang/sys.git
+git clone https://github.com/golang/net.git
+git clone https://github.com/golang/build.git
+git clone https://github.com/golang/text.git
+git clone https://github.com/golang/sync.git
+git clone https://github.com/golang/perf.git
+git clone https://github.com/golang/mod.git
+git clone https://github.com/golang/lint.git
+git clone https://github.com/golang/time.git
