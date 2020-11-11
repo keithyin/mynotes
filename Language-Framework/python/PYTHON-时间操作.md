@@ -30,6 +30,9 @@ someTimeDelta = now-someDay
 
 # 时区转换
 
+# 周几？
+d=datetime.datetime(2018,11,11)
+t=d.weekday() # 周一是 0
 ```
 
 
