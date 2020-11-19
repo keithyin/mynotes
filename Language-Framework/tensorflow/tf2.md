@@ -4,13 +4,20 @@ tf2 eager模式 和 tf1 的主要不同点有：
 * op都是命令式的
 * 每次前向都会重新构建计算图
 
+https://www.tensorflow.org/tutorials/quickstart/advanced
+
+* Layer: tf.keras.layers.*
+* Loss: tf.keras.losses.*
+* Optimizer: tf.keras.optimizers.*
+* Metric: tf.keras.metrics.*
+
 # 输入
 
 # 模型
-如果需要自定义模型，需要继承 `tf.keras.Model` 这个和 `torch.nn.Module` 基本等价。
+如果需要自定义Layer，需要继承 `tf.keras.layers.Layer` 这个和 `torch.nn.Module` 基本等价。
 
 ```python
-class MyModel(tf.keras.Model):
+class MyLayer(tf.keras.layers.Layer):
     def __init__(self):
         self.fc1 = tf.keras.layers.Dense(10)
         self.fc2 = tf.keras.layers.Dense(1)
@@ -19,6 +26,7 @@ class MyModel(tf.keras.Model):
     def call(self, x):
         return self.fc2(self.fc1(x))
 ```
+tf.keras.Model用来建模整个模型！tf.keras.layers.Layer用来建模某层。
 
 # 反向传导
 反向传导的核心是 tf.GradientTape(), 这个可以简单理解为：在 gradient_tape context 下的计算，会被追踪前向计算图 已为了构建反向传导图。
@@ -27,6 +35,7 @@ class MyModel(tf.keras.Model):
 https://www.tensorflow.org/api_docs/python/tf/GradientTape
 
 # 参数的导出与导入
+
 
 # 模型持久化
 
