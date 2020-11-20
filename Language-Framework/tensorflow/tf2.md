@@ -11,6 +11,15 @@ https://www.tensorflow.org/tutorials/quickstart/advanced
 * Optimizer: tf.keras.optimizers.*
 * Metric: tf.keras.metrics.*
 
+tf.Module & tf.keras.layers.Layer & tf.keras.Model
+* tf.keras.Model继承自 tf.keras.layers.Layer
+* tf.keras.layers.Layer 继承自 tf.Module
+
+tf.Module 与 torch.nn.Module基本完全等价
+torch.nn.Module有一点不好用的是，参数的 in_feature 和 out_feature都需要我们自己指定，tf.keras.layers.Layer提供了 in_feature不需要手动指定的功能。
+
+
+
 # 输入
 
 # 模型
@@ -35,6 +44,25 @@ tf.keras.Model用来建模整个模型！tf.keras.layers.Layer用来建模某层
 https://www.tensorflow.org/api_docs/python/tf/GradientTape
 
 # 参数的导出与导入
+tf.keras.Model, tf.keras.layers.Layer 都继承自 tf.Module.
+tf.Module可以按照以下方式保存
+
+### 保存与加载参数
+https://www.tensorflow.org/guide/intro_to_modules
+```python
+chkp_path = 'checkpoint_file_path'
+checkpoint = tf.train.Checkpoint(model=my_model)
+checkpoint.write(chkp_path)
+checkpoint.write(chkp_path)
+```
+
+```python
+new_model = MySequentialModule()
+new_checkpoint = tf.train.Checkpoint(model=new_model)
+new_checkpoint.restore("my_checkpoint")
+```
+
+### 保存与加载计算图
 
 
 # 模型持久化
