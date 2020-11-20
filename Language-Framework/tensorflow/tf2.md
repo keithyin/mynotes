@@ -63,6 +63,21 @@ new_checkpoint.restore("my_checkpoint")
 ```
 
 ### 保存与加载计算图
+https://www.tensorflow.org/guide/intro_to_graphs
+首先是 明白 tf.function: 将执行流程 trace 成一个计算图
+```python
+saved_model_dir = "saved_model_dir"
+tf.saved_model.save(my_model, saved_model_dir)
+
+# ls -l the_saved_model
+# drwxr-sr-x 2 kbuilder kokoro  4096 Sep 10 01:35 assets
+# -rw-rw-r-- 1 kbuilder kokoro 12617 Sep 10 01:35 saved_model.pb -- 文件存的是 计算图
+# drwxr-sr-x 2 kbuilder kokoro  4096 Sep 10 01:35 variables -- 该目录存的是参数
+```
+
+```python
+new_model = tf.saved_model.load("the_saved_model") #加载模型 & 加载参数？
+```
 
 
 # 模型持久化
