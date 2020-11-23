@@ -33,24 +33,77 @@
 > * 因为从四帧中 是可以推断出，运动方向，位置，速度的。
 
 
+**序列决策问题的两个基本任务**
+
+* reinforcement learning
+    * the environment is initially unknown
+    * the agent interacts with the environment
+    * the agent improves its policy
+* Planning
+    * A model of environment is known
+    * the agent performs computations with its model (without any external interaction)
+    * the agent improves its policy
 
 
+**Exploration & Exploitation**
 
-
-
-
+* Exploration finds more information about the environment
+* Exploitation exploits known information to maximise reward
+* It is usually important to explore as well as exploit
 
 
 ## 强化学习
 
-**三大类算法**
+**RL算法三大组件**
 
-* value based --- 现在基本就是 Q-Learning 了
+* Policy: agent's behaviour function
+    * it is a map from state to action
+    * Deterministic policy: $a=\pi(s)$
+    * Stochastic policy: $\pi(a|s) = \mathbb P[A_t=a|S_t=s]$
+* Value function: how good is each state and/or action
+    * value function is a prediction of future reward
+    * Used to evaluate goodness/badness of states
+    * And therefore to select between actions, e.g.
+$$v_\pi(s) = \mathbb_pi[R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t=s]$$
+* Model: agent's representation of the environment
+    * model predicts what the environment will do next
+    * $\mathcal P predicts the next state$
+    * $\mathcal R predicts the next immediate reward$
+$$
+\mathcal P_{ss'}^a = \mathbb P[S_{t+1}=s'|S_t=s, A_t=a]
+$$
+$$
+\mathcal R_s^a = \mathbb E[R_{t+1}|S_t=s, A_t=a]
+$$
+
+
+**RL算法分类 （第一种分类方式）**
+
+* value based：--- 现在基本就是 Q-Learning 了
+    * 显式 policy 函数 （无）
+    * Value Function （有）
 * policy based --- policy gradient 和 actor-critic
-* model based
+    * 显式 policy 函数 （🈶️）
+    * 显式 value function （🈚️）
 
+* Actor Critic
+    * 显式 policy function （🈶️）
+    * 显式 value function （🈶️）
 
+**RL算法分类 （第二种分类方式）**
 
+* model free：
+    * policy and/or value function （🈶️）
+    * model （🈚️）
+* model based：
+    * policy and/or value function （🈶️）
+    * model （🈶️）
+
+**RL算法分类 （第二种分类方式）**
+
+* on-policy
+
+* off-policy
 
 **算法的基本组件**
 
@@ -88,7 +141,7 @@
   * A3C
   * DPG
   * DDPG
-  * ​
+  * 
 
 
 **另一种分类方法**
