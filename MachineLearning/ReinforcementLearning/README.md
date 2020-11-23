@@ -4,7 +4,7 @@
 
 > Reinforcement Learning is learning what to do -- **how to map situations to actions** -- so as to maximize a numerical reward signal.
 >
-> **trial-and-error search and delayed reward **-- are the two important distinguishing features of reinforcement learning.
+> **trial-and-error search and delayed reward** -- are the two important distinguishing features of reinforcement learning.
 >
 > 强化学习是定义在一类问题上，而不是方法上，所有能解决那类问题的方法都可以称作强化学习方法。
 >
@@ -64,11 +64,11 @@
     * value function is a prediction of future reward
     * Used to evaluate goodness/badness of states
     * And therefore to select between actions, e.g.
-$$v_\pi(s) = \mathbb_pi[R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t=s]$$
+$$v_\pi(s) = \mathbb_\pi[R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t=s]$$
 * Model: agent's representation of the environment
     * model predicts what the environment will do next
-    * $\mathcal P predicts the next state$
-    * $\mathcal R predicts the next immediate reward$
+    * $\mathcal P$ predicts the next state
+    * $\mathcal R$ predicts the next immediate reward
 $$
 \mathcal P_{ss'}^a = \mathbb P[S_{t+1}=s'|S_t=s, A_t=a]
 $$
