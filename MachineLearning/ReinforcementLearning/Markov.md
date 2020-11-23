@@ -33,8 +33,8 @@ The future is independent of the past given the present.(给定当前的状态�
 一个 **Markov Reward Process** 是一个四元组 <$\mathcal{S},\mathcal{P},\mathcal{R},\gamma$>
 
 * $\mathcal{S}$: 有限状态的集合
-* $\mathcal{P}$: 状态转移矩阵 $\mathcal{P}_{ss'}=\Bbb{P}[S_{t+1}=s'|S_t=s]$
-* $\mathcal{R}$:  奖励函数 $\mathcal{R}_s=\Bbb{E}[\text{R}_{t+1}|S_t=s]$,
+* $\mathcal{P}$: 状态转移矩阵 $\mathcal P_{ss'}=\mathbb P[S_{t+1}=s'|S_t=s]$
+* $\mathcal{R}$:  奖励函数 $\mathcal R_s=\mathbb E[\text{R}_{t+1}|S_t=s]$,
   * 为什么下标是$t+1$呢？，这里强行解释一下，因为$Reward$是在离开$s$状态时获得的，所以是$\text{R}_{t+1}$
 * $\gamma$:  衰减因子
 
