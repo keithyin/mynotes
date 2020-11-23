@@ -46,8 +46,9 @@ The return $G_t$ is the **total discounted reward from time-step $t$**
 
 
 $$
-G_t=\text{R}_{t+1}+\gamma\text{R}_{t+2} ... = \sum_{k=0}^{\inf}\gamma^k\text{R}_{t+k+1}
+G_t=R_{t+1}+\gamma R_{t+2} ... = \sum_{k=0}^{\inf}\gamma^k R_{t+k+1}
 $$
+
 $G_t$是一个采样，所以不需要考虑求期望。
 
 
@@ -58,7 +59,7 @@ The state value function $v(s)$ of an MRP is the **expected return** starting fr
 
 
 $$
-v(s)=\Bbb{E}[G_t|S_t=s]
+v(s)=\mathbb E[G_t|S_t=s]
 $$
 **Bellman Equation for MRPs**:
 
@@ -70,11 +71,11 @@ $$
 
 $$
 \begin{aligned}
-v(s)&=\mathbb{E}[G_t|S_t=s] \\
-&=\mathbb{E}[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\
-&=\mathbb{E}[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\
-&=\mathbb{E}[R_{t+1}+\gamma G_{t+1}|S_t=s]\\
-&=\mathbb{E}[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\
+v(s)&=\mathbb E[G_t|S_t=s] \\
+&=\mathbb E[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\
+&=\mathbb E[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\
+&=\mathbb E[R_{t+1}+\gamma G_{t+1}|S_t=s]\\
+&=\mathbb E[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\
 v(s)&=\mathcal{R}_s+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}v(s')
 \end{aligned}
 $$
@@ -94,29 +95,29 @@ $$
 * $\mathcal{S}$是一个有限状态集合
 * $\mathcal{A}$是一个有限动作集合(actions)
 * $\mathcal{P}$ 依旧是状态转移矩阵，只不过公式有点小变化，
-  * $\mathcal{P}_{ss'}^a=\Bbb{P}[S_{t+1}=s'|S_t=s,A_t=a]$
+  * $\mathcal P_{ss'}^a=\mathbb P[S_{t+1}=s'|S_t=s,A_t=a]$
 * $\mathcal{R}$是奖励函数
-  * $\mathcal{R}_s^a=\Bbb{E}(R_{t+1}|S_t=s,A_t=a)$
+  * $\mathcal R_s^a= \mathbb E(R_{t+1}|S_t=s,A_t=a)$
 * $\gamma$ 是衰减因子
 
 
 
 对于`MDP` 还有一个要考虑的就是`policy` $\pi$ ,它的定义如下：
 
-* $\pi(a|s)=\Bbb{P}[A_t=a|S_t=s]$
+* $\pi(a|s)=\Bbb P[A_t=a|S_t=s]$
 * 意思是，在状态$s$下，应该采取什么样的动作 `action`
 * **注意**: `policy` 既可以是`deterministic`的，也可以是`stochastic`的：
   * `deterministic`: $a=\pi(s)$
-  * `stochastic`: $\pi(a|s)=\Bbb{P}[A_t=a|S_t=s]$
+  * `stochastic`: $\pi(a|s)=\Bbb P[A_t=a|S_t=s]$
 
 
 
 
 **给定MDP和$\pi$, MDP是可以转化为MRP的：**
 
-* <$\mathcal{S},\mathcal{A},\mathcal{P},\mathcal{R},\gamma$>($\pi$) --> <$\mathcal{S},\mathcal{P}^\pi,\mathcal{R}^\pi,\gamma$>
-* $\mathcal{P}_{ss'}^\pi=\sum_{a\in A}\pi(a|s)\mathcal{P}_{ss'}^a$
-* $\mathcal{R}^\pi=\sum_{a\in A}\pi(a|s)\mathcal{R}_s^a$
+* <$\mathcal S,\mathcal A,\mathcal P,\mathcal R,\gamma$>($\pi$) --> <$\mathcal S,\mathcal P^\pi,\mathcal R^\pi,\gamma$>
+* $\mathcal P_{ss'}^\pi=\sum_{a\in A}\pi(a|s)\mathcal P_{ss'}^a$
+* $\mathcal R^\pi=\sum_{a\in A}\pi(a|s)\mathcal{R}_s^a$
 
 
 
@@ -124,17 +125,17 @@ $$
 **MDP的两类值函数(value function):**
 
 * state-value function $v_\pi(s)$
-  * $v_\pi(s)=\Bbb{E}[G_t|S_t=s]$
+  * $v_\pi(s)=\Bbb E[G_t|S_t=s]$
   * 当前状态能够获得的期望`return`
 * action-value function $q_\pi(s,a)$
-  * $q_\pi(s,a)=\Bbb{E}_\pi[G_t|S_t=s, A_t=a]$
+  * $q_\pi(s,a)=\Bbb E_\pi[G_t|S_t=s, A_t=a]$
   * 当前状态下，选择`Action` `a`，获得的期望`return`
 * 两类值函数之间的关系 (下面公式也叫做 Bellman Expectation Equation)(给定$\pi$，可以用来求$v_\pi(s), q_\pi(s,a)$)
   * $v_\pi(s)=\sum_{a\in A}\pi(a|s)q_\pi(s,a)$
 
-  * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s')$
-  * $v_\pi(s)=\sum_{a\in A}\pi(a|s)(\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s'))$
-  * $q_\pi(s,a)=\mathcal{R}_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^a\sum_{a'\in A}\pi(a'|s')q_\pi(s',a'))$
+  * $q_\pi(s,a)=\mathcal R_s^a+\gamma\sum_{s'\in S}\mathcal{P}_{ss'}^av_\pi(s')$
+  * $v_\pi(s)=\sum_{a\in A}\pi(a|s)(\mathcal R_s^a+\gamma\sum_{s'\in S}\mathcal P_{ss'}^av_\pi(s'))$
+  * $q_\pi(s,a)=\mathcal R_s^a+\gamma\sum_{s'\in S}\mathcal P_{ss'}^a\sum_{a'\in A}\pi(a'|s')q_\pi(s',a'))$
 
 
 
@@ -159,9 +160,9 @@ $$
 $$
 \begin{aligned}
 v_\star(s) &= \max_a q_\star(s,a) \\
- q_\star(s,a)&= \mathcal{R}_s^a+\gamma\sum_{s' \in S}\mathcal{P}_{ss'}^av_\star(s') \\
- v_\star(s) &= \max_a \Bigl(  \mathcal{R}_s^a+\gamma\sum_{s' \in S}\mathcal{P}_{ss'}^av_\star(s') \Bigl)\\
- q_\star(s,a)&= \mathcal{R}_s^a+\gamma\sum_{s' \in S}\mathcal{P}_{ss'}^a  \max_{a'} q_\star(s',a')
+ q_\star(s,a)&= \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^av_\star(s') \\
+ v_\star(s) &= \max_a \Bigl(  \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^av_\star(s') \Bigl)\\
+ q_\star(s,a)&= \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^a  \max_{a'} q_\star(s',a')
 \end{aligned}
 $$
 
