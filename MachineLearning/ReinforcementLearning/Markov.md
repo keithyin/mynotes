@@ -17,7 +17,7 @@ The future is independent of the past given the present.(给定当前的状态�
 **一个马尔科夫过程可以表示成为一个二元组<$\mathcal{S},\mathcal{P}$>**
 
 * $\mathcal{S}$ 是一个有限状态集合
-* $\mathcal{P}$ 是状态之间的转移概率 $\mathcal{P}_{ss'}=\Bbb{P}(S_{t+1}=s'|S_t=s)$
+* $\mathcal{P}$ 是状态之间的转移概率 $\mathcal{P}_{ss'}=\mathbb P(S_{t+1}=s'|S_t=s)$
 
 
 
