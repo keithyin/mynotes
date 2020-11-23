@@ -64,7 +64,7 @@
     * value function is a prediction of future reward
     * Used to evaluate goodness/badness of states
     * And therefore to select between actions, e.g.
-$$v_\pi(s) = \mathbb_\pi[R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t=s]$$
+$$v_\pi(s) = \mathbb V_\pi[R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... | S_t=s]$$
 * Model: agent's representation of the environment
     * model predicts what the environment will do next
     * $\mathcal P$ predicts the next state
