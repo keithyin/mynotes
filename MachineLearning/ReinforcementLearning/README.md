@@ -52,6 +52,19 @@
 * It is usually important to explore as well as exploit
 
 
+**回报 Return**
+
+total discounted reward from time-step t
+$$
+G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... = \sum_{k=0}^\inf \gamma^k R_{t+k+1}
+$$
+
+**值函数：是一个 state-[action]  -- 回报 函数**
+
+$$
+v(s) = \mathbb E[G_t|S_t=s]
+$$
+
 ## 强化学习
 
 **RL算法三大组件**
@@ -204,7 +217,7 @@ Value Function 有两种： **目的是求 bellman equation**
 
 ## on/off-line
 
-* ​
+* 
 
 
 
