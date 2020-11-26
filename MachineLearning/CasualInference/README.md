@@ -38,10 +38,17 @@ $$
 $$
 E[Y_i^{obs}|X_i=x, W_i=1] - E[Y_i^{obs}|X_i=x, W_i=0]
 $$
-除非我们假设 已知 $X_i$ 条件下 $W_i$ 与 $Y_i^{obs}$ 独立，该公式才和 CATE 计算公式一致。当 treatment assignment is random conditional on $X_i$时，该假设成立。这里需要注意的是在 $X_i$ 条件下进行 random assignment。并不是百度爱迪生 那种 分流方式！！
+除非我们假设 已知 $X_i$ 条件下 $W_i$ 与 $Y_i^{obs}$ 独立，该公式才和 CATE 计算公式一致。当 treatment assignment is random conditional on $X_i$时，该假设成立。这里需要注意的是在 $X_i$ 条件下进行 random assignment。百度爱迪生那种分流方式也可以认为假设成立。
 
 
 * propensity score: $P(X_i) = P(W_i=1|X_i)$, the probability of treatment given $X_i$.
+
+# uplift modeling
+回忆一下AB测试的流程：随机分流，分为对照组和实验组，在实验组上使用策略，这时候可以认为 “treatment assignment is random conditional on $X_i$”是成立的。然后会看 实验和对照上的一些指标。如果指标是正的，该策略就可以推全了。
+
+那么，uplift modeling是干嘛的呢？是用来建模策略的增量的。ie：预估 $\tau(X_i)$, 预估这玩意有啥用呢？？
+
+如果在AB测试的时候我们知道 $\tau(X_i)$ ，那么我们完全可以使用监督学习的方式学习一个模型进行预测。可惜的是，我们并不知道。uplift领域中有三大主要方法用来预估 $\tau_(X_i)$
 
 # Glossary
 
