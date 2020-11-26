@@ -48,7 +48,28 @@ $$
 
 那么，uplift modeling是干嘛的呢？是用来建模策略的增量的。ie：预估 $\tau(X_i)$, 预估这玩意有啥用呢？？
 
-如果在AB测试的时候我们知道 $\tau(X_i)$ ，那么我们完全可以使用监督学习的方式学习一个模型进行预测。可惜的是，我们并不知道。uplift领域中有三大主要方法用来预估 $\tau_(X_i)$
+如果在AB测试的时候我们知道 $\tau(X_i)$ ，那么我们完全可以使用监督学习的方式学习一个模型进行预测。可惜的是，我们并不知道。uplift领域中有三大主要方法用来预估 $\tau(X_i)$
+
+* Two-Model approach：
+  * 构建两个预测模型，一个使用实验组数据，一个使用对照组数据。
+* Class Variable Transformation: 用于二值收益变量
+  * aa
+* model uplift directly through the modification of well known classification machine learning algorithms such as decision tree, random forest or SVM
+
+## Two Model
+> 通常被用作 baseline 模型（真的惨。。）
+
+使用 实验组 和 对照组数据 对 $E[Y_i(1)|X_i], E[Y_i(0)|X_i]$ 独立建模。
+
+## Class Transformation
+> 用于 二值收益变量，比如：点击，转化。都是二值收益变量
+该方法构建了以下变量
+$$
+Z_i = Y_i^{obs}W_i + (1-Y_i^{obs})(1-W_i)
+$$
+$Z_i=1$包含两种情况：
+* obs 属于 实验组，且 $Y_i^{obs}=1$
+* obs 属于 对照组，且 $Y_i^{obs}=0$
 
 # Glossary
 
