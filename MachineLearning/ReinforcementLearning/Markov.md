@@ -159,9 +159,9 @@ $$
 
 $$
 \begin{aligned}
-v_\star(s) &= \max_a q_\star(s,a) \\
- q_\star(s,a)&= \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^av_\star(s') \\
- v_\star(s) &= \max_a \Bigl(  \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^av_\star(s') \Bigl)\\
+v_\star(s) &= \max_a q_\star(s,a) \\\\
+ q_\star(s,a)&= \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^av_\star(s') \\\\
+ v_\star(s) &= \max_a \Bigl(  \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^av_\star(s') \Bigl)\\\\
  q_\star(s,a)&= \mathcal R_s^a+\gamma\sum_{s' \in S}\mathcal P_{ss'}^a  \max_{a'} q_\star(s',a')
 \end{aligned}
 $$
