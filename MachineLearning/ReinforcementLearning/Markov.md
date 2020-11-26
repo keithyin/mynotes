@@ -72,10 +72,10 @@ $$
 $$
 \begin{aligned}
 v(s)&=\mathbb E[G_t|S_t=s] \\
-&=\mathbb E[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\
-&=\mathbb E[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\
-&=\mathbb E[R_{t+1}+\gamma G_{t+1}|S_t=s]\\
-&=\mathbb E[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\
+&=\mathbb E[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\\\
+&=\mathbb E[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\\\
+&=\mathbb E[R_{t+1}+\gamma G_{t+1}|S_t=s]\\\\
+&=\mathbb E[R_{t+1}+\gamma v(S_{t+1})|S_t=s]\\\\
 v(s)&=\mathcal R_s+\gamma\sum_{s'\in S}\mathcal P_{ss'}v(s')
 \end{aligned}
 $$
