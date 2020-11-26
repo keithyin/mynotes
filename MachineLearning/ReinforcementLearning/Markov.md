@@ -71,7 +71,7 @@ $$
 
 $$
 \begin{aligned}
-v(s)&=\mathbb E[G_t|S_t=s] \\
+v(s)&=\mathbb E[G_t|S_t=s] \\\\
 &=\mathbb E[R_{t+1}+\gamma R_{t+2} + \gamma^2R_{t+3}+...|S_t=s]\\\\
 &=\mathbb E[R_{t+1}+\gamma (R_{t+2} + \gamma R_{t+3}+...)|S_t=s] \\\\
 &=\mathbb E[R_{t+1}+\gamma G_{t+1}|S_t=s]\\\\
