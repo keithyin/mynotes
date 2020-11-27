@@ -50,15 +50,14 @@ go 1.15 # golang 的版本号
 
 golang 对于 module 的命令 一般都包含两个影响：1）修改 go.mod 文件，2）下载对应的 module
 
-|命令|go.mod|Yes|补充说明|
-|go get|修改依赖的版本，或者添加一个新依赖|Yes|需要在 go.mod 所在目录下执行？|
-|go run|imported module 如果不在 go.mod中，则会添加|Yes|~|
-|go test|imported module 如果不在 go.mod中，则会添加|Yes|~|
-|go build|imported module 如果不在 go.mod中，则会添加|Yes|~|
-|go mod verify|验证go.mod中依赖的合法性|不会下载|～|
-|go mod download|下载 go.mod中的依赖|Yes|～|
-|go mod tidy|添加module依赖 & 删除不用依赖|Yes|～|
-|go list -m all|～|～|打印该module所有的依赖，是go.mod中的，还是所有 imported 就不确定了。|
+| 命令              | go.mod                                      | 下载 | 补充说明                                                     |
+| ----------------- | ------------------------------------------- | ---- | ------------------------------------------------------------ |
+| go get            | 修改依赖的版本，或者添加一个新依赖          | Yes  | 需要在 go.mod 所在目录下执行？                               |
+| go run/test/build | imported module 如果不在 go.mod中，则会添加 | Yes  |                                                              |
+| go mod verify     | 验证go.mod中依赖的合法性                    | No   |                                                              |
+| go mod download   | 下载 go.mod中的依赖                         | yes  |                                                              |
+| go mod tidy       | 添加module依赖 & 删除不用依赖               | Yes  |                                                              |
+| go list -m all    |                                             |      | 打印该module所有的依赖，是go.mod中的，还是所有 imported 就不确定了。 |
 
 * `go list -m -versions rsc.io/sampler` 可以查看一个 `module` 都有哪些版本
 * 
