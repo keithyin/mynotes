@@ -26,9 +26,13 @@ export GOPROXY=https://goproxy.cn
 ```
 
 * 创建一个 module：cd 到项目的根目录，然后 `go mod init`。当我们执行 `go mod init` 就会看到项目根目录多了一个 `go.mod` 文件，打开进去看
+```
+go mod init # 如果不加参数的话 生成的 go.mod 第一行就是该项目 src/ 后面根的路径
+go mod init github.com/keithyin/ProjName # 加参数的话， 这个参数就构成了 go.mod 的第一行。
+```
 
 ```
-module yinpeng/BookMeetingRoom # module's module name. 也是 import 路径
+module yinpeng/BookMeetingRoom # module's module name. 也是 import 路径。如果别人使用该项目的话, import 时候要填入该路径！
 
 go 1.15 # golang 的版本号
 ```
@@ -44,16 +48,29 @@ go 1.15 # golang 的版本号
 
 # 命令总结
 
-* 添加依赖
-```shell
-go get someModule # 在 go.mod同级目录下执行
-go run, go test, go build # 会自动将 代码中 imported module添加到 go.mod 中（并下载缺少的 module）
-# 也可以通过手动修改 go.mod 文件的方式添加依赖
-```
-* 管理依赖
-```shell
-go mod verify # 校验 go.mod 中的依赖 是否有效 （如果我们手动修改 go.mod 版本号，出现没有的版本号的时候，就可以检查出来）
-go mod download # 下载 go.mod 中的所有依赖。（避免了我们 一个个的 go get）
+golang 对于 module 的命令 一般都包含两个影响：1）修改 go.mod 文件，2）下载对应的 module
 
-go mod tidy # 清理 unused 依赖。
-```
+|命令|go.mod|Yes|补充说明|
+|go get|修改依赖的版本，或者添加一个新依赖|Yes|需要在 go.mod 所在目录下执行？|
+|go run|imported module 如果不在 go.mod中，则会添加|Yes|~|
+|go test|imported module 如果不在 go.mod中，则会添加|Yes|~|
+|go build|imported module 如果不在 go.mod中，则会添加|Yes|~|
+|go mod verify|验证go.mod中依赖的合法性|不会下载|～|
+|go mod download|下载 go.mod中的依赖|Yes|～|
+|go mod tidy|添加module依赖 & 删除不用依赖|Yes|～|
+|go list -m all|～|～|打印该module所有的依赖，是go.mod中的，还是所有 imported 就不确定了。|
+
+* `go list -m -versions rsc.io/sampler` 可以查看一个 `module` 都有哪些版本
+* 
+
+# 发布 module
+
+1. 为项目开一个 github repo
+2. 项目目录下 执行 `go mod init github.com/keithyin/ProjName`
+3. 项目开发
+4. 打tag： `git tag v1.0.0` , 关于版本号命名规范 https://blog.golang.org/publishing-go-modules
+5. push到 github： `git push origin v1.0.0`
+
+# 参考资料
+https://blog.golang.org/using-go-modules
+
