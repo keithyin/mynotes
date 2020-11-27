@@ -40,3 +40,10 @@ go 1.15 # golang 的版本号
 * 看到这可能会想，如果拿到了别人代码，里面用了一堆 module，难道我们还得一个个 `go get` 吗？其实大可不必，这里分为两种情况：
   * 代码中 `imported moudles(packages)` 没有写在 `go.mod` 文件中。这时候我们使用 `go run ,go test` 时候，会自动检查 `imported moudles(packages)` 是否都在 `go.mod` 中，如果没有，golang 就会自动下载各个 `modules(packages)` 的最新版本。
   * `go.mod` 中有：这时候我们只需要执行一个命令 让其下载即可 ``
+
+
+# 命令总结
+```shell
+go mod verify # 校验 go.mod 中的依赖 是否有效 （如果我们手动修改 go.mod 版本号，出现没有的版本号的时候，就可以检查出来）
+go mod download # 下载 go.mod 中的所有依赖。
+```
