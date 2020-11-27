@@ -43,7 +43,17 @@ go 1.15 # golang 的版本号
 
 
 # 命令总结
+
+* 添加依赖
+```shell
+go get someModule # 在 go.mod同级目录下执行
+go run, go test, go build # 会自动将 代码中 imported module添加到 go.mod 中（并下载缺少的 module）
+# 也可以通过手动修改 go.mod 文件的方式添加依赖
+```
+* 管理依赖
 ```shell
 go mod verify # 校验 go.mod 中的依赖 是否有效 （如果我们手动修改 go.mod 版本号，出现没有的版本号的时候，就可以检查出来）
-go mod download # 下载 go.mod 中的所有依赖。
+go mod download # 下载 go.mod 中的所有依赖。（避免了我们 一个个的 go get）
+
+go mod tidy # 清理 unused 依赖。
 ```
