@@ -67,6 +67,10 @@ $$
 $$
 Z_i = Y_i^{obs}W_i + (1-Y_i^{obs})(1-W_i)
 $$
+
+* $W_i$ 表示用户 i 是否被 treatment
+* $Y_i^{obs}$ 表示 i 是否 点击/转化
+
 $Z_i=1$包含两种情况：
 * obs 属于 实验组，且 $Y_i^{obs}=1$
 * obs 属于 对照组，且 $Y_i^{obs}=0$
