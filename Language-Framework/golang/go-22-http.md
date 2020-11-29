@@ -34,6 +34,8 @@ cookies主要存储在 `entries map[string]map[string]entry` 中，这里重要�
 * first key: eTLD+1  [什么是etld](https://web.dev/same-site-same-origin/)。实际上就是 site
 * subkey: cookie的 `name/domain/path`
 
+* 存储：根据 url 确定 site 作为第一个key，然后根据 `name/domain/path` 作为 subkey，然后存 cookie
+* 获取：根据 url 得到 site，取出所有 cookies，然后根据 `domain` 和 `path` 进行过滤
 
 ```go
 func (j *Jar) setCookies(u *url.URL, cookies []*http.Cookie, now time.Time) {
