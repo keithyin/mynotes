@@ -86,6 +86,9 @@ $$
 ## Modeling Uplift Directly
 > modifying existing machine leaning algorithms to directly infer a treatment effect
 
+# evaluation
+
+* predict uplift for both treated and control observations and compute the average prediction per decile in both groups. Then, the difference between those averages is tenken for each decile. 
 
 
 
