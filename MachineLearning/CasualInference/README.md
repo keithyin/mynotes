@@ -75,6 +75,20 @@ $Z_i=1$包含两种情况：
 * obs 属于 实验组，且 $Y_i^{obs}=1$
 * obs 属于 对照组，且 $Y_i^{obs}=0$
 
+当 $P(X_i=x) = 1/2$ 时，我们可以得到以下公式：
+$$
+\tau(X_i) = 2P(Z_i=1|X_i) - 1
+$$
+所以我们只需要建模 $P(Z_i=1|X_i)$，即：$E[Z_i=1|X_i]$. class transformation 方法是优于 two model方法的。所以目前来说比较火🔥
+
+当 $P(X_i=x)=1/2$ 并不满足时：。。。
+
+## Modeling Uplift Directly
+> modifying existing machine leaning algorithms to directly infer a treatment effect
+
+
+
+
 # Glossary
 
 * uplift modeling:  the set of **techniques** used to **model the incremental impact** of an action or treatment on a customer outcome。ie：建模 策略 对用户 **影响增益**的一系列工具
