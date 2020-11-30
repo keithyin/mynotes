@@ -1,4 +1,6 @@
 # Review
+刚开始看uplift modeling时候让我最迷的一点就是对于Treatment Group & Control Group含义的理解。因为之前接触过推荐，所以自然的就理解成 基础策略为Control Group，新策略为Treatment Group。但是实际上并不是这样。拿发红包来说，有一个基础的发券策略S1，A发5元，B发10元。。。 经过模型优化，我们又来了一个策略S2，A发6元，B发5元。S1 和 S2并不是ControlGroup 和 TreatmentGroup。ControlGroup为A发5元，TreatmentGroup为A发10元。这个要搞清楚。
+
 
 ## uplift modeling
 > the set of **techniques** used to **model the incremental impact** of an action or treatment on a customer outcome。ie：建模 策略 对用户 **影响增益**的一系列工具
