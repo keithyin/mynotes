@@ -98,5 +98,12 @@ $$
 
 * uplift modeling:  the set of **techniques** used to **model the incremental impact** of an action or treatment on a customer outcome。ie：建模 策略 对用户 **影响增益**的一系列工具
 
+
+* Customer acquisition： 客户获得（拉新）which prospects are most likely to become customers; this also includes win-back campaigns where attrited customers are targeted;
+* Customer development: 客户发展（增加客户在平台上的消费）。which customers are most likely to buy additional products (cross-selling) or to increase monetary values (up-selling);
+* Customer retention: 客户维系。which customers are most likely to be ‘saved’ by a retention campaign; this essentially identifies who have more ‘controllable’ risks as opposed to those who will attrite regardless of the retention effort.
+* Customer churn: 客户流失
+
 # 参考资料
 [http://proceedings.mlr.press/v67/gutierrez17a/gutierrez17a.pdf](http://proceedings.mlr.press/v67/gutierrez17a/gutierrez17a.pdf)
+[https://www2.deloitte.com/tw/tc/pages/technology/articles/newsletter-12-32.html](https://www2.deloitte.com/tw/tc/pages/technology/articles/newsletter-12-32.html)
