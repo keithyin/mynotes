@@ -103,6 +103,7 @@ $$
 * Customer development: 客户发展（增加客户在平台上的消费）。which customers are most likely to buy additional products (cross-selling) or to increase monetary values (up-selling);
 * Customer retention: 客户维系。which customers are most likely to be ‘saved’ by a retention campaign; this essentially identifies who have more ‘controllable’ risks as opposed to those who will attrite regardless of the retention effort.
 * Customer churn: 客户流失
+* upselling，cross-selling，down-sell：[https://www.jianshu.com/p/2b7c8ca37c6e](https://www.jianshu.com/p/2b7c8ca37c6e)
 
 # 参考资料
 [http://proceedings.mlr.press/v67/gutierrez17a/gutierrez17a.pdf](http://proceedings.mlr.press/v67/gutierrez17a/gutierrez17a.pdf)
