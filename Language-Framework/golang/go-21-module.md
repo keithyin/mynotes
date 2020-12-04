@@ -1,3 +1,29 @@
+# go 的包管理
+
+* GOPATH
+* vender
+* go module
+
+# GOPATH
+
+* 需要用的库 + 自己开发的代码都要放到 `$GOPATH/src` 目录下，`import` 导入的路径查找也是 `$GOPATH/src`
+
+问题：
+
+* 多版本的时候，不好处理。
+
+# vender
+
+* 工程 root 下有个 vender 子目录，用于放置依赖包，这样不同项目使用不同包的版本就更容易配置了。
+
+问题：
+
+* 没有依赖包 的版本信息
+
+# Go Module
+
+* 增加了版本信息 + 包的分版本下载。
+
 * 什么是 module
   * A module is a collection of Go packages stored in a file tree with a `go.mod` file at its root。比如说我们自己写的项目，如果项目 root目录下有个 `go.mod` 文件的话，那就是 module了。
 
@@ -72,4 +98,4 @@ golang 对于 module 的命令 一般都包含两个影响：1）修改 go.mod �
 
 # 参考资料
 https://blog.golang.org/using-go-modules
-
+https://zhuanlan.zhihu.com/p/311969770
