@@ -104,11 +104,14 @@ $$
 **Area Under Uplift Curves (AUUC)**
 
 * 准备两个验证集：一个 treatment group验证集，一个 control group验证集。Userid 为 Primary-Key
-* 拿训练好的模型预测两组用户 uplift-socres
+* 拿训练好的模型预测两组用户 uplift-socres：1）ControlGroup上的用户：计算uplift，2）TreatmentGroup上的用户：计算uplift。
 * 两组用户根据uplift-scores进行降序排。该操作用于人群对齐。基于假设（相似uplift-scores的人具有相似的行为）
 * 然后分别取两组的top 10%, 20%, ... 100%。计算两组的 转化率差异（并非直接用这个值，而是有一个诡异的公式。）。画出一个曲线
-* 曲线下面积即为auuc
-* 离线优化目标可以朝着auuc变大的方向去。
+* 曲线下面积即为auuc。
+* 离线优化目标可以朝着auuc变大的方向去。即：预测 uplift 高的人群，真实的 uplift 也是高的
+
+uplift高的那些用户，实际上我们计划圈出来进行treatment的，我们需要确认的是，uplift高的人在 treatment 和 control Group 中的表现的确是区分度比较大的，所以才有AUUC？
+
 
 
 # Glossary
