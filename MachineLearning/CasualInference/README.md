@@ -60,8 +60,10 @@ $$
 
 ## Two Model
 > 通常被用作 baseline 模型（真的惨。。）
+使用 实验组 和 对照组数据 对 $E[Y_i(1)|X_i], E[Y_i(0)|X_i]$ 独立建模。然后使用减法得到 uplift $uplift = E[Y_i(1)|X_i] - E[Y_i(0)|X_i]$
+* 独立建模的意思是：两个模型，使用 TreatmentGroup 数据 和 ControlGroup 数据独立训练
 
-使用 实验组 和 对照组数据 对 $E[Y_i(1)|X_i], E[Y_i(0)|X_i]$ 独立建模。
+广义two models模型：一旦输入特征加上了 control/treatment group的标记，那就是 two models模型了。
 
 ## Class Transformation
 > 用于 二值收益变量，比如：点击，转化。都是二值收益变量
