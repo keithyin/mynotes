@@ -92,11 +92,29 @@ $$
 
 * predict uplift for both treated and control observations and compute the average prediction per decile in both groups. Then, the difference between those averages is tenken for each decile. 
 
+> 我们无法看到 treated/not treated在同一个人身上的影响，所以我们没有ground truth来评估uplift model。
+
+* uplift通常使用一些 `aggregated measures` ，例如 `uplift bins` 或者 `uplift curves`. 
+* upliff-model的评估通常基于一种假设：相似 uplift-score 的人通常具有相同的行为（认为相同uplift-score的用户是同一类人。）
+
+
+
+**Area Under Uplift Curves (AUUC)**
+
+* 准备两个验证集：一个 treatment group验证集，一个 control group验证集。Userid 为 Primary-Key
+* 拿训练好的模型预测两组用户 uplift-socres
+* 两组用户根据uplift-scores进行降序排。该操作用于人群对齐。基于假设（相似uplift-scores的人具有相似的行为）
+* 然后分别取两组的top 10%, 20%, ... 100%。计算两组的 转化率差异（并非直接用这个值，而是有一个诡异的公式。）。画出一个曲线
+* 曲线下面积即为auuc
+* 离线优化目标可以朝着auuc变大的方向去。
 
 
 # Glossary
 
 * uplift modeling:  the set of **techniques** used to **model the incremental impact** of an action or treatment on a customer outcome。ie：建模 策略 对用户 **影响增益**的一系列工具
+* quantile: 四分位，概率分布曲线下面积四等分，会得到的三个数
+* decile：10分位，
+* Percentile
 
 
 * Customer acquisition： 客户获得（拉新）which prospects are most likely to become customers; this also includes win-back campaigns where attrited customers are targeted;
@@ -107,4 +125,7 @@ $$
 
 # 参考资料
 [http://proceedings.mlr.press/v67/gutierrez17a/gutierrez17a.pdf](http://proceedings.mlr.press/v67/gutierrez17a/gutierrez17a.pdf)
+
 [https://www2.deloitte.com/tw/tc/pages/technology/articles/newsletter-12-32.html](https://www2.deloitte.com/tw/tc/pages/technology/articles/newsletter-12-32.html)
+
+[https://mp.weixin.qq.com/s?__biz=MzU1NTMyOTI4Mw==&mid=2247498630&idx=1&sn=b36515e54c2dbc20186942102497c390&chksm=fbd749eacca0c0fc9e285ffc7d06e336115f387394362a4707c71377f02832f8c42bcc71cc7a&mpshare=1&scene=24&srcid=&sharer_sharetime=1585109170232&sharer_shareid=255a68ecb152bdfa3b164d51ce560a8d#rd](https://mp.weixin.qq.com/s?__biz=MzU1NTMyOTI4Mw==&mid=2247498630&idx=1&sn=b36515e54c2dbc20186942102497c390&chksm=fbd749eacca0c0fc9e285ffc7d06e336115f387394362a4707c71377f02832f8c42bcc71cc7a&mpshare=1&scene=24&srcid=&sharer_sharetime=1585109170232&sharer_shareid=255a68ecb152bdfa3b164d51ce560a8d#rd)
