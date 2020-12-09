@@ -14,3 +14,14 @@ model is known 的含义是：
 
 问题： 给定 policy，计算其 value function $v_\pi(s)$
 解决方案：iterative application of Bellman expectation backup
+
+算法：
+1. at each iteration k+1
+2. 对所有的状态
+3. 根据 $v_k(s')$ 更新 $v_{k+1}(s)$, $s'$ 是 $s$ 的下一个状态
+
+更新公式
+
+$$
+v_{k+1} = \sum_{a \in A}\pi(a|s) \Bigr(  \mathcal R_s^a + \gamma\sum_{s' \in S} P_{ss'}^{a'}v_k(s') \Bigr)
+$$
