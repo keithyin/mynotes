@@ -77,8 +77,19 @@ Three simple ideas for asynchronous dynamic programming:
 * Prioritised sweeping (因为状态-值函数的更新 和 状态选取的顺序是有关系的，所以如何选取状态是一个值得思考🤔的点)
 * Real-time dynamic programming
 
+## 状态选择方法
+* Prioritised Sweeping
+* 使用 agent 的经历去指导 当前要更新的 state 的选择
+
 **Prioritised Sweeping**
 * 使用 bellman error 指导状态的选择，error 大的状态优先更新。
 $$
 \Bigr | \max_a \Bigr (\mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s') \Bigr )-v(s) \Bigr |
 $$
+
+**Agent's Experience**
+* after each time-step $S_t, A_t, R_{t+1}$
+$$
+v(S_t) <- \max_a \Bigr( \mathcal R_{S_t}^a + \gamma\sum_{s'}\mathcal P_{S_ts'}^a v(s') \Bigr)
+$$
+
