@@ -51,9 +51,16 @@ $$
 
 
 # Value Iteration
-> idea：如果我们知道子问题的解 $v_{optimal}(s')$，那么原始问题的解通过 one-step look ahead 也可以找到
+> idea：如果我们知道子问题的解 $v_{optimal}(s')$，那么原始问题的解通过 one-step look ahead 也可以找到.
+> value iteration 就是基于下面这个公式
+> 直觉：从最终的 reward 的开始，往前进行迭代
 
 $$
 v_{optimal}(s) = \max_a \mathcal R_s^a + \gamma \sum_{s' \in S} \mathcal P_{ss'}^a v_{optimal}(s')
 $$
+
+算法：
+1. at each iteration k+1
+2. 对于所有的状态 $s\in S$
+3. 根据上面的公式，通过 $v_{k}(s')$ 更新 $v_{k+1}(s)$
 
