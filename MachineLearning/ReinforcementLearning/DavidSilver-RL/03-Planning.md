@@ -93,3 +93,4 @@ $$
 v(S_t) \leftarrow \max_a \Bigr( \mathcal R_{S_t}^a + \gamma\sum_{s'}\mathcal P_{S_ts'}^a v(s') \Bigr)
 $$
 
+# Full-Width Backups or Sample Backups
