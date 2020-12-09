@@ -67,3 +67,18 @@ $$
 与 policy iteration 的对比：
 1. 没有显式的 policy
 2. 中间过程的 value functions 可能并不对应任何 policy
+
+# Asynchronous Dynamic Programming
+前面聊的几个方法都是 Synchronous backups, 可以看出：我们都是通过 $v_k(s')$ 来更新 $v_{k+1}(s)$ 的。
+那么什么是 asynchronous backups 如何操作呢？我们直接 inplace 的更新 $v(s)$.
+
+Three simple ideas for asynchronous dynamic programming:
+* In-place dynamic programming (inplace 更新 $v(s)$)
+* Prioritised sweeping (因为状态-值函数的更新 和 状态选取的顺序是有关系的，所以如何选取状态是一个值得思考🤔的点)
+* Real-time dynamic programming
+
+**Prioritised Sweeping**
+* 使用 bellman error 指导状态的选择，error 大的状态优先更新。
+$$
+\Bigr|\max_a (\Bigr \mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s') -v(s) \Bigr)\Bigr|
+$$
