@@ -64,3 +64,6 @@ $$
 2. 对于所有的状态 $s\in S$
 3. 根据上面的公式，通过 $v_{k}(s')$ 更新 $v_{k+1}(s)$
 
+与 policy iteration 的对比：
+1. 没有显式的 policy
+2. 中间过程的 value functions 可能并不对应任何 policy
