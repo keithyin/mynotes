@@ -49,3 +49,5 @@ $$
 修改点：
 1. policy evaluation 是否真的需要收敛才可以？执行n次 policy evaluation迭代是否可行
 
+
+# Value Iteration
