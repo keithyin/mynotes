@@ -40,3 +40,8 @@ $$
 $$
 \pi_{j+1}(a|s) = \max_a R_s^a + \gamma\sum_{s'\in S}P_{ss'}^a v_{\pi_{j}}(s')
 $$
+ 
+或者使用以下更新公式
+$$
+\pi_{j+1}(a|s) = \max_a \pi_j(a|s)
+$$
