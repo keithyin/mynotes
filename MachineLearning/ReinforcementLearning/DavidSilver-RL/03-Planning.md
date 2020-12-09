@@ -34,7 +34,7 @@ $$
 # Policy Iteration
 
 1. at each iteration j+1
-1. 进行 policy evaluation（计算 $v_{\pi_j}(s)$）（内部需要迭代 $K$ 次 才能得到正确的 policy evaluation）
+1. 进行 policy evaluation（计算 $v_{\pi_j}(s)$）（内部需要迭代 $K$ 次 才能得到正确的 policy evaluation)
 2. policy evaluation之后，$v_{\pi_j}(s)$就都知道了。我们可以使用以下公式 improve policy。对所有的状态 使用 $v_{\pi_j}(s)$ 更新 $v_{\pi_{j+1}}(s)$
 
 $$
@@ -45,3 +45,7 @@ $$
 $$
 \pi_{j+1}(a|s) = \max_a \pi_j(a|s)
 $$
+
+修改点：
+1. policy evaluation 是否真的需要收敛才可以？执行n次 policy evaluation迭代是否可行
+
