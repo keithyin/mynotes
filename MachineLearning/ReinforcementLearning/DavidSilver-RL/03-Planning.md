@@ -23,7 +23,7 @@ model is known 的含义是：
 更新公式
 
 $$
-v_{k+1}(s) = \sum_{a \in A}\pi(a|s) \Bigr(  \mathcal R_s^a + \gamma\sum_{s' \in S} P_{ss'}^{a'}v_k(s') \Bigr)
+v_{k+1}(s) = \sum_{a \in A}\pi(a|s) \Bigr(  \mathcal R_s^a + \gamma\sum_{s' \in S} \mathcal P_{ss'}^{a'}v_k(s') \Bigr)
 $$
  
 或者更新公式
@@ -38,7 +38,7 @@ $$
 2. policy evaluation之后，$v_{\pi_j}(s)$就都知道了。我们可以使用以下公式 improve policy。对所有的状态 使用 $v_{\pi_j}(s)$ 更新 $v_{\pi_{j+1}}(s)$
 
 $$
-\pi_{j+1}(a|s) = \max_a R_s^a + \gamma\sum_{s'\in S}P_{ss'}^a v_{\pi_{j}}(s')
+\pi_{j+1}(a|s) = \max_a \mathcal R_s^a + \gamma\sum_{s'\in S}\mathcal P_{ss'}^a v_{\pi_{j}}(s')
 $$
  
 或者使用以下更新公式
