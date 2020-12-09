@@ -51,3 +51,9 @@ $$
 
 
 # Value Iteration
+> idea：如果我们知道子问题的解 $v_{optimal}(s')$，那么原始问题的解通过 one-step look ahead 也可以找到
+
+$$
+v_{optimal}(s) = \max_a \mathcal R_s^a + \gamma \sum_{s' \in S} \mathcal P_{ss'}^a v_{optimal}(s')
+$$
+
