@@ -33,5 +33,5 @@ $$
 2. policy evaluation之后，$v_\pi(s)$就都知道了。我们可以使用以下公式 improve policy。对所有的状态 使用 $\pi_{k}(s')$ 更新 $\pi_k(s)$
 
 $$
-\pi_{j+1}(a|s) = \max_a R_s^a + \gamma\sum_{s' \in S}P_{ss'}^a v_\pi_{j}(s')
+\pi_{j+1}(a|s) = \max_a R_s^a + \gamma\sum_{s'\in S}P_{ss'}^a v_{\pi_{j}}(s')
 $$
