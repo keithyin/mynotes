@@ -90,6 +90,6 @@ $$
 **Agent's Experience**
 * after each time-step $S_t, A_t, R_{t+1}$
 $$
-v(S_t) <- \max_a \Bigr( \mathcal R_{S_t}^a + \gamma\sum_{s'}\mathcal P_{S_ts'}^a v(s') \Bigr)
+v(S_t) \leftarrow \max_a \Bigr( \mathcal R_{S_t}^a + \gamma\sum_{s'}\mathcal P_{S_ts'}^a v(s') \Bigr)
 $$
 
