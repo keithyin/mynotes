@@ -25,6 +25,11 @@ model is known 的含义是：
 $$
 v_{k+1}(s) = \sum_{a \in A}\pi(a|s) \Bigr(  \mathcal R_s^a + \gamma\sum_{s' \in S} P_{ss'}^{a'}v_k(s') \Bigr)
 $$
+ 
+或者更新公式
+$$
+q_{k+1}(s,a)=\mathcal R_s^a+\gamma\sum_{s'\in S}\mathcal P_{ss'}^a\sum_{a'\in A}\pi(a'|s')q_{k}(s',a'))
+$$
 
 # Policy Iteration
 
