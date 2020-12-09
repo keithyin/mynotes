@@ -23,5 +23,5 @@ model is known 的含义是：
 更新公式
 
 $$
-v_{k+1} = \sum_{a \in A}\pi(a|s) \Bigr(  \mathcal R_s^a + \gamma\sum_{s' \in S} P_{ss'}^{a'}v_k(s') \Bigr)
+v_{k+1}(s) = \sum_{a \in A}\pi(a|s) \Bigr(  \mathcal R_s^a + \gamma\sum_{s' \in S} P_{ss'}^{a'}v_k(s') \Bigr)
 $$
