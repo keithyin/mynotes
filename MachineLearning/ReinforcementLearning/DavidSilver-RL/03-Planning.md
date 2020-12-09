@@ -80,5 +80,5 @@ Three simple ideas for asynchronous dynamic programming:
 **Prioritised Sweeping**
 * 使用 bellman error 指导状态的选择，error 大的状态优先更新。
 $$
-\Bigr |\max_a (\Bigr \mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s') -v(s) \Bigr )\Bigr |
+\Bigr | \max_a \Bigr (\mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s') -v(s) \Bigr )\Bigr |
 $$
