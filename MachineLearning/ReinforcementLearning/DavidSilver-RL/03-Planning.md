@@ -105,4 +105,10 @@ $$
 DP对于百万状态级别的问题还能跑，如果状态空间进一步扩大，DP就很难能跑出结果了。
 
 ## Sample Backups
-使用 sample rewards and sample transitions $<S,A,R,S'>$。
+* 使用 sample rewards and sample transitions $<S,A,R,S'>$。
+* 更加依赖 agent's experience
+
+优点：
+* Model-Free：不需要知道 $\mathcal R_s^a, \mathcal P_{ss'}^a$
+* 每次backup不需要考虑 所有的action 和 后续状态，所以每次 backup的速度快
+* 通过采样解决了 状态多的问题
