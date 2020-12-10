@@ -122,4 +122,4 @@ DP对于百万状态级别的问题还能跑，如果状态空间进一步扩大
 $$
 \tilde{v_k}(s) = \max_a\Bigr(\mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s', w_k)\Bigr)
 $$
-* 训练模型，样本为 $\\{ <s, \tilde{v_k}(s)> \\}$. 直接 mini-batch 更新即可
+* 训练模型，样本为 $\\{ <s, \tilde{v_k}(s)> \\}$. 直接 mini-batch 更新即可。$w_k \rightarrow w_{k+1}$
