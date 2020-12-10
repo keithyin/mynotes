@@ -112,3 +112,10 @@ DP对于百万状态级别的问题还能跑，如果状态空间进一步扩大
 * Model-Free：不需要知道 $\mathcal R_s^a, \mathcal P_{ss'}^a$
 * 每次backup不需要考虑 所有的action 和 后续状态，所以每次 backup的速度快
 * 通过采样解决了 状态多的问题
+
+# Approx Dynamic Programming
+上面介绍的方法都是通过一个 table 来保存 $v(s)$ 的值，这个值是否可以直接使用函数进行预估呢 $v(s) = v(s, w)$. 可以将这个思路应用到上述的所有算法中。
+如何应用到 Value Iteration 中呢？
+
+* 采样一个 batch 的 state
+* batch state 预估
