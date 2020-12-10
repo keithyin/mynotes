@@ -95,3 +95,14 @@ $$
 
 # Full-Width Backups or Sample Backups
 
+## Full-Width Backups
+上面介绍的方法可以看出：
+* DP use full-width backups
+* 对于每次 backup（状态的更新），无论是sync方法 还是 async方法
+    * 每个 successor state and action is considered
+    * Using knowledge of the MDP transitions and reward function
+
+DP对于百万状态级别的问题还能跑，如果状态空间进一步扩大，DP就很难能跑出结果了。
+
+## Sample Backups
+使用 sample rewards and sample transitions $<S,A,R,S'>$。
