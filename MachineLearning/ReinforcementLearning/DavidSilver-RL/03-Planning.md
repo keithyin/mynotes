@@ -120,6 +120,6 @@ DP对于百万状态级别的问题还能跑，如果状态空间进一步扩大
 * 采样一个 batch 的 state
 * 对batch state 预估其 max 值
 $$
-\tilde{v_k(s)} = \max_a\Bigr(\mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s', w_k)\Bigr)
+\tilde{v_k}(s) = \max_a\Bigr(\mathcal R_s^a + \gamma\sum_{s'}\mathcal P_{ss'}^av(s', w_k)\Bigr)
 $$
-* 训练模型，样本为 $\\{ <s, \tilde{v_k(s)}> \\}$. 直接 mini-batch 更新即可
+* 训练模型，样本为 $\\{ <s, \tilde{v_k}(s)> \\}$. 直接 mini-batch 更新即可
