@@ -37,3 +37,12 @@ docker search $image_name # 查找镜像
 # 构建镜像
 * 使用 `docker commit` 构建镜像
 * 使用 `docker build & Dockerfile` 构建镜像
+
+
+使用 docker commit构建镜像流程：
+* 创建一个容器
+* 在容器中进行修改（装软件，创建文件，etc）
+* 将修改提交为一个新镜像
+
+使用 docker build & Dockerfile 构建镜像
+* 就像是在写配置文件(Dockerfile)， docker build 根据 Dockerfile进行构建镜像
