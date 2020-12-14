@@ -42,6 +42,19 @@ fn main() {
 }
 ```
 
+类比 顶层 const 与 底层 const 来理解变量声明与定义，实际上只有指针才区分 顶层 const 还是 底层 const。对于值，就只有顶层 const. 因为 rust 称之为 immutable, 所以就使用 顶层 immutable 与 底层 immutable 来说明吧
+
+```
+let a = 10; // a 顶层 immutable
+let ref_a = &a; // 顶层 immutable + 底层 immutable
+let mut mut_ref_a = &a; // 顶层 mutable + 底层 immutable
+
+let mut b = 100; // 顶层 mutable
+let ref_b = &b; // 顶层 immutable + 底层 immutable
+let mut mut_ref_b = &b; // 顶层 mutable + 底层 immutable
+let ref_b = &mut b; // 顶层 immutable + 底层 mutable
+let mut mm_ref_b = &mut b; // 顶层 mutable + 底层 mutable
+```
 
 
 # 基础数据类型
