@@ -79,6 +79,18 @@ a = 100; // fail, 顶层 const
 let a = 10;
 ```
 
+```rust
+{
+        let mut a = 1000;
+        let mut ref_a = &mut a;
+        let ref_ref_a = &mut ref_a; // 这里去掉 mut，就会报错，思考一下为什么。
+        println!("{}", **ref_ref_a);
+        **ref_ref_a = 100000;
+        println!("{}", **ref_ref_a);
+
+    }
+```
+
 # 基础数据类型
 
 ```rust
