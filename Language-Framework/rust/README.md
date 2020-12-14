@@ -40,7 +40,7 @@ fn main() {
     
     // 常量 vs immutable variable ？
 }
-```
+```rust
 
 类比 顶层 const 与 底层 const 来理解变量声明与定义，实际上只有指针才区分 顶层 const 还是 底层 const。对于值，就只有顶层 const. 因为 rust 称之为 immutable, 所以就使用 顶层 immutable 与 底层 immutable 来说明吧
 
