@@ -54,8 +54,30 @@ let ref_b = &b; // 顶层 immutable + 底层 immutable
 let mut mut_ref_b = &b; // 顶层 mutable + 底层 immutable
 let ref_b = &mut b; // 顶层 immutable + 底层 mutable
 let mut mm_ref_b = &mut b; // 顶层 mutable + 底层 mutable
+
+// 引用的引用
+let mut a = 1000;
+let mut ref_a = &a;
+let ref_ref_a = &ref_a;
+println!("{}", **ref_ref_a);
 ```
 
+所以对于 等号（=） 做一个简单的总结
+* 等号 右边
+    * 如果右边是值：执行移动语义 或者 赋值语义
+    * 如果右边是引用：&是赋值语义，&mut 是移动语义。只是语义在，我发现并不会做严格检查
+* 等号 左边，等号左边就简单了，要么就是 let，要么就是 let mut
+    * let: 顶层 immutable
+    * let mut: 顶层 mutable
+* 右边确定了 变量的部分类型，左边只是考虑是不是给变量 加上 顶层 immutable
+
+顶层 immutable
+```rust
+let a = 10;
+a = 100; // fail, 顶层 const
+
+let a = 10;
+```
 
 # 基础数据类型
 
