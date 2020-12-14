@@ -91,6 +91,21 @@ let a = 10;
     }
 ```
 
+* 思考以下代码。函数参数列表中的 变量 一定是 let 的。而非 let mut 的。
+```rust
+fn modify(a: &mut &mut i32) {
+    **a = 100;
+}
+
+fn call_modify(){
+    let mut a = 1000;
+    let mut ref_a = &mut a;
+    let ref_ref_a = &mut ref_a;
+    modify(ref_ref_a);
+    println!("modified: {}", a);
+}
+```
+
 # 基础数据类型
 
 ```rust
