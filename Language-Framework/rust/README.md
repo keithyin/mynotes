@@ -755,14 +755,14 @@ fn main() {
 
 # 包
 
-* 包：`cargo` 的给一个功能，允许 构建，测试，分享create
-* create：一个模块的树形结构，形成库或二进制项目
+* 包：`cargo` 提供一个功能，允许 构建，测试，分享create
+* crate：一个模块的树形结构，形成库或二进制项目。 crate只模块的树形结构
 * 模块：通过 use 来使用，用来控制作用域和路径的私有性
 * 路径：一个命名例如结构体、函数或模块等项的方式。
 * 包与create
   * 包提供一系列功能的一个或多个create
-  * create root 是 src/main.rs 或者是 src/lib.rs。如果只有 main.rs，则说明这个包只有一个 create。如果同时包含 main.rs 和 其他的 lib.rs，则说明有多个 create
-  * create 会将一个作用域的相关功能 分组到一起，使得该功能可以很方便的在多个项目之间共享
+  * crate root 是 src/main.rs 或者是 src/lib.rs。如果只有 main.rs，则说明这个包只有一个 crate。如果同时包含 main.rs 和 其他的 lib.rs，则说明有多个 crate
+  * crate 会将一个作用域的相关功能 分组到一起，使得该功能可以很方便的在多个项目之间共享
 * 使用模块控制作用域和私有性
   * 创建一个 lib 可以通过 `cargo new --lib libname` 来进行创建
   * 默认所有项（函数，方法，结构体，枚举，模块，常量） 都是私有的，需要使用 `pub` 才能暴露给外部
@@ -789,5 +789,41 @@ fn main() {
 }
 ```
 
+如何将不同的mod放在不同的文件中。
+* rust 中的 crate 树结构需要手动在代码中声明。
+* 声明完之后去创建 对应的 文件夹 + 文件即可。
+* rust 中：src/lib.rs 或者 src/main.rs 为 crate 的顶层模块。`crate::`，如果如果想要添加新的 `mod` 必须逐级声明下去。
 
+* 假设我们需要分文件放一个 `crate::hello::world` 一个模块。
+	* 在 `src/lib.rs` 或者 `src/main.rs` 声明 `hello` 模块, `mod hello`. 并在 创建 `src/hello.rs` 文件。
+	* 在 `src/hello.rs` 声明模块 `world` 。`pub mod world` 并创建 `src/hello/world.rs` 文件。
+	* 或者 `src/hello.rs` 中写 `mod world{....}`. 这样就不用创建新文件了。
+
+```rust
+// src/main.rs
+mod hello;
+
+// src/hello.rs
+pub mod world
+
+// src/hello/world.rs
+pub fn call() {
+	println!("hello world");
+}
+```
+
+```rust
+// src/main.rs
+mod hello;
+
+// src/hello.rs
+pub mod world{
+	pub fn call() {
+		println!("hello world");
+	}
+}
+```
+
+
+* 总结，如果想把代码 分 文件(夹) 管理起来，那就首先在代码中声明好，然后对应的文件创建起来，然后将代码移动过去
 
