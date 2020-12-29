@@ -32,3 +32,16 @@ Model Free Prediction: 评估一个policy的好坏。仅仅是评估
 * Increment total return $S(s) \leftarrow S(s) + G_t$
 * Value is estimated by mean return $V(s) = S(s)/N(s)$
 * 最终, 当$N(s)\rightarrow \inf$ 时 $V(s) \rightarrow v_\pi(s)$
+
+
+如果value进行增量更新
+* for each state $S_t$ with return $G_t$
+* $N(S_t)\leftarrow N(S_t) + 1$
+* $V(S_t) \leftarrow V(S_t)+\frac{1}{N(S_t)}(G_t - V(S_t))$ . 对于 non-stationary 问题来说 $V(S_t) \leftarrow V(S_t)+\alpha(G_t - V(S_t))$（训练的episode需要保持时间递增关系）
+
+# Temporal-Diference Learning (TD)
+* TD methods learn directly from episodes of experience
+* TD is model-free: no knowledge of MDP transitions / rewards
+* TD learns from incomplete episodes, by bootstrapping
+* TD updates a guess towards a guess
+* TD 
