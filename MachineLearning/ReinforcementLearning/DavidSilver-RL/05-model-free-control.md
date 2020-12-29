@@ -9,10 +9,10 @@
 
 * Greedy Policy improvement over $V(S)$ requires model of MDP
 $$
-\pi'(s) = \argmax_{a \in A} \mathcal R_s^a + \mathcal P_{ss'}^aV(s')
+\pi'(s) = \arg \max_{a \in A} \mathcal R_s^a + \mathcal P_{ss'}^aV(s')
 $$
 
 * Greedy policy improvement over $Q(s, a)$ is model-free
 $$
-\pi'(s) = \argmax_{a \in A} Q(s, a)
+\pi'(s) = \arg \max_{a \in A} Q(s, a)
 $$
