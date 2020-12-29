@@ -5,3 +5,14 @@
 * Policy Improvement：根据 policy evaluation 结果 进行 improve policy。Greedy Policy Improvement?
 * 👆上面两个操作不停循环
 
+# Policy Improvement
+
+* Greedy Policy improvement over $V(S)$ requires model of MDP
+$$
+\pi'(s) = \argmax_{a \in A} \mathcal R_s^a + \mathcal P_{ss'}^aV(s')
+$$
+
+* Greedy policy improvement over $Q(s, a)$ is model-free
+$$
+\pi'(s) = \argmax_{a \in A} Q(s, a)
+$$
