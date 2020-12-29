@@ -5,8 +5,9 @@
 * Policy Improvement：根据 policy evaluation 结果 进行 improve policy。Greedy Policy Improvement?
 * 👆上面两个操作不停循环
 
+Policy Iteration包含两个主要阶段：Policy Evaluation & Policy Improvement, 对于 Policy Evaluation，是有 modelf-free(MC, TD). 如果想要整体都Model Free的话，那么 Policy Improvement 也需要 Model Free方法。
+
 # Policy Improvement
-> policy evaluation 存在 model-based(DP) 和 model-free(MC, TD) 方法
 
 * Greedy Policy improvement over $V(S)$ requires model of MDP
 $$
@@ -17,3 +18,15 @@ $$
 $$
 \pi'(s) = \arg \max_{a \in A} Q(s, a)
 $$
+
+因为 Greedy Policy Improvement over $Q(s, a)$ is model-free，所以在 policy evaluation的时候，我们 evaluate 的也是 $q(a,s)$ 而非 $v(s)$ 了。
+
+# Monte-Carlo Control
+
+基础的 Policy Iteration算法，在 policy evaluation时候，因为需要采样大量episode，旨在更精确的评估policy，所以需要耗费大量时间。对于control问题来说，policy evaluation阶段，我们需要耗费那么长时间吗？
+* 答案当然是 可以不费那么长时间，是有一个 episode 进行 policy evaluation 即可，然后执行 policy improvement
+
+# TD Control （Sarsa）On-policy
+Monte-Carlo中我们需要一个 episode 进行 policy evaluation。对于TD来说，一个 time-step 我们就可以进行 policy evaluation 然后 policy improvement了。对应的算法也叫做 Sarsa
+
+# Q-Learning off-policy
