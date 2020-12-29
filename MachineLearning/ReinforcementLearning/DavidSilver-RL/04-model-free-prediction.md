@@ -44,4 +44,5 @@ Model Free Prediction: 评估一个policy的好坏。仅仅是评估
 * TD is model-free: no knowledge of MDP transitions / rewards
 * TD learns from incomplete episodes, by bootstrapping
 * TD updates a guess towards a guess
-* TD 
+* TD 使用 episode 可以非 terminate
+
