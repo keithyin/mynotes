@@ -46,3 +46,4 @@ Model Free Prediction: 评估一个policy的好坏。仅仅是评估
 * TD updates a guess towards a guess
 * TD 使用 episode 可以非 terminate
 
+将 Monte-Carlo中的 $G_t$ 替换为 $R_{t+1} + \gamma V(S_{t+1})$ 即可。
