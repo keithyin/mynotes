@@ -31,4 +31,4 @@ Model Free Prediction: 评估一个policy的好坏。仅仅是评估
 * Increment counter $N(s) \leftarrow N(s) + 1$
 * Increment total return $S(s) \leftarrow S(s) + G_t$
 * Value is estimated by mean return $V(s) = S(s)/N(s)$
-* 最终, 当$N(s)\rightarrow \inf$ 时 $V(s)->v_\pi(s)$
+* 最终, 当$N(s)\rightarrow \inf$ 时 $V(s) \rightarrow v_\pi(s)$
