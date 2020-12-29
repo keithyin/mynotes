@@ -6,6 +6,7 @@
 * 👆上面两个操作不停循环
 
 # Policy Improvement
+> policy evaluation 存在 model-based(DP) 和 model-free(MC, TD) 方法
 
 * Greedy Policy improvement over $V(S)$ requires model of MDP
 $$
