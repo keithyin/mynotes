@@ -31,3 +31,11 @@ $$
 $$
 \mathbb E_{\tau \sim \pi_\theta}\Biggr[\nabla_\theta \log\pi_\theta(s,a) Q^{\pi_\theta}(s,a)\Biggr]
 $$
+
+# Reinforce
+只能用在 terminate MDP 中。使用 return 来作为 $Q^{\pi_\theta}(s,a)$ 的无偏估计
+
+# Actor-Critic
+使用一个 q-value net 来估计 $Q^{\pi_\theta}(s,a)$
+
+# 
