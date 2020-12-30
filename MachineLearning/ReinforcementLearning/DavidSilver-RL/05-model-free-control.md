@@ -21,12 +21,27 @@ $$
 
 因为 Greedy Policy Improvement over $Q(s, a)$ is model-free，所以在 policy evaluation的时候，我们 evaluate 的也是 $q(a,s)$ 而非 $v(s)$ 了。
 
-# Monte-Carlo Control
+
+
+#  on-policy
+> * on-policy 与 off-policy 的区分出现在 policy-evaluation 阶段。
+> * off-policy使用 behavior-policy 产生的 trajectory，来 evaluate target-policy。
 
 基础的 Policy Iteration算法，在 policy evaluation时候，因为需要采样大量episode，旨在更精确的评估policy，所以需要耗费大量时间。对于control问题来说，policy evaluation阶段，我们需要耗费那么长时间吗？
 * 答案当然是 可以不费那么长时间，是有一个 episode 进行 policy evaluation 即可，然后执行 policy improvement
+* MC On-Policy
 
-# TD Control （Sarsa）On-policy
 Monte-Carlo中我们需要一个 episode 进行 policy evaluation。对于TD来说，一个 time-step 我们就可以进行 policy evaluation 然后 policy improvement了。对应的算法也叫做 Sarsa
+* TD On-Policy
 
-# Q-Learning off-policy
+# Off-Policy
+> * on-policy 与 off-policy 的区分出现在 policy-evaluation 阶段。
+> * off-policy使用 behavior-policy 产生的 trajectory，来 evaluate target-policy。
+
+off-policy的优点
+* Learn from observing humans or other agents
+* Re-use experience generated from old policies $\pi_1, \pi_2, \pi_3, ..., \pi_{t-1}$
+* Learn about optimal policy while following exploratory policy
+* Learn about multiple policies while following one policy
+
+在policy-evaluation的时候，我们的目标主要是
