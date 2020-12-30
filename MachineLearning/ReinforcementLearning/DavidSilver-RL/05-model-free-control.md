@@ -44,4 +44,4 @@ off-policy的优点
 * Learn about optimal policy while following exploratory policy
 * Learn about multiple policies while following one policy
 
-在policy-evaluation的时候，我们的目标主要是
+在policy-evaluation的时候，我们的目标主要是计算 $q_\pi(a,s)$, 
