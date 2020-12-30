@@ -26,3 +26,8 @@ $$
 &=\mathbb E_{(s,a)\sim \pi_\theta}\Biggr[\nabla_\theta \log\pi_\theta(s,a)\mathcal R_s^a\Biggr]
 \end{aligned}
 $$
+
+如何将 One-Step MDP PG 算法扩展到 MDP 上？
+$$
+\mathbb E_{\tau \sim \pi_\theta}\Biggr[\nabla_\theta \log\pi_\theta(s,a)\mathcal Q^{\pi_\theta}(s,a)\Biggr]
+$$
