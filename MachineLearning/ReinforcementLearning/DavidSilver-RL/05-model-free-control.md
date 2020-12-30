@@ -45,7 +45,7 @@ off-policy的优点
 * Learn about multiple policies while following one policy
 
 在policy-evaluation的时候，我们的目标主要是计算 $q_\pi(a,s)$, $q_\pi(a,s)=\mathbb E_\pi[G_t|S_t=s, A_t=a]$. 如果我们使用其它 policy $\mu$ 采样出来的 trajectory 来进行policy evaluation的话，那就需要 importance sampling
-![](https://img-blog.csdnimg.cn/2020123009222658.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTI0MzYxNDk=,size_16,color_FFFFFF,t_70)
-![](https://img-blog.csdnimg.cn/20201230092022439.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTI0MzYxNDk=,size_10,color_FFFFFF,t_10)
-![](https://img-blog.csdnimg.cn/20201230092101210.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTI0MzYxNDk=,size_10,color_FFFFFF,t_10)
+<img src="https://img-blog.csdnimg.cn/2020123009222658.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTI0MzYxNDk=,size_16,color_FFFFFF,t_70"/>
+<img src="https://img-blog.csdnimg.cn/20201230092022439.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTI0MzYxNDk=,size_10,color_FFFFFF,t_10)"/>
+<img src="https://img-blog.csdnimg.cn/20201230092101210.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTI0MzYxNDk=,size_10,color_FFFFFF,t_10)"/>
 
