@@ -22,7 +22,7 @@ $$
 
 $$
 \begin{aligned}
-\nabla_\theta J(\theta) &= \sum_s d(s)\sum_a\pi_\theta(s,a) \nabla_\theta \log\pi_\theta(s,a)\mathcal R_s^a \\\
+\nabla_\theta J(\theta) &= \sum_s d(s)\sum_a\pi_\theta(s,a) \nabla_\theta \log\pi_\theta(s,a)\mathcal R_s^a \\\\
 &=\mathbb E_{\pi_theta}\Biggr[\nabla_\theta \log\pi_\theta(s,a)\mathcal R_s^a\Biggr]
 \end{aligned}
 $$
