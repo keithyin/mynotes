@@ -16,6 +16,6 @@ Policy based reinforcement learning is an **optimisation** problem
 
 One-Step MDP，Policy Gradient推倒
 $$
-j(\theta)=\mathbb E_{\pi_\theta}[r] \\\
+j(\theta)=\mathbb E_{\pi_\theta}[r] 
 = \sum_{s\in S}d(s)\sum_a\pi_\theta(s,a)\mathcal R_s^a
 $$
