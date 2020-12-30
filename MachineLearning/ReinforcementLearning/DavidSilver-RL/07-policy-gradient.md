@@ -9,3 +9,13 @@
 * episode environments, 我们可以使用 start value。$J(\theta) = V^{\pi_\theta}(s1) = \mathbb E_\theta[v1]$
 * continuing environments, 我们可以使用 average value。$J_{avV}(\theta)=\sum_sd^{\pi_\theta}(s)V^{\pi_\theta}(s)$
 * 或者使用average reward per time-step，$J_{avR}(\theta)=\sum_sd^{\pi_\theta}(s)\sum_a\pi_\theta(s,a)\mathcal R_s^a$
+
+Policy based reinforcement learning is an **optimisation** problem
+* Find $\theta$ that maximises $J(\theta)$
+* Value based 并不是个优化问题？而是 policy evaluation & policy improvement
+
+One-Step MDP，Policy Gradient推倒
+$$
+j(\theta)=\mathbb E_{\pi_\theta}[r] \\\
+= \sum_{s\in S}d(s)\sum_a\pi_\theta(s,a)\mathcal R_s^a
+$$
