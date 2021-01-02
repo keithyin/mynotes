@@ -34,4 +34,4 @@ async fn get_two_sites_async() {
 * thread 是由操作系统来进行切换的，async代码的协程切换需要用户自己写代码
 * 一个线程 会有 多个 协程在之上运行？
 
-在Rust中
+在Rust中`async fn` 创建了一个 `asynchronous function`, 该函数返回一个 `Future`. 执行
