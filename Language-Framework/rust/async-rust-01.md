@@ -55,10 +55,42 @@ async fn hello_world() {
 
 fn main() {
     let future = hello_world(); // Nothing is printed
-    block_on(future); // `future` is run and "hello, world!" is printed, block_on 会阻塞当前进程，直到 future 
+    block_on(future); // `future` is run and "hello, world!" is printed, block_on 会阻塞当前进程，直到 future 执行完成。
 }
 ```
+3. 在 `async fn` 中，可以使用 `.await` 来等待 `Future` 完成， 和`block_on()` 不同 `.await` 并不阻塞当前线程，将当前线程的控制权交出，异步的等待 `future` 完成，
 
+```rust
+// 唱歌 & 跳舞 是可以并发执行的，但是 学习唱歌 & 唱歌 是序列执行的。所以代码可以写成以下方式。
+async fn learn_song() -> Song { /* ... */ }
+async fn sing_song(song: Song) { /* ... */ }
+async fn dance() { /* ... */ }
+
+async fn learn_and_sing() {
+    // Wait until the song has been learned before singing it.
+    // We use `.await` here rather than `block_on` to prevent blocking the
+    // thread, which makes it possible to `dance` at the same time.
+    let song = learn_song().await; // 阻塞， 然后将当前线程的控制权交给其它人。
+    sing_song(song).await;
+}
+
+async fn async_main() {
+    let f1 = learn_and_sing();
+    let f2 = dance();
+
+    // `join!` is like `.await` but can wait for multiple futures concurrently.
+    // If we're temporarily blocked in the `learn_and_sing` future, the `dance`
+    // future will take over the current thread. If `dance` becomes blocked,
+    // `learn_and_sing` can take back over. If both futures are blocked, then
+    // `async_main` is blocked and will yield to the executor.
+    futures::join!(f1, f2);
+}
+
+fn main() {
+    block_on(async_main());
+}
+
+```
 
 # 参考资料
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
