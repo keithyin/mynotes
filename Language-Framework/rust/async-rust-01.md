@@ -34,4 +34,31 @@ async fn get_two_sites_async() {
 * thread 是由操作系统来进行切换的，async代码的协程切换需要用户自己写代码
 * 一个线程 会有 多个 协程在之上运行？
 
-在Rust中`async fn` 创建了一个 `asynchronous function`, 该函数返回一个 `Future`. 执行
+在Rust中`async fn` 创建了一个 `asynchronous function`, 该函数返回一个 `Future`. 执行返回值的时候，才是真正的执行函数体！
+
+# 如何使用 async & await
+1. 添加依赖
+```rust
+[dependencies]
+futures = "0.3"
+```
+2. 使用 `async fn` 创建一个 `asynchronous function`, 该函数会返回一个 `Future`, 如果想让 函数执行的话，这个 `Future` 需要在一个 `executor` 中执行
+```rust
+// `block_on` blocks the current thread until the provided future has run to
+// completion. Other executors provide more complex behavior, like scheduling
+// multiple futures onto the same thread.
+use futures::executor::block_on;
+
+async fn hello_world() {
+    println!("hello, world!");
+}
+
+fn main() {
+    let future = hello_world(); // Nothing is printed
+    block_on(future); // `future` is run and "hello, world!" is printed, block_on 会阻塞当前进程，直到 future 
+}
+```
+
+
+# 参考资料
+[https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
