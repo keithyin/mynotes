@@ -91,5 +91,111 @@ fn main() {
 }
 ```
 
+# Future 到底是什么
+`Future` 是 `rust` 异步编程的核心，它表示了一个 计算某个值的 异步计算，当然，这个值也可以是 `()`。一个简单的 `Future` 可以是下面这个样子
+```rust
+
+trait SimpleFuture {
+    type Output;
+    fn poll(&mut self, wake: fn()) -> Poll<Self::Output>;
+}
+
+enum Poll<T> {
+    Ready(T),
+    Pending,
+}
+```
+* `pool`: 通过调用 `poll` 可以使 `future` 前进。如果在本次调用中，`future`完成了，就会返回 `Pool::Ready(result)`。 如果没有完成，就返回 `Pool::Pending`，同时安排一下，当`Future`准备好向下执行时调用 `wake` 。当 `wake` 被调用后，驱动 该 `Future` 的 `executor` 就会再次调用 `poll`。
+* 因为 `async fn` 里面也会有 `async fn`, 如果里面 `.await` 了，那么一次的 `poll` 执行也会在此结束，这时会返回 `Pool::Pending` 并安排上 `wake`
+
+举例：如何写一个 `SocketReadFuture` 呢，基本功能为，如果有数据读的是时候，就读取，然后返回结果。如果没有数据读取的时候，就安排 `wake`，并返回 `Pool::Pending`
+```rust
+pub struct SocketRead<'a> {
+    socket: &'a Socket,
+}
+
+impl SimpleFuture for SocketRead<'_> {
+    type Output = Vec<u8>;
+
+    fn poll(&mut self, wake: fn()) -> Poll<Self::Output> {
+        if self.socket.has_data_to_read() {
+            // The socket has data-- read it into a buffer and return it.
+            Poll::Ready(self.socket.read_buf())
+        } else {
+            // The socket does not yet have data.
+            //
+            // Arrange for `wake` to be called once data is available.
+            // When data becomes available, `wake` will be called, and the
+            // user of this `Future` will know to call `poll` again and
+            // receive data.
+            self.socket.set_readable_callback(wake);
+            Poll::Pending
+        }
+    }
+}
+```
+关于`Future`的调度器，可以按照下面方式实现
+```rust
+/// A SimpleFuture that runs two other futures to completion concurrently.
+///
+/// Concurrency is achieved via the fact that calls to `poll` each future
+/// may be interleaved, allowing each future to advance itself at its own pace.
+pub struct Join<FutureA, FutureB> {
+    // Each field may contain a future that should be run to completion.
+    // If the future has already completed, the field is set to `None`.
+    // This prevents us from polling a future after it has completed, which
+    // would violate the contract of the `Future` trait.
+    a: Option<FutureA>,
+    b: Option<FutureB>,
+}
+
+// Join实现了 Future, 所以，Join也是一个 Future
+impl<FutureA, FutureB> SimpleFuture for Join<FutureA, FutureB>
+where
+    FutureA: SimpleFuture<Output = ()>,
+    FutureB: SimpleFuture<Output = ()>,
+{
+    type Output = ();
+    fn poll(&mut self, wake: fn()) -> Poll<Self::Output> {
+        // Attempt to complete future `a`.
+        if let Some(a) = &mut self.a {
+            if let Poll::Ready(()) = a.poll(wake) {
+                self.a.take();
+            }
+        }
+
+        // Attempt to complete future `b`.
+        if let Some(b) = &mut self.b {
+            if let Poll::Ready(()) = b.poll(wake) {
+                self.b.take();
+            }
+        }
+
+        if self.a.is_none() && self.b.is_none() {
+            // Both futures have completed-- we can return successfully
+            Poll::Ready(())
+        } else {
+            // One or both futures returned `Poll::Pending` and still have
+            // work to do. They will call `wake()` when progress can be made.
+            Poll::Pending
+        }
+    }
+}
+```
+上面只是介绍了一个简单的 `Future`，一个真实的 `Future` 如下所示
+```rust
+trait Future {
+    type Output;
+    fn poll(
+        // Note the change from `&mut self` to `Pin<&mut Self>`:
+        self: Pin<&mut Self>,
+        // and the change from `wake: fn()` to `cx: &mut Context<'_>`:
+        cx: &mut Context<'_>,
+    ) -> Poll<Self::Output>;
+}
+```
+
+
+
 # 参考资料
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
