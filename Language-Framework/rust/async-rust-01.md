@@ -89,7 +89,6 @@ async fn async_main() {
 fn main() {
     block_on(async_main());
 }
-
 ```
 
 # 参考资料
