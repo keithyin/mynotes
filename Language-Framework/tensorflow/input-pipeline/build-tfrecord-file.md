@@ -2,7 +2,7 @@
 **注意：在创建TFRecord File的时候，是不会用到tf的graph的，不会有tensor，一切都跟命令式编程一样。**
 
 
-tensorflow.__version__=1.15
+tensorflow.\_\_version\_\_=1.15
 
 抽象：
 * `Feature`: 特征，也称`Field`字段。 对应tensorflow中的类，`tf.train.Feature`
