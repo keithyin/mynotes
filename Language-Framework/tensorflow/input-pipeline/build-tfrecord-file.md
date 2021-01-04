@@ -1,5 +1,29 @@
 # 如何创建一个`TFRecord File`
 
+tensorflow.__version__=1.15
+
+抽象：
+* `Feature`: 特征，也称`Field`字段。 对应tensorflow中的类，`tf.train.Feature`
+```python
+# The following functions can be used to convert a value to a type compatible
+# with tf.Example.
+
+def _bytes_feature(value):
+  """Returns a bytes_list from a string / byte."""
+  return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+def _float_feature(value):
+  """Returns a float_list from a float / double."""
+  return tf.train.Feature(float_list=tf.train.FloatList(value=[value]))
+
+def _int64_feature(value):
+  """Returns an int64_list from a bool / enum / int / uint."""
+  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+```
+* `Example`: 一条
+
+
+
 **注意：在创建TFRecord File的时候，是不会用到tf的graph的，不会有tensor，一切都跟命令式编程一样。**
 
 ```python
