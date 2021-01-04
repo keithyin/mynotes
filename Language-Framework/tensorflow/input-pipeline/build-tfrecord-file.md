@@ -4,7 +4,7 @@
 
 tensorflow.\_\_version\_\_=1.15
 
-抽象：
+抽象：Feature, Features, Example
 * `Feature`: 特征，也称`Field`字段。 对应tensorflow中的类，`tf.train.Feature`
 ```python
 # The following functions can be used to convert a value to a type compatible
