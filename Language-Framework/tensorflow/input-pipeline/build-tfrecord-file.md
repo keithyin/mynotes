@@ -1,4 +1,6 @@
 # 如何创建一个`TFRecord File`
+**注意：在创建TFRecord File的时候，是不会用到tf的graph的，不会有tensor，一切都跟命令式编程一样。**
+
 
 tensorflow.__version__=1.15
 
@@ -19,120 +21,80 @@ def _float_feature(value):
 def _int64_feature(value):
   """Returns an int64_list from a bool / enum / int / uint."""
   return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+
+print(_bytes_feature(b'test_string'))
+print(_bytes_feature(u'test_bytes'.encode('utf-8')))
+
+print(_float_feature(np.exp(1)))
+
+print(_int64_feature(True))
+print(_int64_feature(1))
 ```
-* `Example`: 一条
-
-
-
-**注意：在创建TFRecord File的时候，是不会用到tf的graph的，不会有tensor，一切都跟命令式编程一样。**
-
+* `Example`: 一条训练样本，也称`instance`。Feature 的集合。
 ```python
-def _int64_feature(value):
-  return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
+def serialize_example(feature0, feature1, feature2, feature3):
+  """
+  Creates a tf.Example message ready to be written to a file.
+  """
 
-def _bytes_feature(value):
-  return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+  # Create a dictionary mapping the feature name to the tf.Example-compatible
+  # data type.
 
-def convert_to(data_set, name):
-  """Converts a dataset to tfrecords."""
-  images = data_set.images #image的shape应该是[batch, rows, cols, depth]
-  labels = data_set.labels
-  num_examples = data_set.num_examples
+  feature = {
+      'feature0': _int64_feature(feature0),
+      'feature1': _int64_feature(feature1),
+      'feature2': _bytes_feature(feature2),
+      'feature3': _float_feature(feature3),
+  }
 
-  if images.shape[0] != num_examples:
-    raise ValueError('Images size %d does not match label size %d.' %
-                     (images.shape[0], num_examples))
-  rows = images.shape[1]
-  cols = images.shape[2]
-  depth = images.shape[3]
+  # Create a Features message using tf.train.Example.
 
-  filename = os.path.join(FLAGS.directory, name + '.tfrecords')
-  print('Writing', filename)
-  writer = tf.python_io.TFRecordWriter(filename)
-  for index in range(num_examples):
-    image_raw = images[index].tostring() #转化为字节流
-    example = tf.train.Example(features=tf.train.Features(feature={
-        'height': _int64_feature(rows),
-        'width': _int64_feature(cols),
-        'depth': _int64_feature(depth),
-        'label': _int64_feature(int(labels[index])),
-        'image_raw': _bytes_feature(image_raw)}))
-    writer.write(example.SerializeToString())
-  writer.close()
+  example_proto = tf.train.Example(features=tf.train.Features(feature=feature))
+  return example_proto.SerializeToString()
 ```
 
-## tf.train.\*\*List
-
-* tf.train.Int64List 保存着Int64类型的列表
-* tf.train.FloatList 保存着Float类型的列表
-* tf.train.BytesList 保存着Bytes类型的列表
-
-Magic attribute generated for "value" proto field
-为`value`原始字段 生成的 魔术属性。
+* 写入tfrecord中
 ```python
-int64_list = tf.train.Int64List(valule=[value])
-
+with tf.python_io.TFRecordWriter(filename) as writer:
+  for i in range(n_observations):
+    example = serialize_example(feature0[i], feature1[i], feature2[i], feature3[i])
+    writer.write(example)
 ```
 
-## tf.train.Feature
-属性：
-
-* bytes_list
-Magic attribute generated for "bytes_list" proto field.
-为`bytes_list`原始字段生成的魔术属性。
-
-* float_list
-Magic attribute generated for "float_list" proto field.
-
-* int64_list
-Magic attribute generated for "int64_list" proto field.
-
+# 从tfrecord中解析数据
+* 使用tensorflow Graph模型读数据
 ```python
-tf.train.Feature(int64_list = int64_list)
+raw_image_dataset = tf.data.TFRecordDataset('images.tfrecords')
+
+# Create a dictionary describing the features.
+image_feature_description = {
+    'height': tf.FixedLenFeature([], tf.int64),
+    'width': tf.FixedLenFeature([], tf.int64),
+    'depth': tf.FixedLenFeature([], tf.int64),
+    'label': tf.FixedLenFeature([], tf.int64),
+    'image_raw': tf.FixedLenFeature([], tf.string),
+}
+
+def _parse_image_function(example_proto):
+  # Parse the input tf.Example proto using the dictionary above.
+  return tf.parse_single_example(example_proto, image_feature_description)
+
+parsed_image_dataset = raw_image_dataset.map(_parse_image_function)
+parsed_image_dataset
 ```
-
-## tf.train.Features
-属性：
-* feature
-Magic attribute generated for "feature" proto field.
-为`feature`原始字段生成的魔术属性。
-
+* 使用 python api 读数据。用来检查数据挺方便的。
 ```python
-tf.train.Features(feature={
-        'height': _int64_feature(rows),
-        'width': _int64_feature(cols),
-        'depth': _int64_feature(depth),
-        'label': _int64_feature(int(labels[index])),
-        'image_raw': _bytes_feature(image_raw)})
+record_iterator = tf.python_io.tf_record_iterator(path=filename)
+
+for string_record in record_iterator:
+  example = tf.train.Example()
+  example.ParseFromString(string_record)
+  print(example)
 ```
 
-**看完了各种为谁生成魔术属性之后，来看看Example怎么写**
-## tf.train.Example
-```python
-example = tf.train.Example(features=tf.train.Features(feature={
-        'height': _int64_feature(rows),
-        'width': _int64_feature(cols),
-        'depth': _int64_feature(depth),
-        'label': _int64_feature(int(labels[index])),
-        'image_raw': _bytes_feature(image_raw)}))
-# 将样本序列化后写到文件里
-writer.write(example.SerializeToString())
-#这里的writer就是 tf.python_io.TFRecordWriter(filename)
-#写完记得close一下哦
-```
-
-一个`example` 就是一个样本。
-
-从这看来一个原始数据需要层层包装才可以生成record文件：
-
-```python
-1. 用Int64List 包装值
-2. 用Feature 包装 Int64List
-3. 用Features包装 Feature
-4. 用Example包装 Features
-```
-
-## 参考资料
+# 参考资料
 [http://warmspringwinds.github.io/tensorflow/tf-slim/2016/12/21/tfrecords-guide/](http://warmspringwinds.github.io/tensorflow/tf-slim/2016/12/21/tfrecords-guide/)
 [https://github.com/tensorflow/tensorflow/blob/r1.1/tensorflow/examples/how_tos/reading_data/convert_to_records.py](https://github.com/tensorflow/tensorflow/blob/r1.1/tensorflow/examples/how_tos/reading_data/convert_to_records.py)
 [http://web.stanford.edu/class/cs20si/lectures/notes_09.pdf](http://web.stanford.edu/class/cs20si/lectures/notes_09.pdf)
+
+https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/load_data/tf_records.ipynb
