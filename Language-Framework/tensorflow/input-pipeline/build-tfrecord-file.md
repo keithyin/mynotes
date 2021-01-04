@@ -95,8 +95,8 @@ for string_record in record_iterator:
 
 # 变长数据的处理
 有两种方法:
-* 转成bytes存储
-* 直接使用 list 存储
+* 转成bytes存储, 可以和长度一起存储。
+* 直接使用 list 存储。解析出来的是 SparseTensor
 ```python
 # 使用 bytes 存储
 def write_tf_record():
