@@ -160,7 +160,8 @@ def parse_from_record_graph():
         # Parse the input tf.Example proto using the dictionary above.
         example = tf.parse_single_example(example_proto, image_feature_description)
         # visited_city = tf.io.decode_raw(example['visited_city'], out_type=tf.int64)
-        visited_city = example["visited_city"]
+        visited_city = example["visited_city"] # 因为使用 VarLenFeature解析，所以返回的是 tf.sparse.SparseTensor类型
+        visited_city = tf.sparse.to_dense(visited_city) # 转成 dense 类型。
         return visited_city
 
     parsed_image_dataset = raw_image_dataset.map(_parse_image_function)
