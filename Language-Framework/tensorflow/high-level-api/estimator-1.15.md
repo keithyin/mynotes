@@ -77,3 +77,7 @@ def cnn_model_fn(features, labels, mode):
   return tf.estimator.EstimatorSpec(
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
+
+# 参考资料
+(https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md)[https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md]
+(https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/estimators/cnn.ipynb)[https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/estimators/cnn.ipynb]
