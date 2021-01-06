@@ -28,7 +28,7 @@ session.run(next_batch) #来获取每个 batch 就可以了.
 
 
 
-## tf.data.Dataset
+# tf.data.Dataset
 
 **构建 Dataset 的方法**
 
@@ -110,9 +110,42 @@ def func(example_proto):
     pass
 ```
 
+# 变长数据的操作
+
+```python
+def parse_from_record_graph():
+    record_filename = tf.placeholder(dtype=tf.string, shape=[1])
+    raw_image_dataset = tf.data.TFRecordDataset(record_filename)
+
+    # Create a dictionary describing the features.
+    image_feature_description = {
+        'visited_city': tf.io.VarLenFeature(dtype=tf.int64),
+    }
+
+    def _parse_image_function(example_proto):
+        # Parse the input tf.Example proto using the dictionary above.
+        example = tf.parse_single_example(example_proto, image_feature_description)
+        # visited_city = tf.io.decode_raw(example['visited_city'], out_type=tf.int64)
+        visited_city = example["visited_city"]
+        visited_city = tf.sparse.to_dense(visited_city)
+        return {"visited_city": visited_city}, tf.shape(visited_city)[0]
+
+    parsed_image_dataset = raw_image_dataset.map(_parse_image_function)
+    # 这里一定要注意 padded_shapes 的值，其格式一定要与前一步dataset返回的结果格式匹配上！！！！特别是 tuple 和 list不要混。
+    # (None, )表示对于原始数据的第一维进行pad，如果不想pad的话 (1, ) 直接写明tensor的shape即可。如果有存在标量使用 () 即可。
+    parsed_image_dataset = parsed_image_dataset.padded_batch(2, padded_shapes=({'visited_city': (None,)}, ()))
+    iterator = parsed_image_dataset.make_initializable_iterator()
+
+    next_val = iterator.get_next()
+    #
+    with tf.Session() as sess:
+        sess.run(iterator.initializer, feed_dict={record_filename: ["tfrecord.pb"]})
+        while True:
+            print(sess.run(next_val))
+```
 
 
-## 迭代器
+# 迭代器
 
 `tf.data API` 提供了多种迭代器供选择
 
