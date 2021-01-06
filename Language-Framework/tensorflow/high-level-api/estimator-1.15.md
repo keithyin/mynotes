@@ -11,6 +11,12 @@ tensorflow已经实现了一些常用的 estimator。
 * Estimator
 * ...
 
+# input
+```python
+def input_fn():
+  return features, labels # 只需要返回这两个玩意就可以了。features, labels, 可以是 Tensor，可以是 list of tensor，可以是 string to tensor dict
+```
+
 # model
 `model_fn` 的签名如下所示，按理说，不同的 estimator 应该具有不同的 `model_fn` 签名？具体需要看一下代码吧。
 ```python
@@ -77,6 +83,44 @@ def cnn_model_fn(features, labels, mode):
   return tf.estimator.EstimatorSpec(
       mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
 ```
+
+# estimator
+```python
+# Create the Estimator
+mnist_classifier = tf.estimator.Estimator(
+    model_fn=cnn_model_fn, model_dir="/tmp/mnist_convnet_model")
+
+# Set up logging for predictions
+tensors_to_log = {"probabilities": "softmax_tensor"}
+
+logging_hook = tf.train.LoggingTensorHook(
+    tensors=tensors_to_log, every_n_iter=50)
+
+train_input_fn = tf.estimator.inputs.numpy_input_fn(
+    x={"x": train_data},
+    y=train_labels,
+    batch_size=100,
+    num_epochs=None,
+    shuffle=True)
+
+# train one step and display the probabilties
+mnist_classifier.train(
+    input_fn=train_input_fn,
+    steps=1, # 训练几个step。
+    hooks=[logging_hook])
+    
+# evaluate model！
+eval_input_fn = tf.estimator.inputs.numpy_input_fn(
+    x={"x": eval_data},
+    y=eval_labels,
+    num_epochs=1,
+    shuffle=False)
+
+eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
+print(eval_results)
+```
+
+
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
