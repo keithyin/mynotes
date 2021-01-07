@@ -111,7 +111,9 @@ def func(example_proto):
 ```
 
 # 变长数据的操作
-
+有两种方式处理变长数据
+1. parse_single_example 的时候 to_dense(), batch 的时候使用 padded_batch
+2. parse_single_example 的时候不做操作，batch 的时候 使用  batch(), 模型中使用的时候 `tf.sparse.to_dense()`。 这个结果与上述一致。
 ```python
 def parse_from_record_graph():
     record_filename = tf.placeholder(dtype=tf.string, shape=[1])
@@ -144,6 +146,36 @@ def parse_from_record_graph():
             print(sess.run(next_val))
 ```
 
+```python
+def parse_from_record_graph():
+    record_filename = tf.placeholder(dtype=tf.string, shape=[1])
+    raw_image_dataset = tf.data.TFRecordDataset(record_filename)
+
+    # Create a dictionary describing the features.
+    image_feature_description = {
+        'visited_city': tf.io.VarLenFeature(dtype=tf.int64),
+    }
+
+    def _parse_image_function(example_proto):
+        # Parse the input tf.Example proto using the dictionary above.
+        example = tf.parse_single_example(example_proto, image_feature_description)
+        # visited_city = tf.io.decode_raw(example['visited_city'], out_type=tf.int64)
+        visited_city = example["visited_city"]
+        return {"visited_city": visited_city}, tf.shape(visited_city)[0]
+
+    parsed_image_dataset = raw_image_dataset.map(_parse_image_function)
+   
+    parsed_image_dataset = parsed_image_dataset.batch(2)
+    iterator = parsed_image_dataset.make_initializable_iterator()
+
+    next_val = iterator.get_next()
+    next_val[0]['visited_city'] = tf.sparse.to_dense(next_val[0]['visited_city'])
+    
+    with tf.Session() as sess:
+        sess.run(iterator.initializer, feed_dict={record_filename: ["tfrecord.pb"]})
+        while True:
+            print(sess.run(next_val))
+```
 
 # 迭代器
 
