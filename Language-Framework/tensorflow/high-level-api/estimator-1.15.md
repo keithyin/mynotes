@@ -18,7 +18,13 @@ def input_fn():
 ```
 
 # model
-`model_fn` 的签名如下所示，按理说，不同的 estimator 应该具有不同的 `model_fn` 签名？具体需要看一下代码吧。
+`model_fn` 的签名如下所示.
+```python
+def model_fn(features, labels, mode):
+  ...
+  ...
+  return tf.estimator.EstimatorSpec()
+```
 ```python
 def cnn_model_fn(features, labels, mode):
   """Model function for CNN."""
@@ -120,8 +126,51 @@ eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
 print(eval_results)
 ```
 
+# 模型的导出
+> 模型导出并不是将训练时候的Graph直接导出，而是新建一个Graph，然后再导出。
 
+下面介绍，Estimator训练好的模型如何导出以做它用。
+对于导出模型主要关注的点是，模型的输入是什么，输出是什么。
+
+### 构建Serving Input：
+主要是在做 输入预处理部分
+* 添加 placeholder：（提供Graph显式入口）
+* 对输入进行处理
+```python
+feature_spec = {'foo': tf.FixedLenFeature(...),
+                'bar': tf.VarLenFeature(...)}
+
+def serving_input_receiver_fn():
+  """An input receiver that expects a serialized tf.Example."""
+  serialized_tf_example = tf.placeholder(dtype=tf.string,
+                                         shape=[default_batch_size],
+                                         name='input_example_tensor')
+  receiver_tensors = {'examples': serialized_tf_example}
+  features = tf.parse_example(serialized_tf_example, feature_spec)
+  return tf.estimator.export.ServingInputReceiver(features, receiver_tensors) # 将placeholder 和 模型输入 tensor 打包起来。
+```
+https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/io/parse_example
+
+### 指定模型的输出: 
+输出在 `model_fn` 返回的 `EstimatorSpec` 中指定。每个导出的输出都需要是一个`ExportOutput`子类的对象，例如 `tf.estimator.export.ClassificationOutput`, `tf.estimator.export.RegressionOutput`, or `tf.estimator.export.PredictOutput`.
+```python
+def model_fn(...):
+  logit = model(input)
+  exported = {
+    "prediction": tf.estimator.export.PredictOutput(logit)
+  }
+  return tf.extimator.EstimatorSpec(export_outputs=exported, ...)
+```
+### 导出模型
+```python
+estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn,
+                            strip_default_attrs=True)
+```
+This method builds a new graph by first calling the serving_input_receiver_fn() to obtain feature Tensors, and then calling this Estimator's model_fn() to generate the model graph based on those features. It starts a fresh Session, and, by default, restores the most recent checkpoint into it. (A different checkpoint may be passed, if needed.) Finally it creates a time-stamped export directory below the given export_dir_base (i.e., export_dir_base/<timestamp>), and writes a SavedModel into it containing a single MetaGraphDef saved from this Session.
+  
+### 
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
 https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/estimators/cnn.ipynb
+https://github.com/tensorflow/docs/blob/r1.13/site/en/guide/saved_model.md
