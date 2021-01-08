@@ -181,6 +181,22 @@ TODO
 * tf.estimator.TrainSpec: 训练 model 需要的一些参数
 * tf.estimator.EvalSpec: 评估时候 需要的一些参数
 
+```python
+class TrainSpec(
+    collections.namedtuple('TrainSpec', ['input_fn', 'max_steps', 'hooks'])):
+    
+class EvalSpec(
+    collections.namedtuple('EvalSpec', [
+        'input_fn', 'steps', 'name', 'hooks', 'exporters', 'start_delay_secs',
+        'throttle_secs'
+    ])):
+    """
+    exporters: Iterable of `Exporter`s, or a single one, or `None`.
+        `exporters` will be invoked after each evaluation.
+    """
+
+```
+
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
