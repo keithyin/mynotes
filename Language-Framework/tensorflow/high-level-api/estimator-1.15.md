@@ -170,7 +170,16 @@ This method builds a new graph by first calling the serving_input_receiver_fn() 
   
 ### Serving
 
-# 
+# 涉及到的Config总结
+
+* tf.ConfigProto: 用来配置 session 资源
+* tf.estimator.RunConfig: estimator 的运行Config，包含 `ConfigProto`，同时也有一些其它estimator相关的配置
+
+感觉 `**Spec` 命名的类，是为了封装 函数的输入而存在的。。。
+* tf.estimator.EstimatorSpec: `model_fn` 返回的结构体。用来指明 `model` 的一些基本信息
+* tf.estimator.TrainSpec: 训练 model 需要的一些参数
+* tf.estimator.EvalSpec: 评估时候 需要的一些参数
+
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
