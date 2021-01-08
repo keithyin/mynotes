@@ -174,7 +174,33 @@ TODO
 # 涉及到的Config总结
 
 * tf.ConfigProto: 用来配置 session 资源
+  * https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/ConfigProto.
+  * 
 * tf.estimator.RunConfig: estimator 的运行Config，包含 `ConfigProto`，同时也有一些其它estimator相关的配置
+  * checkpoint 配置，summary 配置。
+```python
+
+
+class RunConfig(object):
+  """This class specifies the configurations for an `Estimator` run."""
+  def __init__(self,
+               model_dir=None,
+               tf_random_seed=None,
+               save_summary_steps=100,
+               save_checkpoints_steps=_USE_DEFAULT,
+               save_checkpoints_secs=_USE_DEFAULT,
+               session_config=None,
+               keep_checkpoint_max=5,
+               keep_checkpoint_every_n_hours=10000,
+               log_step_count_steps=100,
+               train_distribute=None,
+               device_fn=None,
+               protocol=None,
+               eval_distribute=None,
+               experimental_distribute=None,
+               experimental_max_worker_delay_secs=None,
+               session_creation_timeout_secs=7200):
+```
 
 感觉 `**Spec` 命名的类，是为了封装 函数的输入而存在的。。。
 * tf.estimator.EstimatorSpec: `model_fn` 返回的结构体。用来指明 `model` 的一些基本信息
