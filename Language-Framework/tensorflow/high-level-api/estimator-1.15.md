@@ -126,6 +126,13 @@ eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
 print(eval_results)
 ```
 
+```python
+# 该api挺好用。此函数 运行 train 的时候，每导出一次 ckpt, 都会跑一遍 eval。至于这两个操作是不是并行就不清楚了。
+tf.estimator.train_and_evaluate(
+    estimator, train_spec, eval_spec
+)
+```
+
 # 模型的导出
 > 模型导出并不是将训练时候的Graph直接导出，而是新建一个Graph，然后再导出。
 
