@@ -241,7 +241,10 @@ class EvalSpec(
 3. 测试：EvalSpec
 4. 导出：EvalSpec 里配好 Exporter. 在执行export功能的时候，构建的是一个 **PREDICT** model !所以 model_fn 的PREDICT分支的`EstimatorSpec`中配置好`export_outputs`
 
-train_and_evaluate基本
+train_and_evaluate基本执行流程: 
+1. 模型训练，产生 ckpt
+2. evaluator 看到有ckpt产生，就开始 evaluate
+3. evaluate 之后构建一个 PREDICT 图，将当前 ckpt + grph export 出来。可以用作 serving
 
 
 # 参考资料
