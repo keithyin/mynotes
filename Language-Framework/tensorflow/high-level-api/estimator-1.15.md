@@ -196,7 +196,7 @@ class RunConfig(object):
                save_summary_steps=100,
                save_checkpoints_steps=_USE_DEFAULT,
                save_checkpoints_secs=_USE_DEFAULT,
-               session_config=None,
+               session_config=None, # tf.ConfigProto
                keep_checkpoint_max=5,
                keep_checkpoint_every_n_hours=10000,
                log_step_count_steps=100,
