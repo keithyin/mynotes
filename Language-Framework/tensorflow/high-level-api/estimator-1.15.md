@@ -246,6 +246,8 @@ train_and_evaluate基本执行流程:
 2. evaluator 看到有ckpt产生，就开始 evaluate
 3. evaluate 之后构建一个 PREDICT 图，将当前 ckpt + grph export 出来。可以用作 serving
 
+# 模型的导出与导入
+https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/saved_model.md
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
