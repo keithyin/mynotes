@@ -230,6 +230,19 @@ class EvalSpec(
 
 ```
 
+# 工具方法 train_and_evaluate
+`tf.estimator.train_and_evaluate`
+
+将 1）训练，2）保存ckpt，3）evaluate，4）导出serving model一起封装了起来，还包括 tensorboard。
+我们需要提供
+0. estimator
+1. 训练：TrainSpec
+2. 保存 ckpt & tensorboard，tf.estimator.RunConfig 配置好相应参数
+3. 测试：EvalSpec
+4. 导出：EvalSpec 里配好 Exporter. 在执行export功能的时候，构建的是一个 **PREDICT** model !所以 model_fn 的PREDICT分支的`EstimatorSpec`中配置好`export_outputs`
+
+train_and_evaluate基本
+
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
