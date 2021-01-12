@@ -38,3 +38,22 @@ DataFrame的列：表示一个简单类型(整数，字符串 ..)或者一个复
 * 字段的操作
 * 条件语句： `df.where("col_name < expr")`
 * 聚合语句: `df.groupBy("col_name")` 聚合语句后面可以接着一堆聚合操作。`df.groupBy('col_name1').sum('col_name2')....`
+
+# RDD
+row 类型 RDD？ 难道还有其它类型
+对于row类型，可以 `row[0]`, 可以 `row.col_name`，可以 `row['colname']`
+Row can be used to create a row object by using named arguments. It is not allowed to omit a named argument to represent that the value is None or missing. This should be explicitly set to None in this case.
+
+```python
+from pyspark.sql import Row
+row = Row(name="Alice", age=11)
+print(row['name'], row['age'])
+print(row.name, row.age)
+print('name' in row)
+print('wrong_key' in row)
+
+Person = Row("name", "age")
+print('name' in Person)
+print('wrong_key' in Person)
+Person("Alice", 11)
+```
