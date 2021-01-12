@@ -43,3 +43,5 @@ t=d.weekday() # 周一是 0
 
 # 计时器的基本操作 (time)
 
+# 参考资料
+https://www.journaldev.com/23365/python-string-to-datetime-strptime#python-strptime
