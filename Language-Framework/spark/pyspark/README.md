@@ -14,3 +14,27 @@ spark上有对三种数据类型的操作
 * 数据库表 & RDD：之间好像没有直接转的，就把 `DataFrame` 当作桥梁用吧。
 
 动作操作：`count(), show(), take()`
+
+
+# DataFrame
+DataFrame的schema定义了DataFrame的列名和类型
+```python
+import pyspark.sql.types as T
+
+# StructType 可以套 StructType。估计不行 🙅
+schema = T.StructType([
+    T.StructField("user_id", T.LongType(), True),
+    T.StructField("coupon_id", T.LongType(), True),
+    T.StructField("info", T.ArrayType(T.StringType(), True), True)])
+```
+
+DataFrame的列：表示一个简单类型(整数，字符串 ..)或者一个复杂类型 (Array，Map)
+
+* `StructType`: 一个 `StructField` array
+* `StructField`: 表示 `DataFrame` 某列的字段描述
+* `**Type`: 表示数据类型
+
+对DataFrame的操作主要是类似 sql 语句中的操作，不过是需要通过 `selectExpr` 方式来调用。
+* 字段的操作
+* 条件语句： `df.where("col_name < expr")`
+* 聚合语句: `df.groupBy("col_name")` 聚合语句后面可以接着一堆聚合操作。`df.groupBy('col_name1').sum('col_name2')....`
