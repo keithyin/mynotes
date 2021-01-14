@@ -254,6 +254,8 @@ https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/saved_model.md
 * 使用 `saved_model_cli show --dir exported_model_dir --all` 先检查一下导出来的图，看一下模型的 输入 & 输出都是什么玩意。
 * 然后就可以撸代码了
 
+https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/high-level-api/load_model_saved_by_estimator.py
+
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
