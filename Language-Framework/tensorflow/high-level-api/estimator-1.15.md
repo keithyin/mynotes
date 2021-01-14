@@ -249,6 +249,12 @@ train_and_evaluate基本执行流程:
 # 模型的导出与导入
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/saved_model.md
 
+# estimator导出的模型如何load
+> estimator导出的model不需要用 tensorflow-serving 时怎么办
+* 使用 `saved_model_cli show --dir exported_model_dir --all` 先检查一下导出来的图，看一下模型的 输入 & 输出都是什么玩意。
+* 然后就可以撸代码了
+
+
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
 https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/estimators/cnn.ipynb
