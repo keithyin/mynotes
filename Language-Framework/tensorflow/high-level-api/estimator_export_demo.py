@@ -35,6 +35,8 @@ def cnn_model_fn(features, labels, mode):
     # Logits Layer
     logits = tf.layers.dense(inputs=dropout, units=10)
 
+    cls_summ = tf.summary.histogram("class_dist", tf.argmax(input=logits, axis=1))
+
     predictions = {
         # Generate predictions (for PREDICT and EVAL mode)
         "classes": tf.argmax(input=logits, axis=1),
@@ -70,9 +72,11 @@ def cnn_model_fn(features, labels, mode):
         "accuracy": tf.metrics.accuracy(
             labels=labels, predictions=predictions["classes"])
     }
+    summary_hook = tf.train.SummarySaverHook(save_steps=1, summary_op=[cls_summ], output_dir="model_dir/eval")
+
     print("build eval graph")
     return tf.estimator.EstimatorSpec(
-        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops, export_outputs=None)
+        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops, export_outputs=None, evaluation_hooks=[summary_hook])
 
 
 def input_fn():
@@ -124,9 +128,8 @@ if __name__ == '__main__':
     train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=300)
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, exporters=exporter, throttle_secs=5)
 
-    # mnist_classifier.train(train_input_fn, steps=100)
+    mnist_classifier.train(train_input_fn, steps=100)
     # logging_global_step = tf.train.LoggingTensorHook(tensors={"show_me_global_step": "global_step"}, every_n_iter=1)
-    # mnist_classifier.evaluate(eval_input_fn, hooks=[logging_global_step])
+    mnist_classifier.evaluate(eval_input_fn)
 
-    tf.estimator.train_and_evaluate(estimator=mnist_classifier, train_spec=train_spec, eval_spec=eval_spec)
-
+    # tf.estimator.train_and_evaluate(estimator=mnist_classifier, train_spec=train_spec, eval_spec=eval_spec)
