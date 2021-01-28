@@ -1,11 +1,11 @@
 import tensorflow as tf
 import numpy as np
 
+
 def cnn_model_fn(features, labels, mode):
     """Model function for CNN."""
     # Input Layer
     input_layer = tf.reshape(features["x"], [-1, 28, 28, 1])
-
     # Convolutional Layer #1
     conv1 = tf.layers.conv2d(
         inputs=input_layer,
@@ -109,6 +109,8 @@ def serving_input_fn():
 
 
 if __name__ == '__main__':
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.INFO)
+
     estimator_config = tf.estimator.RunConfig(model_dir="model_dir",
                                               save_checkpoints_steps=100)
 
@@ -121,6 +123,10 @@ if __name__ == '__main__':
 
     train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=300)
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, exporters=exporter, throttle_secs=5)
+
+    # mnist_classifier.train(train_input_fn, steps=100)
+    # logging_global_step = tf.train.LoggingTensorHook(tensors={"show_me_global_step": "global_step"}, every_n_iter=1)
+    # mnist_classifier.evaluate(eval_input_fn, hooks=[logging_global_step])
 
     tf.estimator.train_and_evaluate(estimator=mnist_classifier, train_spec=train_spec, eval_spec=eval_spec)
 
