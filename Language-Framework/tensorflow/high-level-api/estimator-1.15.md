@@ -256,6 +256,8 @@ https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/saved_model.md
 
 https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/high-level-api/load_model_saved_by_estimator.py
 
+# NB
+* global_step在evaluate时候是不会累加的。这也是非常合理的。
 
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
