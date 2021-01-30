@@ -141,7 +141,7 @@ with tf.name_scope("histogram_summary") as name_scope:
     tf.summary.histogram("pred_cvr", cvr)
     tf.summary.histogram("cvr_cost", cvr_cost)
     
-    # 因为
+    # output_dir 如此设定是为了和 estimator 那些 metric 的输出保持一致。
     eval_summary_hook = tf.train.SummarySaverHook(save_steps=1,
                                                   output_dir="{}/eval".format(model_ckpt_dir),
                                                   summary_op=tf.summary.merge_all(scope=name_scope))
