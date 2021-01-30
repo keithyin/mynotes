@@ -133,6 +133,22 @@ tf.estimator.train_and_evaluate(
 )
 ```
 
+# tensorboard & summary
+我们在 `model_fn` 中写的 `tf.summary.scalar, tf.summary.hitogram ...` 这个仅仅是 train 时候的 summary。`metrics` 那一堆是 `eval` 时候的 summary。如果我们想在eval时候输出除metrics之外的其它 summary 的时候，需要用到 `Hook!`
+
+```python
+with tf.name_scope("histogram_summary") as name_scope:
+    tf.summary.histogram("pred_cvr", cvr)
+    tf.summary.histogram("cvr_cost", cvr_cost)
+    
+    # 因为
+    eval_summary_hook = tf.train.SummarySaverHook(save_steps=1,
+                                                  output_dir="{}/eval".format(model_ckpt_dir),
+                                                  summary_op=tf.summary.merge_all(scope=name_scope))
+return tf.estimator.EstimatorSpec(
+              mode=mode, loss=loss, eval_metric_ops=eval_metric_ops, export_outputs=None, evaluation_hooks=[summary_hook])
+```
+
 # 模型的导出
 > 模型导出并不是将训练时候的Graph直接导出，而是新建一个Graph，然后再导出。
 
