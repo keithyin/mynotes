@@ -109,6 +109,7 @@ def serving_input_fn():
     feature = tf.parse_example(example_proto, features={"x": tf.FixedLenFeature([], dtype=tf.string)})
     img = tf.io.decode_raw(feature['x'], out_type=tf.float32)
     feature['x'] = img
+    # features 实际就对应了 model_fn 的 features 参数。label在inference的时候就不用存在了。
     return tf.estimator.export.ServingInputReceiver(features=feature, receiver_tensors=receiver_tensor)
 
 
