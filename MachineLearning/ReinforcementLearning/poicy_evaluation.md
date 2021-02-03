@@ -21,11 +21,16 @@ doubly robust: dicrect method & inverse propensity score有一个模型是正确
 ## Inverse Propensity Score
 $$
 \begin{aligned}
-V_{IPS}^{\pi_1} &= \mathbb E_{\pi_1(s,a)}\Bigr[f(s, a)\Bigr] \\\\
+\hat V_{IPS}^{\pi_1} &= \mathbb E_{\pi_1(s,a)}\Bigr[f(s, a)\Bigr] \\\\
 &= \sum_{s,a} \pi_1(s,a)f(s,a) \\\\
 &= \sum_{s,a} \pi_0(s,a)\frac{\pi_1(s,a)}{\pi_0(s,a)}f(s,a) \\\\
 &= \mathbb E_{\pi_0(s,a)}\Bigr[\frac{\pi_1(s,a)}{\pi_0(s,a)}f(s, a)\Bigr]
 \end{aligned}
 $$
 得到最后一个公式后，我们就可以使用 $\pi_0$ 的采样数据进行预估了。
+
+## Doubly Robust Estimator
+$$
+\hat V_{DR}^{\pi_1} = \frac{1}{|S|} \sum_{(s, a, r_a) \in S} \Bigr[ \frac{(r_a  - \hat r(s, a))\pi_1(s,a)}{\pi_0(s,a)} + \hat r(s, \pi_1(s)) \Bigr]
+$$
 
