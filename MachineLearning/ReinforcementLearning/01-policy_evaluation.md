@@ -73,4 +73,4 @@ $$
 V_{step-IS} := \sum_{t=1}^H \gamma^{t-1} \rho_{1:t} r_t
 $$
 
-给定一个数据集 $D$, is estimator的结果为 $\frac{1}{|D|}\sum_{i=1}^{|D|} V_{IS}^(i)$. 其中，$|D|$ 表示 trajectory 的的数量。
+给定一个数据集 $D$, is estimator的结果为 $\frac{1}{|D|}\sum_{i=1}^{|D|} V_{IS}^{(i)}$. 其中，$|D|$ 表示 trajectory 的的数量。
