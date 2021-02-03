@@ -39,3 +39,4 @@ $$
 # Doubly Robust Off-policy Value Evaluation for Reinforcement Learning
 > multi step mdp policy evaluation
 
+对于policy evaluation来说：infinite mdp 也可以直接简化为 finite mdp. 取的长度 on the order$O(\frac{1}{1-\gamma})$
