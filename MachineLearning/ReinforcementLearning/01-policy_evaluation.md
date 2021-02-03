@@ -91,3 +91,9 @@ $V_{DR} := V_{DR}^H$. 注意上述公式，应该从 $t=H,...,1$ 执行。
 $$
 V_{DR-v2}^{H+1-t} := \hat V(s_t) + \rho_t\Bigr(r_t + \gamma V_{DR-v2}^{H-t} - \hat R(s_t, a_t) - \gamma\hat V(s_{t+1})\frac{\hat P(s_{t+1}|s_t, a_t)}{P(s_{t+1}|s_t, a_t)}\Bigr)
 $$
+
+注意：
+1. 如果 $P(s_{t+1}|s_t, a_t)$ is unknown, 上述公式是不可用的。
+2. 如果我们确性 $\hat P(s_{t+1}|s_t, a_t)$ 预估的非常准确，那么上式的 $\frac{\hat P(s_{t+1}|s_t, a_t)}{P(s_{t+1}|s_t, a_t)}$ 就可以约掉。
+
+
