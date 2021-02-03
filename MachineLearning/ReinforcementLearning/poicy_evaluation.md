@@ -3,12 +3,13 @@
 
 在contextual bandit中，有两类方法来解决off-line学习问题：
 1. direct method: 
-  1. estimate the reward function from given data 
-  2. and uses this estimate in place of actual reward to evaluate the policy value on a set of contexts.
+	1. estimate the reward function from given data 
+	2. and uses this estimate in place of actual reward to evaluate the policy value on a set of contexts.
 2. inverse propensity score:
-  1. uses importance weighting to correct for the incorrect proportions of actions in the historic data.
+	1. uses importance weighting to correct for the incorrect proportions of actions in the historic data.
   
 direct method: 需要一个准确的 reward 模型。但是因为新的policy取action的分布与 旧policy不一致。所以就会导致，旧数据学习出来的reward对于旧policy可能预估的很好，但是对于新的policy并不准确。
-inverse propensity score: 旧policy的 propensity score一般能够很好的学习。但是 inverse propensity score 方法的 方差很高。
 
+inverse propensity score: 旧policy的 propensity score一般能够很好的学习。但是 inverse propensity score 方法的 方差很高。
 doubly robust: dicrect method & inverse propensity score有一个模型是正确的，那么 doubly robust 得到的结果就是无偏的。
+
