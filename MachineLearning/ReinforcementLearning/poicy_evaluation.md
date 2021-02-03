@@ -16,4 +16,4 @@ doubly robust: dicrect method & inverse propensity score有一个模型是正确
 ## direct method
 1. 从 $\pi_0$ 采集的数据集中训练一个 $\hat r(s, a)$ 模型
 2. 评估 $\pi_1$, $\hat V_{DM}^{\pi_1} = \frac{1}{|S|}\sum_{x\in S} \hat r(s, \pi_1(s))$.
-3. 评估得到的 $\hat V_{DM}^{\pi_1}$ 与 $\frac{1}{|S|}\sum_{x\in S} r$ 进行比较，看看新策略是好还是坏
+3. 评估得到的 $\hat V_{DM}^{\pi_1}$ 与 $\frac{1}{|S|}\sum_{x\in S} r_{s,a}$ 进行比较，看看新策略是好还是坏
