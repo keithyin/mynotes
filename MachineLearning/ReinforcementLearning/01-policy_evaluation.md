@@ -52,11 +52,13 @@ Goal: estimate $v^{\pi_1, H}$, the vaue of a given target policy $\pi_1$ from da
 如果 true parameters of the MDP are known. the value of the target poicy can be computed recursively by the Bellman equaltions.
 
 let $V^0(s) = 0$, and for $h=1,2,3,...,H$
+
 $$
 \begin{aligned}
 Q^h(s,a) &:= \mathbb E_{s' \sim P(s'|s,a)}[R(s,a) + \gamma V^{h-1}{s'}] \\\\
 V^h(s) &:= \mathbb E_{a \sim \pi_1(a|s))}[Q^h(s, a)]
 \end{aligned}
-
 $$
 
+算法流程：
+1. 使用样本回归出来一个 $\hat p(s'|s, a), \hat r(s, a)$. 然后
