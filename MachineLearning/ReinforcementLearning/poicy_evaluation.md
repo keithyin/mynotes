@@ -22,8 +22,8 @@ doubly robust: dicrect method & inverse propensity score有一个模型是正确
 $$
 \begin{aligned}
 V_{IPS}^{\pi_1} &= \mathbb E_{\pi_1(s,a)}\Bigr[f(s, a)\Bigr] \\\\
-&= \sum_{s,a} \pi_1(s,a)f(x,a) \\\\
-&= \sum_{s,a} \pi_0(s,a)\frac{\pi_1(s,a)}{\pi_0(s,a)}f(x,a) \\\\
+&= \sum_{s,a} \pi_1(s,a)f(s,a) \\\\
+&= \sum_{s,a} \pi_0(s,a)\frac{\pi_1(s,a)}{\pi_0(s,a)}f(s,a) \\\\
 &= \mathbb E_{\pi_0(s,a)}\Bigr[\frac{\pi_1(s,a)}{\pi_0(s,a)}f(s, a)\Bigr]
 \end{aligned}
 $$
