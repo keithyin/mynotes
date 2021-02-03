@@ -60,6 +60,10 @@ V^h(s) &:= \mathbb E_{a \sim \pi_1(a|s))}[Q^h(s, a)]
 \end{aligned}
 $$
 
+$V^0(s)$ 实际表示的是 initial state 前一步。
+为什么这里可以forward的计算return？是因为 $R(s,a)$ 被我们预估出来了。
+
+
 算法流程：
 1. 使用样本回归出来一个 $\hat p(s'|s, a), \hat r(s, a)$. 
 2. 然后使用上面的公式进行进行计算就可以了。
