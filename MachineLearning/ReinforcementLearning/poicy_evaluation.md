@@ -31,6 +31,6 @@ $$
 
 ## Doubly Robust Estimator
 $$
-\hat V_{DR}^{\pi_1} = \frac{1}{|S|} \sum_{(s, a, r_a) \in S} \Bigr[ \frac{(r_a  - \hat r(s, a))\pi_1(s,a)}{\pi_0(s,a)} + \hat r(s, \pi_1(s)) \Bigr]
+\hat V_{DR}^{\pi_1} = \frac{1}{|S|} \sum_{(s, a, r_a) \in S} \Bigr[ \frac{(r_a  - \hat r(s, a))\pi_1(s,a)}{\pi_0(s,a)} + \mathbb E_{a' \in \pi_1(s,a')}\hat r(s, a') \Bigr]
 $$
 
