@@ -81,3 +81,13 @@ $$
 
 ## DR for Sequential Setting
 
+let $V_{DR}^0:=0$
+$$
+V_{DR}^{H+1-t} := \hat V(s_t) + \rho_t\Bigr(r_t + \gammaV_{DR}^{H-t} - \hatQ(s_t, a_t)\Bigr)
+$$
+$V_{DR} := V_{DR}^H$. 注意上述公式，应该从 $t=H,...,1$ 执行。
+
+上述公式还是有方差大的问题
+$$
+V_{DR-v2}^{H+1-t} := \hat V(s_t) + \rho_t\Bigr(r_t + \gammaV_{DR-v2}^{H-t} - \hat R(s_t, a_t) - \gamma\hat V(s_{t+1})\frac{\hat P(s_{t+1}|s_t, a_t)}{P(s_{t+1}|s_t, a_t)}\Bigr)
+$$
