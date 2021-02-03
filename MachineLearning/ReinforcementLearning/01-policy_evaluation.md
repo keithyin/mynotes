@@ -47,7 +47,7 @@ Goal: estimate $v^{\pi_1, H}$, the vaue of a given target policy $\pi_1$ from da
 
 
 两类estimator：regression estimators, importance sampling estimators
-## regression estimators
+## Regression Estimators
 > 与 contextual bandit 的 direct method 一致
 如果 true parameters of the MDP are known. the value of the target poicy can be computed recursively by the Bellman equaltions.
 
@@ -61,4 +61,16 @@ V^h(s) &:= \mathbb E_{a \sim \pi_1(a|s))}[Q^h(s, a)]
 $$
 
 算法流程：
-1. 使用样本回归出来一个 $\hat p(s'|s, a), \hat r(s, a)$. 然后
+1. 使用样本回归出来一个 $\hat p(s'|s, a), \hat r(s, a)$. 
+2. 然后使用上面的公式进行进行计算就可以了。
+
+## Importance Sampling Estimators
+$$
+V_{IS} := \rho_{1:H} * (\sum_{t=1}^H\gamma^{t-1}r_t)
+$$
+
+$$
+V_{step-IS} := \sum_{t=1}^H \gamma^{t-1} \rho_{1:t} r_t
+$$
+
+给定一个数据集 $D$, is estimator的结果为 $\frac{1}{|D|}sum_{i=1}^{|D|} V_{IS}^(i)$. 其中，$|D|$ 表示 trajectory 的的数量。
