@@ -40,3 +40,23 @@ $$
 > multi step mdp policy evaluation
 
 对于policy evaluation来说：infinite mdp 也可以直接简化为 finite mdp. 取的长度 on the order$O(\frac{1}{1-\gamma})$
+
+## Basic Setting
+Data: a set of length-H tragectories is sampled using a fixed stochastic policy $\pi_0$, known as behavior policy
+Goal: estimate $v^{\pi_1, H}$, the vaue of a given target policy $\pi_1$ from data trajectories.
+
+
+两类estimator：regression estimators, importance sampling estimators
+## regression estimators
+> 与 contextual bandit 的 direct method 一致
+如果 true parameters of the MDP are known. the value of the target poicy can be computed recursively by the Bellman equaltions.
+
+let $V^0(s) = 0$, and for $h=1,2,3,...,H$
+$$
+\begin{aligned}
+Q^h(s,a) &:= \mathbb E_{s' \sim P(s'|s,a)}[R(s,a) + \gamma V^{h-1}{s'}] \\\\
+V^h(s) &:= \mathbb E_{a \sim \pi_1(a|s))}[Q^h(s, a)]
+\end{aligned}
+
+$$
+
