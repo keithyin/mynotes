@@ -27,4 +27,5 @@ V_{IPS}^{\pi_1} &= \mathbb E_{\pi_1(s,a)}\Bigr[f(s, a)\Bigr] \\\\
 &= \mathbb E_{\pi_0(s,a)}\Bigr[\frac{\pi_1(s,a)}{\pi_0(s,a)}f(s, a)\Bigr]
 \end{aligned}
 $$
+得到最后一个公式后，我们就可以使用 $\pi_0$ 的采样数据进行预估了。
 
