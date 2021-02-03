@@ -61,7 +61,7 @@ V^h(s) &:= \mathbb E_{a \sim \pi_1(a|s))}[Q^h(s, a)]
 $$
 
 $V^0(s)$ 实际表示的是 initial state 前一步。
-为什么这里可以forward的计算return？是因为 $R(s,a)$ 被我们预估出来了。
+为什么这里可以forward的计算return？？为啥不需要求解 bellman 等式得到 一个 closed-form 的结果。
 
 
 算法流程：
