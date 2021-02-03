@@ -34,3 +34,8 @@ $$
 \hat V_{DR}^{\pi_1} = \frac{1}{|S|} \sum_{(s, a, r_a) \in S} \Bigr[ \frac{(r_a  - \hat r(s, a))\pi_1(s,a)}{\pi_0(s,a)} + \mathbb E_{a' \in \pi_1(s,a')}\hat r(s, a') \Bigr]
 $$
 
+该论文的实验可以关注一下。
+
+# Doubly Robust Off-policy Value Evaluation for Reinforcement Learning
+> multi step mdp policy evaluation
+
