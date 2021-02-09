@@ -195,7 +195,12 @@ trait Future {
 }
 ```
 
+# 使用Waker唤醒task
+调用poll的时，future并没有完成的情况非常常见。当碰到这种情况的时候，future 需要保证，“当该future可以往前走的时候，需要被调度器再次polled”。这个保证是由 `Waker` 负责的。
 
+Each time a future is polled, it is polled as part of a "task". Tasks are the top-level futures that have been submitted to an executor.
+
+`Waker` 提供一个 `wake` 方法，这个方法被用来 通知 executor，相关的 task可以被唤醒，向下执行了。当 `wake()` 被调用，executor就知道相关的task可以向下执行了，`Waker` 同样实现了 `clone`，所以它可以被 `copy`
 
 # 参考资料
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
