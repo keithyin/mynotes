@@ -202,5 +202,56 @@ Each time a future is polled, it is polled as part of a "task". Tasks are the to
 
 `Waker` 提供一个 `wake` 方法，这个方法被用来 通知 executor，相关的 task可以被唤醒，向下执行了。当 `wake()` 被调用，executor就知道相关的task可以向下执行了，`Waker` 同样实现了 `clone`，所以它可以被 `copy`
 
+# async/.await
+两种方式使用 `async`: `async fn` 和 `async` blocks. 他俩都是返回一个 实现了 `Future trait` 的值
+```rust
+// `foo()` returns a type that implements `Future<Output = u8>`.
+// `foo().await` will result in a value of type `u8`.
+async fn foo() -> u8 { 5 }
+
+fn bar() -> impl Future<Output = u8> {
+    // This `async` block results in a type that implements
+    // `Future<Output = u8>`.
+    async {
+        let x: u8 = foo().await;
+        x + 5
+    }
+}
+```
+* `async` bodies 和其它 `futures` 是 lazy 的。they do nothing until they are run。常用的执行 `Future` 的方法是 `.await`
+* 当对一个 `Future` 调用 `.await` 的时候，他会尝试将其执行完成。如果执行的过程中 `Future` blocked，它会将控制权交给当前的线程（it will yield control of the current thread）。如果该`Future`又可以继续执行了，`Executor` 就可以拿起该 `Future` ，继续搞。
+
+### `async` 的生命周期
+`async` 的生命周期，即：`async` 返回的 `Future` 的生命周期，`async` 只有在 `Future` 被调用的时候，才会执行。对于形参是引用的`async fn`，需要在 引用失效之前调用 `.await`
+Unlike traditional functions, async fns which take references or other non-'static arguments return a Future which is bounded by the lifetime of the arguments:
+```rust
+// This function:
+async fn foo(x: &u8) -> u8 { *x }
+
+// Is equivalent to this function:
+fn foo_expanded<'a>(x: &'a u8) -> impl Future<Output = u8> + 'a {
+    async move { *x }
+}
+```
+
+One common workaround for turning an async fn with references-as-arguments into a 'static future is to bundle the arguments with the call to the async fn inside an async block。 By moving the argument into the async block, we extend its lifetime to match that of the Future returned from the call to good.
+```rust
+fn bad() -> impl Future<Output = u8> {
+    let x = 5;
+    borrow_x(&x) // ERROR: `x` does not live long enough
+}
+
+fn good() -> impl Future<Output = u8> {
+    async {
+        let x = 5; //所以这个x相当于傍上了大腿？
+        borrow_x(&x).await
+    }
+}
+```
+
+### `async move`
+
+
+
 # 参考资料
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
