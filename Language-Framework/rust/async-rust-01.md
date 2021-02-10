@@ -300,7 +300,10 @@ Similarly, it isn't a good idea to hold a traditional non-futures-aware lock acr
 
 # Executing Multiple Futures at a Time
 
-* `.await`: `async`
+* `.await`: 在 `async` bodies 中执行 `future`. 会阻塞当前的task，直到对应的 `future` 完成。
+* `join!`:  等待所有的 `future` 完成
+* `select!`: waits for one of several futures to complete 
+
 
 # 参考资料
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
