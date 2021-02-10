@@ -298,5 +298,9 @@ This means that it is not safe to use `Rc`, `&RefCell` or any other types that d
 
 Similarly, it isn't a good idea to hold a traditional non-futures-aware lock across an .await, as it can cause the threadpool to lock up: one task could take out a lock, `.await` and yield to the executor, allowing another task to attempt to take the lock and cause a deadlock. To avoid this, use the Mutex in `futures::lock` rather than the one from `std::sync`.
 
+# Executing Multiple Futures at a Time
+
+* `.await`: `async`
+
 # 参考资料
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
