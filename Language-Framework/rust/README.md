@@ -513,7 +513,15 @@ fn main() {
     println!("{:#?}", xiaoming); // 这里打印会自动换行
 }
 ```
+## tuple structs
+> 给 tuple 一个名字
+```rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
 
+let black = Color(0, 0, 0);
+let origin = Point(0, 0, 0);
+```
 
 
 # 方法
@@ -547,7 +555,7 @@ impl Dog {
 
 ```rust
 enum IpAddrKind {
-	V4,
+	V4, //这种方式与 c++的 enum类似
 	V6,
 } // 在外面的时候不需要分号哦
 
@@ -625,7 +633,111 @@ fn main() {
 }
 ```
 
+# 错误处理
+> 错误类型：recoverable & unrecoverable
 
+* recoverable: 文件找不到
+* unrecoverable: 代码的bug？
+
+对于 recoverable, rust使用 `enum Result<T, E>` 来处理。对于 unrecoverable, rust使用 `panic!` 来处理。
+
+```rust
+fn main() {
+    panic!("crash and burn");
+}
+```
+
+* `Result<T, E>`
+
+```rust
+enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+`T`是没有错误的时候返回的类型，`E`是出错的时候的错误类型！
+
+```rust
+use std::fs::File;
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => panic!("Problem opening the file: {:?}", error),
+    };
+}
+```
+
+```rust
+use std::fs::File;
+use std::io::ErrorKind;
+
+fn main() {
+    let f = File::open("hello.txt");
+
+    let f = match f {
+        Ok(file) => file,
+        Err(error) => match error.kind() {
+            ErrorKind::NotFound => match File::create("hello.txt") {
+                Ok(fc) => fc,
+                Err(e) => panic!("Problem creating the file: {:?}", e),
+            },
+            other_error => {
+                panic!("Problem opening the file: {:?}", other_error)
+            }
+        },
+    };
+}
+```
+
+```rust
+use std::fs::File;
+use std::io::ErrorKind;
+
+fn main() {
+    let f = File::open("hello.txt").unwrap_or_else(|error| {
+        if error.kind() == ErrorKind::NotFound {
+            File::create("hello.txt").unwrap_or_else(|error| {
+                panic!("Problem creating the file: {:?}", error);
+            })
+        } else {
+            panic!("Problem opening the file: {:?}", error);
+        }
+    });
+}
+```
+
+从上面的代码可以看出，对于很多错误，我们是直接 `panic` 的, 每次都用match，就显得过于繁琐了。`rust` 提供来一些基本工具，是的 `panic` 更加方便
+```rust
+// shortcuts for panic on Error: unwrap and expect. 这两个都是 Result<T, E>的工具方法
+use std::fs::File;
+fn main() {
+    // 如果 Result 是 Ok，unwrap 会返回 Ok里面的值，如果 Result是 Err，那么 unwrap 会调用 panic!
+    let f = File::open("hello.txt").unwrap();
+    // 和 unwrap行为类似，只不过 panic! 的时候 会打印出 expect() 中传入的 提示信息。
+    let f = File::open("hello.txt").expect("Failed to open hello.txt");
+}
+```
+### 错误传播
+碰到错误，当前不想处理，网上抛，咋写。 `?` 关键字
+* 如果返回 Result 为 Err，那么直接返回！
+* 如果Result 是Ok，那么返回 Ok里面的值！
+* 只能用在返回值是 Result 函数上
+* rust中 返回值 `()` 等价于 `null`
+```rust
+use std::fs::File;
+use std::io;
+use std::io::Read;
+
+fn read_username_from_file() -> Result<String, io::Error> {
+    let mut f = File::open("hello.txt")?;
+    let mut s = String::new();
+    f.read_to_string(&mut s)?;
+    Ok(s)
+}
+```
 
 # Vector
 
