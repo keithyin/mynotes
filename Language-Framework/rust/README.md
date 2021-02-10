@@ -739,7 +739,8 @@ fn read_username_from_file() -> Result<String, io::Error> {
 }
 ```
 
-# Vector
+# 数据结构
+### Vector
 
 ```rust
 fn main() {
@@ -784,7 +785,7 @@ fn main() {
 
 
 
-# String
+### String
 
 ```rust
 // 1： 创建一个空String
@@ -829,7 +830,7 @@ fn main() {
 
 
 
-# HashMap
+### HashMap
 
 ```rust
 // 1. HashMap<K, V>
@@ -935,7 +936,6 @@ pub mod world{
 	}
 }
 ```
-
 
 * 总结，如果想把代码 分 文件(夹) 管理起来，那就首先在代码中声明好，然后对应的文件创建起来，然后将代码移动过去
 
