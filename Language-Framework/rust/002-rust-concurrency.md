@@ -143,3 +143,8 @@ for received in rx {
     println!("Got: {}", received);
 }
 ```
+
+## 数据共享
+> 上述的 channel 是数据共享的一种方式。现在介绍另一种方式。
+
+* mutex：和 c++, go的
