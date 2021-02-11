@@ -147,4 +147,46 @@ for received in rx {
 ## 数据共享
 > 上述的 channel 是数据共享的一种方式。现在介绍另一种方式。
 
-* mutex：和 c++, go的
+* mutex：和 c++, go的mutex 不同。rust的mutex是个模板，还能存值？？？
+```rust
+use std::sync::Mutex;
+
+fn main() {
+    let m = Mutex::new(5);
+
+    {
+        let mut num = m.lock().unwrap(); // unwrap 得到的实际上是一个 MutexGuard. 可以通过该值操作 mutex里面的值。该 对象出了 scope 还会自动 unlock
+        *num = 6;
+    }
+
+    println!("m = {:?}", m);
+}
+```
+
+* 多线程如何共享 Mutex?
+通过智能指针`Rc<T>`，可以使得一个值拥有多个owner。但是`Rc<T>` 无法用在多线程场景下。在多线程场景下，使用`Arc<T>` 来代替 `Rc<T>`
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0)); // Mutex<T> provides interior mutability
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+        let handle = thread::spawn(move || { //这里依旧是 move closure。
+            let mut num = counter.lock().unwrap();
+
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+```
