@@ -130,4 +130,9 @@ impl<T: Display + PartialOrd> Pair<T> {
 }
 ```
 
-* Using Trait Objects That Allow for Values of Different Types
+* Using Trait Objects That Allow for Values of Different Types. `Box<dyn Draw>`:which is a trait object; it’s a stand-in for any type inside a Box that implements the Draw trait!!
+```rust
+pub struct Screen {
+    pub components: Vec<Box<dyn Draw>>,
+}
+```
