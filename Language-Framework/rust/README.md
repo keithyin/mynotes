@@ -471,6 +471,12 @@ fn main() {
         active: true,
     };
     
+    let hh = User{
+    	name: String::from("hh"),
+        count: String::from("90000"),
+	..xiaohuang
+    };
+    
     xiaohuang.nonce = 20000;
     
     // 创建结构体时：如果参数名字 与 字段名字 重名的话， 可以将 字段名字省略掉
@@ -545,6 +551,11 @@ impl Dog {
 // 可以用多个 impl
 impl Dog {
     //...
+    // Associated Functions (也可以叫做静态方法)。在 impl中实现，但是第一个参数不是 self
+    // 使用  Dog::new() 调用
+    fn new()->u32{
+    	15
+    }
 }
 
 ```
