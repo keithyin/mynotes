@@ -115,7 +115,8 @@ fn call_modify(){
 	* `a` 可以和新内存空间绑定
 	* `a` 可以用来修改原内存空间的值
 
-
+* `mut` applies to whatever you're writing it next to. Writing `mut a` means that the memory labled "a" by your compiler can be written over multiple times. 
+* `&mut b` means you can follow the pointer to some other piece of memory and write over (portions of) that.
 
 # 基础数据类型
 
@@ -570,6 +571,9 @@ impl Dog {
 }
 
 ```
+
+## automatic referencing and dereferencing
+当我们 `object.something()` 的时候，`rust` 可以通过 `something()` 的第一个参数确定接收参数的类型。然后 `Rust` 会自动的添加 `&`, `&mut`, or `*`，目的是为了与方法的第一个参数匹配。 
 
 
 
