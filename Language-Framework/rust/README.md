@@ -118,6 +118,10 @@ fn call_modify(){
 * `mut` applies to whatever you're writing it next to. Writing `mut a` means that the memory labled "a" by your compiler can be written over multiple times. 
 * `&mut b` means you can follow the pointer to some other piece of memory and write over (portions of) that.
 
+https://users.rust-lang.org/t/solved-placement-of-mut-in-function-parameters/19891
+https://stackoverflow.com/questions/28587698/whats-the-difference-between-placing-mut-before-a-variable-name-and-after-the
+
+
 # 基础数据类型
 
 ```rust
