@@ -195,3 +195,23 @@ fn main() {
 
 # tokio
 
+* Executor执行 task
+* task是 tokio.spawn的`async block`
+* `async fn` 里面才能执行 `.await`
+
+```rust
+#[tokio::main]
+async fn main() {
+    println!("hello");
+}
+```
+会被转换成以下代码
+```rust
+fn main() {
+    let mut rt = tokio::runtime::Runtime::new().unwrap();
+    rt.block_on(async {
+        println!("hello");
+    })
+}
+
+```
