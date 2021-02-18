@@ -213,5 +213,58 @@ fn main() {
         println!("hello");
     })
 }
-
 ```
+## spawning
+
+```rust
+use tokio::net::TcpListener;
+use tokio::net::{TcpListener, TcpStream};
+use mini_redis::{Connection, Frame};
+
+async fn process(socket: TcpStream) {
+    // The `Connection` lets us read/write redis **frames** instead of
+    // byte streams. The `Connection` type is defined by mini-redis.
+    let mut connection = Connection::new(socket);
+
+    if let Some(frame) = connection.read_frame().await.unwrap() {
+        println!("GOT: {:?}", frame);
+
+        // Respond with an error
+        let response = Frame::Error("unimplemented".to_string());
+        connection.write_frame(&response).await.unwrap();
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
+
+    loop {
+        let (socket, _) = listener.accept().await.unwrap();
+        // A new task is spawned for each inbound socket. The socket is
+        // moved to the new task and processed there.
+        // 新开一个 task 处理 socket
+        tokio::spawn(async move {
+            process(socket).await;
+        });
+    }
+}
+```
+
+**tasks**
+tokio 的task 是一个 异步green thread. 通过 将一个 `async block` 传给 `tokio.spawn` 来创建。`tokio.spawn` 返回一个 `JoinHandle`，调用者可以通过这个 `JoinHandle` 来和 `spawned task` 进行交互。`async block` 可以返回值，调用者可以通过在 `JoinHandle` 上调用 `await` 来获取返回值。
+```rust
+#[tokio::main]
+async fn main() {
+    let handle = tokio::spawn(async {
+        // Do some async work
+        "return value"
+    });
+
+    // Do some other work
+
+    let out = handle.await.unwrap();
+    println!("GOT {}", out);
+}
+```
+`JoinHandle.await`返回
