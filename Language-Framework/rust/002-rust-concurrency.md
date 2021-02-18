@@ -277,6 +277,232 @@ async fn main() {
 * `'static` bound
 * `Send` bound
 
-`'static` ：task的type是`'static` 的含义是：
-When you spawn a task on the Tokio runtime, its type must be 'static. This means that the spawned task must not contain any references to data owned outside the task.
-`'static` When you spawn a task on the Tokio runtime, its type must be 'static. This means that the spawned task must not contain any references to data owned outside the task.
+`'static` ：task的type是`'static` 的含义是：`async block`中不能含有对外部变量的的引用。
+> `'static` 并不意味着 lives forever
+```rust
+use tokio::task;
+
+#[tokio::main]
+async fn main() {
+    let v = vec![1, 2, 3];
+
+    task::spawn(async {
+        println!("Here's a vec: {:?}", v); //这里的 v 是 外部变量的引用。编译会报错
+    });
+}
+```
+
+```rust
+use tokio::task;
+
+#[tokio::main]
+async fn main() {
+    let v = vec![1, 2, 3];
+
+    task::spawn(async move{
+        println!("Here's a vec: {:?}", v); // 这里就是 owner 了
+    });
+}
+```
+
+`Send`: 因为 `task` 中一旦 `.await` 后，该 `task` 就可能被 `tokio scheduler` 在不同的线程中移来移去，所以生存周期跨越了 `.await` 的变量，必须实现了 `Send trait`
+
+```rust
+// 这个不work，因为 std::rc::Rc 没有实现 Send
+use tokio::task::yield_now;
+use std::rc::Rc;
+
+#[tokio::main]
+async fn main() {
+    tokio::spawn(async {
+        let rc = Rc::new("hello");
+
+        // `rc` is used after `.await`. It must be persisted to
+        // the task's state.
+        yield_now().await;
+
+        println!("{}", rc);
+    });
+}
+```
+
+```rust
+// 这个可以work，因为 std::rc::Rc 的生命周期没有跨越 .await
+use tokio::task::yield_now;
+use std::rc::Rc;
+
+#[tokio::main]
+async fn main() {
+    tokio::spawn(async {
+        // The scope forces `rc` to drop before `.await`.
+        {
+            let rc = Rc::new("hello");
+            println!("{}", rc);
+        }
+
+        // `rc` is no longer used. It is **not** persisted when
+        // the task yields to the scheduler
+        yield_now().await;
+    });
+}
+```
+
+## Shared state
+
+* 使用 `Mutex`
+
+```rust
+use bytes::Bytes;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
+type Db = Arc<Mutex<HashMap<String, Bytes>>>;
+
+use tokio::net::TcpListener;
+use std::collections::HashMap;
+use std::sync::{Arc, Mutex};
+
+#[tokio::main]
+async fn main() {
+    let listener = TcpListener::bind("127.0.0.1:6379").await.unwrap();
+
+    println!("Listening");
+
+    let db = Arc::new(Mutex::new(HashMap::new()));
+
+    loop {
+        let (socket, _) = listener.accept().await.unwrap();
+        // Clone the handle to the hash map.
+        let db = db.clone();
+
+        println!("Accepted");
+        tokio::spawn(async move {
+            process(socket, db).await;
+        });
+    }
+}
+
+use tokio::net::TcpStream;
+use mini_redis::{Connection, Frame};
+
+async fn process(socket: TcpStream, db: Db) {
+    use mini_redis::Command::{self, Get, Set};
+
+    // Connection, provided by `mini-redis`, handles parsing frames from
+    // the socket
+    let mut connection = Connection::new(socket);
+
+    while let Some(frame) = connection.read_frame().await.unwrap() {
+        let response = match Command::from_frame(frame).unwrap() {
+            Set(cmd) => {
+                let mut db = db.lock().unwrap();
+                db.insert(cmd.key().to_string(), cmd.value().clone());
+                Frame::Simple("OK".to_string())
+            }           
+            Get(cmd) => {
+                let db = db.lock().unwrap();
+                if let Some(value) = db.get(cmd.key()) {
+                    Frame::Bulk(value.clone())
+                } else {
+                    Frame::Null
+                }
+            }
+            cmd => panic!("unimplemented {:?}", cmd),
+        };
+
+        // Write the response to the client
+        connection.write_frame(&response).await.unwrap();
+    }
+}
+```
+
+## Channels
+tokio实现了好多`channel`
+
+* `oneshot`: 单生产者，单消费者。 A single value can be sent.
+* `watch`: 单生产者，多消费者. Many values can be sent, but no history is kept. Receivers only see the most recent value.
+* `mpsc`: 多生产者，单消费者. Many values can be sent.
+* `broadcast`: 多生产者，多消费者. Many values can be sent. Each receiver sees every value.
+
+```rust
+use tokio::sync::mpsc;
+
+#[tokio::main]
+async fn main() {
+    let (tx, mut rx) = mpsc::channel(32);
+    let tx2 = tx.clone();
+
+    tokio::spawn(async move {
+        tx.send("sending from first handle").await;
+    });
+
+    tokio::spawn(async move {
+        tx2.send("sending from second handle").await;
+    });
+
+    while let Some(message) = rx.recv().await {
+        println!("GOT = {}", message);
+    }
+}
+```
+
+```rust
+use tokio::sync::oneshot;
+use bytes::Bytes;
+
+/// Multiple different commands are multiplexed over a single channel.
+#[derive(Debug)]
+enum Command {
+    Get {
+        key: String,
+        resp: Responder<Option<Bytes>>,
+    },
+    Set {
+        key: String,
+        val: Vec<u8>,
+        resp: Responder<()>,
+    },
+}
+
+/// Provided by the requester and used by the manager task to send
+/// the command response back to the requester.
+type Responder<T> = oneshot::Sender<mini_redis::Result<T>>;
+
+let t1 = tokio::spawn(async move {
+    let (resp_tx, resp_rx) = oneshot::channel();
+    let cmd = Command::Get {
+        key: "hello".to_string(),
+        resp: resp_tx,
+    };
+
+    // Send the GET request
+    tx.send(cmd).await.unwrap();
+
+    // Await the response
+    let res = resp_rx.await;
+    println!("GOT = {:?}", res);
+});
+
+let t2 = tokio::spawn(async move {
+    let (resp_tx, resp_rx) = oneshot::channel();
+    let cmd = Command::Set {
+        key: "foo".to_string(),
+        val: b"bar".to_vec(),
+        resp: resp_tx,
+    };
+
+    // Send the SET request
+    tx2.send(cmd).await.unwrap();
+
+    // Await the response
+    let res = resp_rx.await;
+    println!("GOT = {:?}", res);
+});
+```
+
+
+## I/O
+
+## Framing
+
+
