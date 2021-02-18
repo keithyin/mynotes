@@ -253,6 +253,9 @@ async fn main() {
 
 **tasks**
 tokio 的task 是一个 异步green thread. 通过 将一个 `async block` 传给 `tokio.spawn` 来创建。`tokio.spawn` 返回一个 `JoinHandle`，调用者可以通过这个 `JoinHandle` 来和 `spawned task` 进行交互。`async block` 可以返回值，调用者可以通过在 `JoinHandle` 上调用 `await` 来获取返回值。
+
+`tasks` 是 tokio scheduler 管理的最小执行单元。` Spawning the task` 会将 `task` 提交给 `Tokio scheduler`, 由`Tokio scheduler`决定该如何调度。`spawned task` 可能在 `spawn` 它的 线程上执行，也可能在不同的线程上执行。`spawned task` 可以在 不同的线程之间来回移动。 
+
 ```rust
 #[tokio::main]
 async fn main() {
@@ -267,4 +270,13 @@ async fn main() {
     println!("GOT {}", out);
 }
 ```
-`JoinHandle.await`返回
+`JoinHandle.await`返回的是`Result`，当task在执行的时候碰到错误(task panic or task is forcefully cancelled by the runtime shutting down)，`JoinHandle.await`就会返回`Err`. 
+
+**task必须满足的几个条件**
+
+* `'static` bound
+* `Send` bound
+
+`'static` ：task的type是`'static` 的含义是：
+When you spawn a task on the Tokio runtime, its type must be 'static. This means that the spawned task must not contain any references to data owned outside the task.
+`'static` When you spawn a task on the Tokio runtime, its type must be 'static. This means that the spawned task must not contain any references to data owned outside the task.
