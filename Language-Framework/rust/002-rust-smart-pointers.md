@@ -35,6 +35,28 @@ fn main() {
 }
 ```
 
+```rust
+use std::rc::Rc;
+
+fn main(){
+    let mut a = Rc::new(100);
+    *a = 100; //由于Rc没有实现 DerefMut。这么写都会报错！！！Rc的值一旦初始化就不能修改了？或许可以考虑一下和RefCell一起使用！！！
+}
+```
+
+```rust
+use std::rc::Rc;
+use std::cell::RefCell;
+
+fn main(){
+    let a = Rc::new(RefCell::new(5));
+    
+    // *a.borrow_mut() = 100; //这句也ok
+    let mut inner_val = a.borrow_mut();
+    *inner_val = 100;
+}
+```
+
 # RefCell<T>
 功能：即使 `RefCell<T>` 不是 mut 的，也可以改变 `T` 的值
 ```rust
