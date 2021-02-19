@@ -503,6 +503,67 @@ let t2 = tokio::spawn(async move {
 
 ## I/O
 
+`async fn read()`
+* `AsyncReadExt::read` 提供了异步的方式来将数据读入`buffer`, 它会返回读入的字节个数
+* `AsyncReadExt::read_to_end` 读文件中的数据，直到碰到EOF。
+
+```rust
+use tokio::fs::File;
+use tokio::io::{self, AsyncReadExt};
+
+#[tokio::main]
+async fn main() -> io::Result<()> {
+    let mut f = File::open("foo.txt").await?;
+    let mut buffer = [0; 10];
+
+    // read up to 10 bytes
+    let n = f.read(&mut buffer[..]).await?;
+
+    println!("The bytes: {:?}", &buffer[..n]);
+    
+    let mut f = File::open("foo.txt").await?;
+    let mut buffer = Vec::new();
+
+    // read the whole file
+    f.read_to_end(&mut buffer).await?;
+    Ok(())
+}
+```
+
+* `AsyncWriteExt::write` 将buffer中的数据写入writer，返回写入的字节数。
+* `AsyncWriteExt::write_all` 将buffer中所有的数据写入writer
+
+```rust
+use tokio::io::{self, AsyncWriteExt};
+use tokio::fs::File;
+
+#[tokio::main]
+async fn main() -> io::Result<()> {
+    let mut file = File::create("foo.txt").await?;
+
+    // Writes some prefix of the byte string, but not necessarily all of it.
+    let n = file.write(b"some bytes").await?;
+
+    println!("Wrote the first {} bytes of 'some bytes'.", n);
+    
+    let mut buffer = File::create("foo.txt").await?;
+
+    buffer.write_all(b"some bytes").await?;
+    Ok(())
+}
+```
+
+**helper functions**
+
+**echo server**
+
 ## Framing
+
+> framing is the process of taking a byte stream and converting it to a stream of frames. A frame is a unit of data transmitted between two peers.
+
+
+## select
+
+
 
 
