@@ -6,8 +6,11 @@
 
 ```rust
 fn main(){
-  let a = Box::new(5); //5是在堆上，堆的地址在栈上
+  let a = Box::new(5); //5是在堆上，堆的地址在栈上. a具有 栈上 和 堆上值的所有权。
   assert_eq!(5, *a);
+  let mut b = Box::new(5);
+  *b = 100;
+  assert_eq!(5, *a); // mut b 表示既可以改变 b 绑定的栈上的值，也可以改变 堆上的值。
 }
 ```
 
