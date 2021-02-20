@@ -9,8 +9,10 @@
 * Estimating customer uplift is a  machine learning problem: 原因：需要训练出一个模型可以进行可靠的 uplift prediction
 
 uplift modeling：
-* 训练：根据随机实验收集到的数据训练一个 uplift 模型
+* 训练：根据随机实验收集到的数据训练一个 uplift 模型.
 * 预测：根据用户的uplift进行决策
+
+
 
 
 ## uplift modeling 三大方法
