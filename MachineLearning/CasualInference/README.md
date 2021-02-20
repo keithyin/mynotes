@@ -8,12 +8,6 @@
 * Estimating customer uplift is a causal inference problem: 原因：我们需要评估 策略 作用和不作用在 该人身上的两种结果。当然，一个策略是无法同时 作用和不作用在同一个人身上的，所以 uplift modeling 通常依赖于随机试验
 * Estimating customer uplift is a  machine learning problem: 原因：需要训练出一个模型可以进行可靠的 uplift prediction
 
-uplift modeling：
-* 训练：根据随机实验收集到的数据训练一个 uplift 模型.
-* 预测：根据用户的uplift进行决策
-
-
-
 
 ## uplift modeling 三大方法
 
@@ -30,7 +24,7 @@ uplift modeling：
 * $\tau_i$ : person i 的 causal effect
 
 $$
-\tau_i = Y_i(1) - Y_i(0)
+CausalEffect:\tau_i = Y_i(1) - Y_i(0)
 $$
 
 我们需要关注的数值为
@@ -51,6 +45,16 @@ $$
 
 
 * propensity score: $P(X_i) = P(W_i=1|X_i)$, the probability of treatment given $X_i$.
+
+
+uplift modeling：
+* 训练：根据随机实验收集到的数据训练一个 uplift 模型.
+* 预测：根据用户的uplift进行决策
+
+关于uplift model 的训练：
+* 既然是训练，那么必然是需要有一个优化目标的。我们希望 CATE 预估的越准越好。
+* 但是问题来了。我们如何知道 CATE 预估的准还是不准呢？我们并没有真实的 uplift-label（因为一个人不可能同时参加多个treatment）。所以也就不知道模型输出的结果到底是准还是不准
+* 通过CausalEffect的公式，我们是不是可以通过$X_i$聚类相似人群构建 uplift-label？
 
 # uplift modeling
 回忆一下AB测试的流程：随机分流，分为对照组和实验组，在实验组上使用策略，这时候可以认为 “treatment assignment is random conditional on $X_i$”是成立的。然后会看 实验和对照上的一些指标。如果指标是正的，该策略就可以推全了。
