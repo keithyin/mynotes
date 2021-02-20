@@ -68,17 +68,13 @@ assert_eq!('b', *x);
 
 **如何实现Copy**
 
-* 使用 `derive`，不能
+* 使用 `derive`，不能自己实现 Copy。
 
 ```rust
 #[derive(Copy, Clone)]
 struct MyStruct;
 ```
 
-```rust
-// Copy 一般是由 unsafe 代码实现。
-impl Copy for MyStruct {...}
-```
 
 ```rust
 #[derive(Copy, Clone)]
@@ -96,4 +92,40 @@ fn main(){
 ```
 
 # `std::clone::Clone`
+
+* A common trait for the ability to explicitly duplicate an object
+* 因为我们不能自定义Copy，但是可以自定义Clone。所以Clone比Copy更加灵活。所以可以使用 Clone 来替代 Copy的作用。
+* 所以在rust中，Copy只有一个语意：bit-wise copy。但是 Clone 可以有两个语意：深Clone，浅Clone
+
+**实现Clone**
+
+* 如果结构体的所有的字段都实现了Clone，那么可以使用 `#[derive(Clone)]`
+* 手动撸
+
+```rust
+#[derive(Clone)]
+struct MyStruct;
+```
+
+```rust
+struct MyStruct{
+...
+}
+
+impl Clone for MyStruct {
+    fn clone(&self) -> MyStruct {
+        // 代码随便写，返回的不是 MyStruct 都可以。。。。。
+        ...
+    }
+}
+```
+
+# `std::marker::Send`
+
+* 用来做类型标记：Types that can be transferred across thread boundaries.
+* 不用我们管，编译器决定是否实现该trait。This trait is automatically implemented when the compiler determines it's appropriate.
+*  An example of a non-Send type is the reference-counting pointer rc::Rc. If two threads attempt to clone Rcs that point to the same reference-counted value, they might try to update the reference count at the same time, which is undefined behavior because Rc doesn't use atomic operations. Its cousin sync::Arc does use atomic operations (incurring some overhead) and thus is Send。
+*  
+
+
 
