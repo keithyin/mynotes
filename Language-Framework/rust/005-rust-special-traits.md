@@ -125,7 +125,7 @@ impl Clone for MyStruct {
 * 用来做类型标记：Types that can be transferred across thread boundaries.
 * 不用我们管，编译器决定是否实现该trait。This trait is automatically implemented when the compiler determines it's appropriate.
 *  An example of a non-Send type is the reference-counting pointer rc::Rc. If two threads attempt to clone Rcs that point to the same reference-counted value, they might try to update the reference count at the same time, which is undefined behavior because Rc doesn't use atomic operations. Its cousin sync::Arc does use atomic operations (incurring some overhead) and thus is Send。
-*  
+*  Arc：atomic reference counting
 
 
 
