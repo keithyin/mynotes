@@ -33,7 +33,7 @@ $$
 
 我们需要关注的数值为
 $$
-\tau(X_i) = E[Y_i(1)|X_i] - E[Y_i(0)|X_i]
+CATE: \tau(X_i) = E[Y_i(1)|X_i] - E[Y_i(0)|X_i]
 $$
 其中：$X_i$ 为用户特征。 这个式子也称为 coniditional average treatment effect (CATE)。由于我们无法同时观测到 $Y_i(1), Y_i(0)$, 所以对于 person i，其真实 observed outcome 为 
 $$
