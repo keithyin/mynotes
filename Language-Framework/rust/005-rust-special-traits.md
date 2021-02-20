@@ -66,10 +66,9 @@ assert_eq!('b', *x);
 * Clone 是 Copy 的超trait，所以，实现了 Copy 的 类，必须同时要实现 Clone，所以 `#[derive(Copy, Clone)]`, 中`Copy, Clone`总是一起出现。
 * 如果一个 类型实现了 Copy trait，那么其 Clone trait 的实现仅返回 `*self` 即可
 
-**实现copy的两种方法**
+**如何实现Copy**
 
-* 使用 `derive`
-* 自己撸
+* 使用 `derive`，不能
 
 ```rust
 #[derive(Copy, Clone)]
@@ -95,3 +94,6 @@ fn main(){
 }
 
 ```
+
+# `std::clone::Clone`
+
