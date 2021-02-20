@@ -123,6 +123,9 @@ impl Clone for MyStruct {
 # `std::marker::Send`
 
 * 用来做类型标记：Types that can be transferred across thread boundaries. （？？如何理解）
+    * Not everything obeys inherited mutability, though. Some types allow you to have multiple aliases of a location in memory while mutating it.
+    * Unless these types use synchronization to manage this access, they are absolutely not thread-safe. Rust captures this through the Send and Sync traits.
+    * 对于有 multiple aliases of a location in memory 的类型(Rc<T>， &T, ...) 如果他们有操作是 not thread-safe 的，那么就不是 Sync 的。
 * 不用我们管，编译器决定是否实现该trait。This trait is automatically implemented when the compiler determines it's appropriate.
 *  An example of a non-Send type is the reference-counting pointer rc::Rc. If two threads attempt to clone Rcs that point to the same reference-counted value, they might try to update the reference count at the same time, which is undefined behavior because Rc doesn't use atomic operations. Its cousin sync::Arc does use atomic operations (incurring some overhead) and thus is Send。
 *  Arc：atomic reference counting
@@ -132,7 +135,7 @@ impl Clone for MyStruct {
 * 用来做类型标记：Types for which it is safe to share references between threads. (线程间共享 reference 是安全的)
 * 不用我们管，编译器决定是否实现该trait。This trait is automatically implemented when the compiler determines it's appropriate.
 * The precise definition is: a type `T` is Sync if and only if `&T` is Send. In other words, if there is no possibility of undefined behavior (including data races) when passing &T references between threads. 
-    * 当传 `&T` 给不同的线程时，不会造成 undefined behavior。那么
-* The precise definition is: a type `T` is Sync if and only if `&T` is Send. In other words, if there is no possibility of undefined behavior (including data races) when passing &T references between threads. 当传 `&T` 给不同的线程时，不会造成 undefined behavior就
-* The precise definition is: a type `T` is Sync if and only if `&T` is Send. In other words, if there is no possibility of undefined behavior (including data races) when passing &T references between threads. 当传 `&T` 给不同的线程时，不会造成 undefined behavior
+    * 解释1: 当传 `&T` 给不同的线程时，不会造成 undefined behavior。那么 T 就是 Sync
+    * 解释2: 当 `&T` 是 Send，那么 `T` 就是 Sync
+
 
