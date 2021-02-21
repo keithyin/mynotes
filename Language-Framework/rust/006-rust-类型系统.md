@@ -34,3 +34,27 @@ fn main(){
 let a = 5;
 let ref ref_a = a; // 等价于 let ref_a = &a;
 ```
+
+# variable
+
+
+A variable is a component of a stack frame, either a named function parameter, an anonymous temporary, or a named local variable.
+* stack frame：分配给函数的栈内存，被用来存储所有的 **局部变量和函数参数**
+
+```rust
+// main函数的 stack frame 足够放下 两个int 和 一个 f32.
+// 当main返回的时候，分配给 main 的 stack frame 会被释放。
+// stack frame 分配 和 释放的 优雅之处在于：1）分配和释放不需要用户来控制。2）分配的大小可以由compiler计算出来，因为编译器知道函数里面用了哪些局部变量。
+fn main() 
+{ 
+    let a = 10; 
+    let b = 20; 
+    let pi = 3.14f32; 
+} 
+```
+
+A local variable (or stack-local allocation) holds a value directly, allocated within the stack's memory. The value is a part of the stack frame.
+
+Local variables are immutable unless declared otherwise. For example: let mut x = ....
+
+感觉：`let mut x = ...`: 只是用来表示，stack frame 上的值能不能修改。那么为什么修改 堆上的值 也需要 `let mut x = ...` 呢？ 有些堆上值的修改，并不会影响栈上值的改变呀。虽然有些是会的。
