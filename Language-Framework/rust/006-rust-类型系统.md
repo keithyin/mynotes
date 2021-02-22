@@ -58,3 +58,7 @@ A local variable (or stack-local allocation) holds a value directly, allocated w
 Local variables are immutable unless declared otherwise. For example: let mut x = ....
 
 感觉：`let mut x = ...`: 只是用来表示，stack frame 上的值能不能修改。那么为什么修改 堆上的值 也需要 `let mut x = ...` 呢？ 有些堆上值的修改，并不会影响栈上值的改变呀。虽然有些是会的。
+
+
+# 其它资料
+https://stackoverflow.com/questions/31567708/difference-in-mutability-between-reference-and-box
