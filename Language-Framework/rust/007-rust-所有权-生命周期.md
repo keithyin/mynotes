@@ -81,6 +81,8 @@ fn main(){
 ```
 
 
+**DerefMut** 的存在，阻止了好多有问题的代码！！！
+
 # rust通过哪些机制保证了 内存安全&并发安全
 https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 
