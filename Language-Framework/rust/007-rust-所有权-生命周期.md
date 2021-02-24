@@ -64,6 +64,21 @@ rust 使用什么机制保证我们遵守该规则
 * References must always be valid.
 	* 使用生命周期标注。需要我们 **正确的进行** 生命周期标注
 
+## 引用计数
+* 大多数情况下，单一ownership规则都可以work。但是总有些情况，一块内存是有多个 owner 的。这时候使用 `Rc<T>` 来管理！！！
+* 我们无法对 **栈空间** 具有多个ownership
+我们看一下如何使用
+
+```rust
+fn main(){
+    let a = String::from("hello");
+    let rc = Rc::new(a); // 这里是由ownership转移的，a的ownership已经放弃了。a管理的堆内存已经交给 rc 来管理了
+    
+    let a = 10;
+    let rc = Rc::new(a); // 这里new，就直接在堆上分配一个空间用来存值了。还是共享的堆空间了。 通过rc，是无法拿到raw pointer的。
+    println!("{}", rc);
+}
+```
 
 
 # rust通过哪些机制保证了 内存安全&并发安全
