@@ -54,7 +54,7 @@ fn main(){
 * At any given time, you can have either one mutable reference or any number of immutable references.
 	* 编译期就能避免 并行编程时碰到的data race问题。当以下3个行为同时发生时，就会出现data race：1）多个指针同时访问一块内存，2）至少有一个指针用来写这块内存，3）并没有机制来同步这块内存的访问
 	* 该机制能够正确的保证 栈内存 不会出现 data race问题
-	* 当然：该规则还会有一些其它的正向影响。。。。。 
+	* 当然：该规则还会有一些其它的诡异的影响。。。。。 
 * References must always be valid.
 	* 防止 dangling pointer
 
@@ -67,7 +67,23 @@ rust 使用什么机制保证我们遵守该规则
 
 
 # rust通过哪些机制保证了 内存安全&并发安全
+https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 
 
+内存安全问题：
+* 错误的内存访问：
+	* 读取未初始化内存；rust保证内存的初始化？
+	* 解引用空指针；
+	* 缓存溢出; 
+* 违反生命周期：使用ownership修理了
+	* invalid free；
+	* use after free; 
+	* double free
+
+线程安全问题：
+* 死锁；没有解决
+* data race；
+
+上述的 引用&借用规则，仅仅是控制住了
 
 
