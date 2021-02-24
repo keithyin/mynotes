@@ -86,5 +86,10 @@ https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 
 上述的 引用&借用规则，仅仅是控制住了
 
-## 并发
+## 并发安全
+* 死锁：并没有解决
+* data race：
+	1. 并发条件下 rust 根本无法共享栈上的 内存。根本构造不出来。只能共享堆上的数据
+	2.  
+
 
