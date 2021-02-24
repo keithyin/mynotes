@@ -89,8 +89,11 @@ https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 ## 并发安全
 * 死锁：并没有解决
 * data race：
-	1. 并发条件下 rust 根本无法共享栈上的 内存。根本构造不出来。只能共享堆上的数据
-	2. 并发过程中的共享只能使用 use std::sync::Arc, 但是仅仅 `Arc` 还不行，`Arc` 只能读，不能写，因为没有实现 `DerefMut trait`
-	3. 所有
+	1. data race：多个线程共同读写同一块内存，但是没有对该内存没有同步机制。
+	2. 并发条件下 rust 根本无法共享栈上的 内存。根本构造不出来。只能共享堆上的数据
+	3. 并发过程中的共享只能使用 `std::sync::Arc`, 但是仅仅 `Arc` 还不行，`Arc` 只能读，不能写，因为没有实现 `DerefMut trait`
+	4. 想到可变，就想到了 `std::cell::RefCell`，但是用 `Arc<RefCell>` 也会报错。**这个原因是啥？如何保证的**
+	5. 最终，只有一条路：`std::sync::Mutex`, 使用 `Arc<Mutex<T>>` 就ok了。而且这种形式，也保证了 data race 不会发生。
+	6. 总结：`Arc` 保证了多线程情况下，引用计数能够正确的加减。`Mutex` 提供了同步机制 & 内部可变性机制。`Arc<Mutex<T>>` 等价于单线程情况下的 `Rc<RefCell<T>>` 
 
 
