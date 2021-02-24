@@ -90,6 +90,7 @@ https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 * 死锁：并没有解决
 * data race：
 	1. 并发条件下 rust 根本无法共享栈上的 内存。根本构造不出来。只能共享堆上的数据
-	2.  
+	2. 并发过程中的共享只能使用 use std::sync::Arc, 但是仅仅 `Arc` 还不行，`Arc` 只能读，不能写，因为没有实现 `DerefMut trait`
+	3. 所有
 
 
