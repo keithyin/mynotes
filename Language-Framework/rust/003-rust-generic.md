@@ -122,6 +122,7 @@ impl<T> Pair<T> {
     }
 }
 
+// 只为 实现了 Display + PartialOrd trait 的 T 实现 cmp_display 方法。
 impl<T: Display + PartialOrd> Pair<T> {
     fn cmp_display(&self) {
         if self.x >= self.y {
@@ -137,5 +138,23 @@ impl<T: Display + PartialOrd> Pair<T> {
 ```rust
 pub struct Screen {
     pub components: Vec<Box<dyn Draw>>,
+}
+```
+
+* 如果 trait 的方法是个 范型方法，应该怎么写呢？https://doc.rust-lang.org/book/ch19-03-advanced-traits.html
+
+```rust
+pub trait Iterator {
+    type Item; // 类型的 placeholder。在实现的时候填入！
+
+    fn next(&mut self) -> Option<Self::Item>;
+}
+
+impl Iterator for Counter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        // --snip--
+    }
 }
 ```
