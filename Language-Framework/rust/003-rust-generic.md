@@ -37,7 +37,10 @@ fn main() {
 
 ```rust
 pub trait Summary {
+    // 因为 trait 是需要 struct 实现的。所以第一个参数可能是 &self, &mut self, self?
     fn summarize(&self) -> String;
+    // 因为 trait 是需要 struct 实现的。 Self 表示调用该方法的 struct
+    fn demo(&self) -> Self;
 }
 ```
 
@@ -72,7 +75,7 @@ impl Summary for Tweet {
 
 * trait 作为形参
 ```rust
-// 所有实现了 Summary 的 对象都可以传进去
+// 所有实现了 Summary 的 对象都可以传进去（传的是引用）
 pub fn notify(item: &impl Summary) {
     println!("Breaking news! {}", item.summarize());
 }
