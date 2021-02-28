@@ -47,17 +47,6 @@ fn main() {
 }
 ```
 
-如何将不同的mod放在不同的文件中。
-* rust 中的 crate 树结构需要手动在代码中声明。即：使用 `mod ...` 来进行 `module tree`声明。
-* 声明完之后去创建 对应的 文件夹 + 文件即可。
-* `math.rs` 文件中声明的 `mod rnd;` 对应于 `math/rnd.rs` 文件。
-  * 有一个特殊情况，那就是 `src/lib.rs` 文件中声明的 `mod some_mod;` 是对应 `src/some_mod.rs` 文件。而非 `src/lib/some_mod.rs` 。只有 `crate root` 文件中的声明特殊而已。 
-* rust 中：src/lib.rs 或者 src/main.rs 为 crate 的顶层模块。`crate::`，如果如果想要添加新的 `mod` 必须逐级声明下去。
-* 假设我们需要分文件放一个 `crate::hello::world` 一个模块。
-    * 在 `src/lib.rs` 或者 `src/main.rs` 声明 `hello` 模块, `mod hello`. 并在 创建 `src/hello.rs` 文件。
-    * 在 `src/hello.rs` 声明模块 `world` 。`pub mod world` 并创建 `src/hello/world.rs` 文件。
-    * 或者 `src/hello.rs` 中写 `mod world{....}`. 这样就不用创建新文件了。
-
 # modules 和 访问控制
 
 * `use keyword`: brings a path into scope
@@ -164,6 +153,19 @@ pub fn eat_at_restaurant() {
 ```
 
 ## 将 module 切分成多个文件
+
+如何将不同的mod放在不同的文件中。
+
+* rust 中的 crate 树结构需要手动在代码中声明。即：使用 `mod ...` 来进行 `module tree`声明。
+* 声明完之后去创建 对应的 文件夹 + 文件即可。
+* `math.rs` 文件中声明的 `mod rnd;` 对应于 `math/rnd.rs` 文件。
+  * 有一个特殊情况，那就是 `src/lib.rs` 文件中声明的 `mod some_mod;` 是对应 `src/some_mod.rs` 文件。而非 `src/lib/some_mod.rs` 。只有 `crate root` 文件中的声明特殊而已。 
+* rust 中：src/lib.rs 或者 src/main.rs 为 crate 的顶层模块。`crate::`，如果如果想要添加新的 `mod` 必须逐级声明下去。
+* 假设我们需要分文件放一个 `crate::hello::world` 一个模块。
+  * 在 `src/lib.rs` 或者 `src/main.rs` 声明 `hello` 模块, `mod hello`. 并在 创建 `src/hello.rs` 文件。
+  * 在 `src/hello.rs` 声明模块 `world` 。`pub mod world` 并创建 `src/hello/world.rs` 文件。
+  * 或者 `src/hello.rs` 中写 `mod world{....}`. 这样就不用创建新文件了。
+
 ```rust
 // src/main.rs
 mod hello; //理解为模块声明。编译的时候rust前往模块同名文件中 加载模块内容。
