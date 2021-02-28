@@ -165,10 +165,10 @@ pub fn eat_at_restaurant() {
 ## 将 module 切分成多个文件
 ```rust
 // src/main.rs
-mod hello;
+mod hello; //理解为模块声明。编译的时候rust前往模块同名文件中 加载模块内容。
 
 // src/hello.rs
-pub mod world
+pub mod world; 
 
 // src/hello/world.rs
 pub fn call() {
