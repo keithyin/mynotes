@@ -157,6 +157,7 @@ pub fn eat_at_restaurant() {
 如何将不同的mod放在不同的文件中。
 
 * rust 中的 crate 树结构需要手动在代码中声明。即：使用 `mod ...` 来进行 `module tree`声明。
+  * `mod` 只能一级一级的声明，不能一次声明多级。比如 `mod a::b` 就是🙅的。
 * 声明完之后去创建 对应的 文件夹 + 文件即可。
 * `math.rs` 文件中声明的 `mod rnd;` 对应于 `math/rnd.rs` 文件。
   * 有一个特殊情况，那就是 `src/lib.rs` 文件中声明的 `mod some_mod;` 是对应 `src/some_mod.rs` 文件。而非 `src/lib/some_mod.rs` 。只有 `crate root` 文件中的声明特殊而已。 
