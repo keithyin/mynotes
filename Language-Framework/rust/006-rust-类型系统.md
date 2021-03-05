@@ -60,5 +60,23 @@ Local variables are immutable unless declared otherwise. For example: let mut x 
 感觉：`let mut x = ...`: 只是用来表示，stack frame 上的值能不能修改。那么为什么修改 堆上的值 也需要 `let mut x = ...` 呢？ 有些堆上值的修改，并不会影响栈上值的改变呀。虽然有些是会的。
 
 
+
+
+
+# let mut
+
+* `mut` 两个作用
+  * 变量所代表的 `栈空间` 的值是否可变。注意⚠️：这里没有提堆的事情哦。
+  * 变量是否可以 mutable reference
+    * 会影响到一些方法的调用，因为一些方法需要 `&mut self`.  需要修改栈空间值的，才需要 `&mut self`
+  * 总结起来看：`mut` 仅表示，变量所表示的栈空间上的值时候能变。
+* 有了引用，自然会有解引用
+  * `*some_obj` :
+    * 当 `some_obj` 是 `T` 的时候，该代码会展开 `*(some_obj.deref(&self)) or *(some_obj.deref_mut(&mut self))` 
+    * 当 `some_obj` 是 `&T, &mut T` 时候，就会返回 `T, mut T` 了。
+
+
+
 # 其它资料
+
 https://stackoverflow.com/questions/31567708/difference-in-mutability-between-reference-and-box
