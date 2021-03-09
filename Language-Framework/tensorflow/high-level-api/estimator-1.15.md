@@ -288,13 +288,14 @@ class EvalSpec(
 `tf.estimator.train_and_evaluate`
 
 将 1）训练，2）保存ckpt，3）evaluate，4）导出serving model一起封装了起来，还包括 tensorboard。
-我们需要提供
+为了使用这些功能，我们需要提供：
 
 0. estimator
-1. 训练：TrainSpec
-2. 保存 ckpt & tensorboard，tf.estimator.RunConfig 配置好相应参数
-3. 测试：EvalSpec
-4. 导出：EvalSpec 里配好 Exporter. 在执行export功能的时候，构建的是一个 **PREDICT** model !所以 model_fn 的PREDICT分支的`EstimatorSpec`中配置好`export_outputs`
+1. 训练：写好 TrainSpec
+2. ckpt & tensorboard：在tf.estimator.RunConfig 中配置好相应参数
+3. 测试：写好 EvalSpec
+4. 导出：EvalSpec 里配好 Exporter。
+	* 在执行export功能的时候，构建的是一个 **PREDICT** model !所以 model_fn 的PREDICT分支的`EstimatorSpec`中配置好`export_outputs`
 
 train_and_evaluate基本执行流程: 
 1. 模型训练，产生 ckpt
