@@ -18,9 +18,9 @@ def input_fn():
 ```
 
 # model
-`model_fn` 的签名如下所示.
+`model_fn` 的签名如下所示. 
 ```python
-def model_fn(features, labels, mode):
+def model_fn(features, labels, mode):  # mode 由 estimator 调用该函数时传入。
   ...
   ...
   return tf.estimator.EstimatorSpec()
