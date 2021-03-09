@@ -191,6 +191,22 @@ estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn,
 ```
 This method builds a new graph by first calling the serving_input_receiver_fn() to obtain feature Tensors, and then calling this Estimator's model_fn() to generate the model graph based on those features. It starts a fresh Session, and, by default, restores the most recent checkpoint into it. (A different checkpoint may be passed, if needed.) Finally it creates a time-stamped export directory below the given export_dir_base (i.e., export_dir_base/<timestamp>), and writes a SavedModel into it containing a single MetaGraphDef saved from this Session.
   
+
+### 分布式训练
+
+* 代码部分无需修改，配置好环境变量 `TF_CONFIG` 即可：`TF_CONFIG`是个json string。
+
+```
+os.environ["TF_CONFIG"] = json.dumps({
+    "cluster": {
+        "chief": ["host0:port"],
+        "worker": ["host1:port", "host2:port", "host3:port"],
+        "ps": ["host4:port", "host5:port"]
+    },
+   "task": {"type": "worker", "index": 0} // type：当前进程角色🎭，index：当前进程在上述列表中的索引。
+})
+```
+
 ### Serving
 TODO
 
@@ -223,6 +239,27 @@ class RunConfig(object):
                experimental_distribute=None,
                experimental_max_worker_delay_secs=None,
                session_creation_timeout_secs=7200):
+```
+
+```
+ConfigProto
+allow_soft_placement	bool allow_soft_placement
+cluster_def	ClusterDef cluster_def
+device_count	repeated DeviceCountEntry device_count
+device_filters	repeated string device_filters
+experimental	Experimental experimental
+gpu_options	GPUOptions gpu_options
+graph_options	GraphOptions graph_options
+inter_op_parallelism_threads	int32 inter_op_parallelism_threads
+intra_op_parallelism_threads	int32 intra_op_parallelism_threads
+isolate_session_state	bool isolate_session_state
+log_device_placement	bool log_device_placement
+operation_timeout_in_ms	int64 operation_timeout_in_ms
+placement_period	int32 placement_period
+rpc_options	RPCOptions rpc_options
+session_inter_op_thread_pool	repeated ThreadPoolOptionProto session_inter_op_thread_pool
+use_per_session_threads	bool use_per_session_threads
+
 ```
 
 感觉 `**Spec` 命名的类，是为了封装 函数的输入而存在的。。。
