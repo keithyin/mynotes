@@ -216,16 +216,17 @@ TODO
   * https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/ConfigProto.
   * 
 * tf.estimator.RunConfig: estimator 的运行Config，包含 `ConfigProto`，同时也有一些其它estimator相关的配置
-  * checkpoint 配置，summary 配置。
+  * checkpoint 配置，
+  * summary 配置
+  * 分布式训练配置？
 ```python
-
 
 class RunConfig(object):
   """This class specifies the configurations for an `Estimator` run."""
   def __init__(self,
-               model_dir=None,
+               model_dir=None,    # ckpt 保存位置
                tf_random_seed=None,
-               save_summary_steps=100,
+               save_summary_steps=100,  # 保存 summary 的 interval
                save_checkpoints_steps=_USE_DEFAULT,
                save_checkpoints_secs=_USE_DEFAULT,
                session_config=None, # tf.ConfigProto
