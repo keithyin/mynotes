@@ -316,6 +316,8 @@ https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/hi
 * global_step在evaluate时候是不会累加的。这也是非常合理的。
 
 # 如何解决train过程auc累积问题
+
+* 解决方案：将 metric 的的中间结果清零 🆑。代码如下
 ```python
 with tf.variable_scope("train_metrics_scope"):
     metric_auc = tf.metrics.auc(true_cvr, cvr, num_thresholds=10240)
