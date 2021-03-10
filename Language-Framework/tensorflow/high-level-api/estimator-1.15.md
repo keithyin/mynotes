@@ -315,6 +315,34 @@ https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/hi
 # NB
 * global_step在evaluate时候是不会累加的。这也是非常合理的。
 
+# 如何解决train过程auc累积问题
+```python
+with tf.variable_scope("train_metrics_scope"):
+    metric_auc = tf.metrics.auc(true_cvr, cvr, num_thresholds=10240)
+    metric_cvr_loss = tf.metrics.mean(cvr_loss)
+    metric_cost_loss = tf.metrics.mean_squared_error(true_cost, cvr_cost, weights=true_cvr)
+
+    is_metric_reset_step = tf.equal(global_step % 10000, 0)
+    metric_reset_op = tf.cond(is_metric_reset_step,
+			      lambda: tf.group([tf.assign(ref, tf.zeros_like(ref))
+						for ref in tf.local_variables() if
+						'train_metrics_scope' in ref.op.name]),
+			      lambda: tf.no_op())
+
+with tf.name_scope("train_metrics_summary"):
+    tf.summary.scalar("auc", metric_auc[0])
+    tf.summary.scalar("cvr_loss", metric_cvr_loss[0])
+    tf.summary.scalar("cost_loss", metric_cost_loss[0])
+
+# ...
+
+train_op = tf.train.AdamOptimizer(
+            learning_rate=lr).minimize(tot_loss,
+				       global_step=global_step)
+train_op = tf.group(train_op, metric_reset_op, metric_auc[1], metric_cvr_loss[1], metric_cost_loss[1])
+```
+
+
 # 参考资料
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
 https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/estimators/cnn.ipynb
