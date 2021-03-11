@@ -9,7 +9,10 @@
 
 estimator实际就是将 3，4 部分代码帮我们写好了，我们只需要关注 1，2部分的实现就好了。
 
+
+
 # 自定义estimator
+
 * tensorflow已经实现了一些常用的 estimator。可以拿来直接用。但是本文更加关注于如何自定义estimator。
 
 * 当我们谈到自定义estimator的时候，我们说的是使用 `tf.estimator.Estimator` 类，而非更加高阶的类，比如:`tf.estimator.DNNClassifier` 
