@@ -474,7 +474,7 @@ eval_spec = tf.estimator.EvalSpec(
 tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
 ```
 
-
+> 如果不使用 `tf.estimator.train_and_evaluate` 的话， 我们就不需要构建 `TrainSpec, EvalSpec, Exporter` 了。仅仅使用 `estimator.train & estimator.evaluate & estimator.export_savedmodel` 即可。
 
 
 
