@@ -244,9 +244,29 @@ estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn,
 ```
 This method builds a new graph by first calling the serving_input_receiver_fn() to obtain feature Tensors, and then calling this Estimator's model_fn() to generate the model graph based on those features. It starts a fresh Session, and, by default, restores the most recent checkpoint into it. (A different checkpoint may be passed, if needed.) Finally it creates a time-stamped export directory below the given export_dir_base (i.e., export_dir_base/<timestamp>), and writes a SavedModel into it containing a single MetaGraphDef saved from this Session.
 
+
+
 * 当使用`train_and_evaluate API`   时如何进行 模型导出配置
-  * 构建`Exporter`
-  * 
+  * 构建`Exporter`, 将其传给 `EvalSpec`
+  * `tf` 提供了两个 `exporter` 可供使用:  `tf.estimator.FinalExporter, tf.estimator.BestExporter` 
+  * `tf.estimator.FinalExporter` : 导出最近的 `ckpt`
+  * `tf.estimator.BestExporter` : 导出loss低的 `ckpt` （较为常用）
+
+```python
+tf.estimator.BestExporter(
+    name='best_exporter', 
+  	serving_input_receiver_fn=None,
+    event_file_pattern='eval/*.tfevents.*', #为了抢占安全，一定要指定。抢占安全？
+  	compare_fn=_loss_smaller,
+    assets_extra=None,  # 除了导出模型，还需要导出的一些文件，比如：vocab文件？
+  	as_text=False, 
+  	exports_to_keep=5
+)
+```
+
+* 关于 `compare_fn`: a function that compares two evaluation results and returns true if current evaluation result is better. Follows the signature: `def compare_fn(best_eval_result, current_eval_result) -> bool`
+  * `best_eval_result, current_eval_result` 实际是 `estimator.evaluate` 的返回值，是个 `dict` . 
+  * `dict` 的 `key` 包含：1）我们定义的 `eval_metrics` 中的那些 `key` ，2）`loss` , 该 `loss` 代表`EstimatorSpec` 中传入的 `loss`, `estimator.evaluator` 返回的 `{"loss": 均值}` 。
 
 
 
@@ -254,6 +274,7 @@ This method builds a new graph by first calling the serving_input_receiver_fn() 
 ### 分布式训练
 
 * 代码部分无需修改，配置好环境变量 `TF_CONFIG` 即可：`TF_CONFIG`是个json string。
+* https://github.com/tensorflow/docs/blob/r1.15/site/en/api_docs/python/tf/estimator/train_and_evaluate.md
 
 ```
 os.environ["TF_CONFIG"] = json.dumps({
@@ -273,7 +294,28 @@ TODO
 
 * tf.ConfigProto: 用来配置 session 资源
   * https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/ConfigProto.
-  * 
+```python
+ConfigProto
+allow_soft_placement	bool allow_soft_placement
+cluster_def	ClusterDef cluster_def
+device_count	repeated DeviceCountEntry device_count
+device_filters	repeated string device_filters
+experimental	Experimental experimental
+gpu_options	GPUOptions gpu_options
+graph_options	GraphOptions graph_options
+inter_op_parallelism_threads	int32 inter_op_parallelism_threads
+intra_op_parallelism_threads	int32 intra_op_parallelism_threads
+isolate_session_state	bool isolate_session_state
+log_device_placement	bool log_device_placement
+operation_timeout_in_ms	int64 operation_timeout_in_ms
+placement_period	int32 placement_period
+rpc_options	RPCOptions rpc_options
+session_inter_op_thread_pool	repeated ThreadPoolOptionProto session_inter_op_thread_pool
+use_per_session_threads	bool use_per_session_threads
+```
+
+
+
 * tf.estimator.RunConfig: estimator 的运行Config，包含 `ConfigProto`，同时也有一些其它estimator相关的配置
   * checkpoint 配置，
   * summary 配置
@@ -301,28 +343,9 @@ class RunConfig(object):
                session_creation_timeout_secs=7200):
 ```
 
-```
-ConfigProto
-allow_soft_placement	bool allow_soft_placement
-cluster_def	ClusterDef cluster_def
-device_count	repeated DeviceCountEntry device_count
-device_filters	repeated string device_filters
-experimental	Experimental experimental
-gpu_options	GPUOptions gpu_options
-graph_options	GraphOptions graph_options
-inter_op_parallelism_threads	int32 inter_op_parallelism_threads
-intra_op_parallelism_threads	int32 intra_op_parallelism_threads
-isolate_session_state	bool isolate_session_state
-log_device_placement	bool log_device_placement
-operation_timeout_in_ms	int64 operation_timeout_in_ms
-placement_period	int32 placement_period
-rpc_options	RPCOptions rpc_options
-session_inter_op_thread_pool	repeated ThreadPoolOptionProto session_inter_op_thread_pool
-use_per_session_threads	bool use_per_session_threads
 
-```
 
-感觉 `**Spec` 命名的类，是为了封装 函数的输入而存在的。。。
+ `**Spec` 命名的类，是为了封装 函数的输入而存在的。。。
 * tf.estimator.EstimatorSpec: `model_fn` 返回的结构体。用来指明 `model` 的一些基本信息
 * tf.estimator.TrainSpec: 训练 model 需要的一些参数
 * tf.estimator.EvalSpec: 评估时候 需要的一些参数
@@ -402,3 +425,6 @@ train_op = tf.group(train_op, metric_reset_op, metric_auc[1], metric_cvr_loss[1]
 https://github.com/tensorflow/docs/blob/r1.15/site/en/guide/custom_estimators.md
 https://github.com/tensorflow/docs/blob/r1.15/site/en/tutorials/estimators/cnn.ipynb
 https://github.com/tensorflow/docs/blob/r1.13/site/en/guide/saved_model.md
+
+https://github.com/tensorflow/docs/blob/r1.15/site/en/api_docs/python/tf/estimator/train_and_evaluate.md
+
