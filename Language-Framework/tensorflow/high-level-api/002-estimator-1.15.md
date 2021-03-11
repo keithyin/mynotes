@@ -124,6 +124,7 @@ mnist_classifier = tf.estimator.Estimator(
 # Set up logging for predictions
 tensors_to_log = {"probabilities": "softmax_tensor"}
 
+# 控制台打印日志
 logging_hook = tf.train.LoggingTensorHook(
     tensors=tensors_to_log, every_n_iter=50)
 
@@ -244,7 +245,7 @@ This method builds a new graph by first calling the serving_input_receiver_fn() 
 
 
 
-* 当使用`train_and_evaluate API`   时如何进行 模型导出配置. 详见 `使用train_and_evaluate`
+* 当使用`train_and_evaluate API`   时如何进行 模型导出配置. 
   * 构建`Exporter`, 将其传给 `EvalSpec`
   * `tf` 提供了两个 `exporter` 可供使用:  `tf.estimator.FinalExporter, tf.estimator.BestExporter` 
   * `tf.estimator.FinalExporter` : 导出最近的 `ckpt`
