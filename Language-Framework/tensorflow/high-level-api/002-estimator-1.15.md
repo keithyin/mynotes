@@ -386,7 +386,7 @@ https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/hi
 
 
 
-# 使用`train_and_evaluate`整体代码
+# `estimator`整体代码
 
 ```python
 from tensorflow.saved_model import signature_constants
