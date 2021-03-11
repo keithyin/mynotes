@@ -39,6 +39,7 @@ import tensorflow as tf
 def train_input_fn():
   dataset = SomeDataset()
   # parse_function 负责单个样本的解析。
+  # parse_function: 建议：对于变长的数据不要进行额外操作，最好在 mode_fn 中搞。
   dataset = dataset.map(lambda record: parse_function(record, is_training))
   dataset = dataset.batch(batch_size)   # 这里不建议使用 padded_batch, 对于pad 操作可以在 model_fn中处理！。
   dataset = dataset.prefetch(FLAGS.prefetch)
