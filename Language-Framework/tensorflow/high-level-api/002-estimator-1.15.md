@@ -57,8 +57,10 @@ def eval_input_fn():
 def serving_input_receiver_fn():
   serialized_tf_examples = tf.placeholder(shape=[None], dtype=tf.string)
   
-  # 请求 tf-serving 时传的 数据。
+  # receiver_tensor：请求 tf-serving 时传的 数据。
   receiver_tensor = {'examples': serialized_tf_examples}
+  
+  # features：传给model_fn的数据。
   features = tf.parse_example(serialized_tf_examples, feature_description)
   return tf.estimator.export.ServingInputReceiver(features, receiver_tensor)
 
