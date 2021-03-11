@@ -380,7 +380,7 @@ https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/hi
 
 
 
-# NB
+# 注意⚠️
 
 * global_step在evaluate时候是不会累加的。这也是非常合理的。
 
