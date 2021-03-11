@@ -152,8 +152,6 @@ eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
 print(eval_results)
 ```
 
-
-
 * tensorflow 还提供了一个 api，`train & evaluate` 可以一行代码搞定 `train_and_evaluate` . 该API，将 1）训练，2）保存ckpt，3）evaluate，4）导出serving model一起封装了起来，还包括 tensorboard。
   为了使用此API，我们需要提供：
   1. 构建一个 `estimator` 以备使用
@@ -246,7 +244,7 @@ This method builds a new graph by first calling the serving_input_receiver_fn() 
 
 
 
-* 当使用`train_and_evaluate API`   时如何进行 模型导出配置
+* 当使用`train_and_evaluate API`   时如何进行 模型导出配置. 详见 `使用train_and_evaluate`
   * 构建`Exporter`, 将其传给 `EvalSpec`
   * `tf` 提供了两个 `exporter` 可供使用:  `tf.estimator.FinalExporter, tf.estimator.BestExporter` 
   * `tf.estimator.FinalExporter` : 导出最近的 `ckpt`
@@ -313,8 +311,6 @@ rpc_options	RPCOptions rpc_options
 session_inter_op_thread_pool	repeated ThreadPoolOptionProto session_inter_op_thread_pool
 use_per_session_threads	bool use_per_session_threads
 ```
-
-
 
 * tf.estimator.RunConfig: estimator 的运行Config，包含 `ConfigProto`，同时也有一些其它estimator相关的配置
   * checkpoint 配置，
@@ -386,6 +382,98 @@ https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/hi
 # NB
 
 * global_step在evaluate时候是不会累加的。这也是非常合理的。
+
+
+
+# 使用`train_and_evaluate`整体代码
+
+```python
+from tensorflow.saved_model import signature_constants
+import tensorflow as tf
+
+def train_input_fn():
+  return dataset
+
+def eval_input_fn():
+  return dataset
+
+def serving_input_receiver_fn():
+  serialized_tf_examples = tf.placeholder(shape=[None], dtype=tf.string)
+  
+  # 请求 tf-serving 时传的 数据。
+  receiver_tensor = {'examples': serialized_tf_examples}
+  features = tf.parse_example(serialized_tf_examples, feature_description)
+  return tf.estimator.export.ServingInputReceiver(features, receiver_tensor)
+
+def model_fn(features, labels, mode):
+  predicted_vals = net(features)
+  
+  """
+  当estimator export模型的时候，mode 会传入 tf.estimator.ModeKeys.PREDICT
+  此时会走该分支
+  """
+  if mode == tf.estimator.ModeKeys.PREDICT:
+    export_outputs = {
+            signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: tf.estimator.export.PredictOutput({
+                "cvr": tf.squeeze(cvr_prob, axis=1, name="cvr"),
+                
+                "user_id": tf.identity(features['user_id'], name='user_id')
+            })
+        }
+    return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions, export_outputs=export_outputs)
+  
+  loss = compute_loss(predicted_vals, labels)
+  
+  if mode == tf.estimator.ModeKeys.EVAL:
+    eval_metric_ops = {
+      "accuracy": tf.metrics.accuracy(
+          labels=labels, predictions=predictions["classes"])
+  	}
+    return tf.estimator.EstimatorSpec(
+        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+  
+  optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+  train_op = optimizer.minimize(
+    loss=loss,
+    global_step=tf.train.get_global_step())
+  return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
+  
+ 
+
+```
+
+> 先判断 `mode == tf.estimator.ModeKeys.PREDICT`, 再判断 `mode == tf.estimator.ModeKeys.EVAL` 最终是 `TRAIN` 的原因是，`predict` 仅需要 预估过程即可，不需 loss计算。同理：`EVAL` 不需要 梯度计算。
+
+```python
+session_config = tf.ConfigProto(allow_soft_placement=True,
+                                log_device_placement=False,
+                                operation_timeout_in_ms=0,
+                                device_filters=device_filters) # device_filters不知干啥用的。。
+
+run_config = tf.estimator.RunConfig(
+        model_dir=output_dir,
+        save_checkpoints_steps=FLAGS.save_checkpoints_steps,
+        session_config=session_config,
+        log_step_count_steps=10
+    )
+
+estimator = tf.estimator.Estimator(
+        model_fn=model_fn,
+        config=run_config
+    )
+
+train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=train_steps, hooks=None)
+
+best_exporter = tf.estimator.BestExporter(serving_input_receiver_fn=serving_input_receiver_fn)
+eval_spec = tf.estimator.EvalSpec(
+    eval_input_fn, steps=100, name=None, hooks=None, exporters=[best_exporter],
+    start_delay_secs=120, throttle_secs=600
+)
+
+tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+```
+
+
 
 
 
