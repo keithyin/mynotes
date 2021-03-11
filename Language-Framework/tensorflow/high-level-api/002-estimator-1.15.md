@@ -18,17 +18,134 @@ estimator实际就是将 3，4 部分代码帮我们写好了，我们只需要�
     * `iterator` 的构建在 `Estimator` 处理，不需要我们写代码
   * `def model_fn` : 定义了模型结构 & `train_op`
 
-## input_fn
+
+
+# `estimator`整体代码
+
+* 先看一个使用 `estimator` 的代码应该如何组织
+  * `input_fn`: 负责 训练/测试 的 `dataset` 构建
+  * `model_fn`: 负责 模型结构 & `train_op`
+  * `serving_input_receiver_fn`: 
+    * 模型训练时候我们通常是使用 `dataset` 方式味数据，构建的计算图中并没有一个显式接收外部输入的地方。
+    * `serving_input_receiver_fn`: 是为了给 `导出模型` 添加一个显式输入(`placeholder`)。
 
 ```python
-def input_fn():
+from tensorflow.saved_model import signature_constants
+import tensorflow as tf
+
+def train_input_fn():
   dataset = SomeDataset()
   # parse_function 负责单个样本的解析。
   dataset = dataset.map(lambda record: parse_function(record, is_training))
   dataset = dataset.batch(batch_size)   # 这里不建议使用 padded_batch, 对于pad 操作可以在 model_fn中处理！。
   dataset = dataset.prefetch(FLAGS.prefetch)
   return dataset
+
+def eval_input_fn():
+  dataset = SomeDataset()
+  # parse_function 负责单个样本的解析。
+  dataset = dataset.map(lambda record: parse_function(record, is_training))
+  dataset = dataset.batch(batch_size)   # 这里不建议使用 padded_batch, 对于pad 操作可以在 model_fn中处理！。
+  dataset = dataset.prefetch(FLAGS.prefetch)
+  return dataset
+
+# 模型导出时需要用到。
+def serving_input_receiver_fn():
+  serialized_tf_examples = tf.placeholder(shape=[None], dtype=tf.string)
+  
+  # 请求 tf-serving 时传的 数据。
+  receiver_tensor = {'examples': serialized_tf_examples}
+  features = tf.parse_example(serialized_tf_examples, feature_description)
+  return tf.estimator.export.ServingInputReceiver(features, receiver_tensor)
+
+def model_fn(features, labels, mode):
+  predicted_vals = net(features)
+  
+  """
+  当estimator export模型的时候，mode 会传入 tf.estimator.ModeKeys.PREDICT
+  此时会走该分支
+  """
+  if mode == tf.estimator.ModeKeys.PREDICT:
+    export_outputs = {
+            signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: tf.estimator.export.PredictOutput({
+                "cvr": tf.squeeze(cvr_prob, axis=1, name="cvr"),
+                
+                "user_id": tf.identity(features['user_id'], name='user_id')
+            })
+        }
+    return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions, export_outputs=export_outputs)
+  
+  loss = compute_loss(predicted_vals, labels)
+  
+  if mode == tf.estimator.ModeKeys.EVAL:
+    eval_metric_ops = {
+      "accuracy": tf.metrics.accuracy(
+          labels=labels, predictions=predictions["classes"])
+  	}
+    return tf.estimator.EstimatorSpec(
+        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+  
+  optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+  train_op = optimizer.minimize(
+    loss=loss,
+    global_step=tf.train.get_global_step())
+  return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
+  
+ 
+
 ```
+
+> 先判断 `mode == tf.estimator.ModeKeys.PREDICT`, 再判断 `mode == tf.estimator.ModeKeys.EVAL` 最终是 `TRAIN` 的原因是，`predict` 仅需要 预估过程即可，不需 loss计算。同理：`EVAL` 不需要 梯度计算。
+
+```python
+session_config = tf.ConfigProto(allow_soft_placement=True,
+                                log_device_placement=False,
+                                operation_timeout_in_ms=0,
+                                device_filters=device_filters) # device_filters不知干啥用的。。
+
+run_config = tf.estimator.RunConfig(
+        model_dir=output_dir,
+        save_checkpoints_steps=FLAGS.save_checkpoints_steps,
+        session_config=session_config,
+        log_step_count_steps=10
+    )
+
+estimator = tf.estimator.Estimator(
+        model_fn=model_fn,
+        config=run_config
+    )
+
+"""
+# 如果不使用 train_and_evaluate() 接口，代码看起来是这样的。
+for _ in range(100):
+  estimator.train(input_fn=train_input_fn,
+                  steps=1000, # 训练几个step。
+                  hooks=[logging_hook])
+  # eval_result 是个 dict，包含 loss 和 eval_metrics 中关注的指标。
+  # loss为整个 evaluate 过程中 mini_batch_loss 的均值。
+  eval_result = estimator.evaluate(input_fn=eval_input_fn)
+  print(eval_result)
+"""
+
+# 使用 train_and_evaluate 的代码看起来是这样的。
+train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=train_steps, hooks=None)
+
+best_exporter = tf.estimator.BestExporter(serving_input_receiver_fn=serving_input_receiver_fn)
+eval_spec = tf.estimator.EvalSpec(
+    eval_input_fn, steps=100, name=None, hooks=None, exporters=[best_exporter],
+    start_delay_secs=120, throttle_secs=600
+)
+
+tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
+```
+
+> 如果不使用 `tf.estimator.train_and_evaluate` 的话， 我们就不需要构建 `TrainSpec, EvalSpec, Exporter` 了。仅仅使用 `estimator.train & estimator.evaluate & estimator.export_savedmodel` 即可。
+
+
+
+下面更详细的介绍每个部分。
+
+`input_fn` 很简单，这里不做更多说明。
 
 ## model_fn
 
@@ -43,117 +160,64 @@ mode 由 estimator 调用该函数时传入。
 	estimator.train 时 mode==tf.estimator.ModeKeys.TRAIN
 	estimator.evaluate 时 mode==tf.estimator.ModeKeys.EVAL
 	estimator.predict 时 mode==tf.estimator.ModeKeys.PREDICT
+该代码有三个分支，对应于三个mode。
+需要注意的是：不同mode下返回的 EstimatorSpec 中侧重的参数是不同的。
+	PREDICT: 对应 estimator.predict
+		EstimatorSpec(mode=mode, predictions=predictions, export_outputs=export_outputs)
+		predictions应该是给 estimator.predict() 用的，该方法返回什么值就靠 predictions指定了
+		export_outputs: 指定导出的 serving 模型是怎样的输出
+  
+  EVAL: 对应 estimator.evaluate
+  	EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+  	loss: 这个应该传的是一个 batch_loss。
+  	eval_metric_ops: metrics 的dict。
+  	loss & eval_metric_ops 中指标 会被 summary 起来，在 tensorboard 中可以看到。
+  	实际上，在 estimator.evaluate时候，也就 loss & eval_metric_ops 中指标会被 summary，其余在代码中写的 tf.summary.scalar 啥的是无效的。如果的确需要，需要使用 hook
+  
+  TRAIN: estimator.train
+  	EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
+  	loss: batch_loss, 训练过程中会被 summary
+  	train_op: 训练op
+  	train过程中，除了 代码中写的 tf.summary.* 会被 summary, 传入的 loss 也会被 summary。
 """
-def model_fn(features, labels, mode):  
-  ...
-  ...
-  return tf.estimator.EstimatorSpec()
-```
-```python
-def cnn_model_fn(features, labels, mode):
-  """Model function for CNN."""
-  # Input Layer
-  input_layer = tf.reshape(features["x"], [-1, 28, 28, 1])
-
-  # Convolutional Layer #1
-  conv1 = tf.layers.conv2d(
-      inputs=input_layer,
-      filters=32,
-      kernel_size=[5, 5],
-      padding="same",
-      activation=tf.nn.relu)
-
-  # Pooling Layer #1
-  pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
-
-  # Convolutional Layer #2 and Pooling Layer #2
-  conv2 = tf.layers.conv2d(
-      inputs=pool1,
-      filters=64,
-      kernel_size=[5, 5],
-      padding="same",
-      activation=tf.nn.relu)
-  pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
-
-  # Dense Layer
-  pool2_flat = tf.reshape(pool2, [-1, 7 * 7 * 64])
-  dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
-  dropout = tf.layers.dropout(
-      inputs=dense, rate=0.4, training=mode == tf.estimator.ModeKeys.TRAIN)
-
-  # Logits Layer
-  logits = tf.layers.dense(inputs=dropout, units=10)
-
-  predictions = {
-      # Generate predictions (for PREDICT and EVAL mode)
-      "classes": tf.argmax(input=logits, axis=1),
-      # Add `softmax_tensor` to the graph. It is used for PREDICT and by the
-      # `logging_hook`.
-      "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
-  }
+def model_fn(features, labels, mode):
+  predicted_vals = net(features)
+  
+  """
+  当estimator export模型的时候，mode 会传入 tf.estimator.ModeKeys.PREDICT
+  此时会走该分支
+  """
   if mode == tf.estimator.ModeKeys.PREDICT:
-    return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
-
-  # Calculate Loss (for both TRAIN and EVAL modes)
-  loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
-
-  # Configure the Training Op (for TRAIN mode)
-  if mode == tf.estimator.ModeKeys.TRAIN:
-    optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
-    train_op = optimizer.minimize(
-        loss=loss,
-        global_step=tf.train.get_global_step())
-    return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
-
-  # Add evaluation metrics (for EVAL mode)
-  eval_metric_ops = {
+    export_outputs = {
+            signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: tf.estimator.export.PredictOutput({
+                "cvr": tf.squeeze(cvr_prob, axis=1, name="cvr"),
+                
+                "user_id": tf.identity(features['user_id'], name='user_id')
+            })
+        }
+    return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions, export_outputs=export_outputs)
+  
+  loss = compute_loss(predicted_vals, labels)
+  
+  if mode == tf.estimator.ModeKeys.EVAL:
+    eval_metric_ops = {
       "accuracy": tf.metrics.accuracy(
           labels=labels, predictions=predictions["classes"])
-  }
-  return tf.estimator.EstimatorSpec(
-      mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+  	}
+    return tf.estimator.EstimatorSpec(
+        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
+  
+  optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
+  train_op = optimizer.minimize(
+    loss=loss,
+    global_step=tf.train.get_global_step())
+  return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 ```
+ 
 
-## train & evaluate
+## `train_and_evaluate`
 
-```python
-# Create the Estimator，指定 model_fn & model_dir
-mnist_classifier = tf.estimator.Estimator(
-    model_fn=cnn_model_fn, model_dir="/tmp/mnist_convnet_model")
-
-# Set up logging for predictions
-tensors_to_log = {"probabilities": "softmax_tensor"}
-
-# 控制台打印日志
-logging_hook = tf.train.LoggingTensorHook(
-    tensors=tensors_to_log, every_n_iter=50)
-
-train_input_fn = tf.estimator.inputs.numpy_input_fn(
-    x={"x": train_data},
-    y=train_labels,
-    batch_size=100,
-    num_epochs=None,
-    shuffle=True)
-
-# train one step and display the probabilties
-# train 的时候指定 input_fn & hooks
-mnist_classifier.train(
-    input_fn=train_input_fn,
-    steps=1, # 训练几个step。
-    hooks=[logging_hook])
-    
-# evaluate model！
-eval_input_fn = tf.estimator.inputs.numpy_input_fn(
-    x={"x": eval_data},
-    y=eval_labels,
-    num_epochs=1,
-    shuffle=False)
-
-eval_results = mnist_classifier.evaluate(input_fn=eval_input_fn)
-print(eval_results)
-```
-
-* tensorflow 还提供了一个 api，`train & evaluate` 可以一行代码搞定 `train_and_evaluate` . 该API，将 1）训练，2）保存ckpt，3）evaluate，4）导出serving model一起封装了起来，还包括 tensorboard。
+*  `train_and_evaluate` 将 1）训练，2）保存ckpt，3）evaluate，4）导出serving model一起封装了起来，还包括 tensorboard。
   为了使用此API，我们需要提供：
   1. 构建一个 `estimator` 以备使用
   2. 训练：定义好 `TrainSpec`
@@ -385,96 +449,6 @@ https://github.com/keithyin/mynotes/blob/master/Language-Framework/tensorflow/hi
 * global_step在evaluate时候是不会累加的。这也是非常合理的。
 
 
-
-# `estimator`整体代码
-
-```python
-from tensorflow.saved_model import signature_constants
-import tensorflow as tf
-
-def train_input_fn():
-  return dataset
-
-def eval_input_fn():
-  return dataset
-
-def serving_input_receiver_fn():
-  serialized_tf_examples = tf.placeholder(shape=[None], dtype=tf.string)
-  
-  # 请求 tf-serving 时传的 数据。
-  receiver_tensor = {'examples': serialized_tf_examples}
-  features = tf.parse_example(serialized_tf_examples, feature_description)
-  return tf.estimator.export.ServingInputReceiver(features, receiver_tensor)
-
-def model_fn(features, labels, mode):
-  predicted_vals = net(features)
-  
-  """
-  当estimator export模型的时候，mode 会传入 tf.estimator.ModeKeys.PREDICT
-  此时会走该分支
-  """
-  if mode == tf.estimator.ModeKeys.PREDICT:
-    export_outputs = {
-            signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY: tf.estimator.export.PredictOutput({
-                "cvr": tf.squeeze(cvr_prob, axis=1, name="cvr"),
-                
-                "user_id": tf.identity(features['user_id'], name='user_id')
-            })
-        }
-    return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions, export_outputs=export_outputs)
-  
-  loss = compute_loss(predicted_vals, labels)
-  
-  if mode == tf.estimator.ModeKeys.EVAL:
-    eval_metric_ops = {
-      "accuracy": tf.metrics.accuracy(
-          labels=labels, predictions=predictions["classes"])
-  	}
-    return tf.estimator.EstimatorSpec(
-        mode=mode, loss=loss, eval_metric_ops=eval_metric_ops)
-  
-  optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.001)
-  train_op = optimizer.minimize(
-    loss=loss,
-    global_step=tf.train.get_global_step())
-  return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
-  
- 
-
-```
-
-> 先判断 `mode == tf.estimator.ModeKeys.PREDICT`, 再判断 `mode == tf.estimator.ModeKeys.EVAL` 最终是 `TRAIN` 的原因是，`predict` 仅需要 预估过程即可，不需 loss计算。同理：`EVAL` 不需要 梯度计算。
-
-```python
-session_config = tf.ConfigProto(allow_soft_placement=True,
-                                log_device_placement=False,
-                                operation_timeout_in_ms=0,
-                                device_filters=device_filters) # device_filters不知干啥用的。。
-
-run_config = tf.estimator.RunConfig(
-        model_dir=output_dir,
-        save_checkpoints_steps=FLAGS.save_checkpoints_steps,
-        session_config=session_config,
-        log_step_count_steps=10
-    )
-
-estimator = tf.estimator.Estimator(
-        model_fn=model_fn,
-        config=run_config
-    )
-
-train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=train_steps, hooks=None)
-
-best_exporter = tf.estimator.BestExporter(serving_input_receiver_fn=serving_input_receiver_fn)
-eval_spec = tf.estimator.EvalSpec(
-    eval_input_fn, steps=100, name=None, hooks=None, exporters=[best_exporter],
-    start_delay_secs=120, throttle_secs=600
-)
-
-tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
-```
-
-> 如果不使用 `tf.estimator.train_and_evaluate` 的话， 我们就不需要构建 `TrainSpec, EvalSpec, Exporter` 了。仅仅使用 `estimator.train & estimator.evaluate & estimator.export_savedmodel` 即可。
 
 
 
