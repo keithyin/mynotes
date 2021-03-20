@@ -219,7 +219,7 @@ def model_fn(features, labels, mode):
     global_step=tf.train.get_global_step())
   return tf.estimator.EstimatorSpec(mode=mode, loss=loss, train_op=train_op)
 ```
- 
+
 
 ## `train_and_evaluate`
 
@@ -308,10 +308,19 @@ def model_fn(...):
 * 导出的模型的裸API
 
 ```python
-estimator.export_savedmodel(export_dir_base, serving_input_receiver_fn,
+estimator.export_saved_model(export_dir_base, serving_input_receiver_fn,
                             strip_default_attrs=True)
 ```
-This method builds a new graph by first calling the serving_input_receiver_fn() to obtain feature Tensors, and then calling this Estimator's model_fn() to generate the model graph based on those features. It starts a fresh Session, and, by default, restores the most recent checkpoint into it. (A different checkpoint may be passed, if needed.) Finally it creates a time-stamped export directory below the given export_dir_base (i.e., export_dir_base/<timestamp>), and writes a SavedModel into it containing a single MetaGraphDef saved from this Session.
+该API执行以下操作：
+
+1. 构建一个新的Graph：
+   1. 通过调用 `serving_input_reveiver_fn()` 获取`feature tensors`，
+   2. 然后调用 Estimator的 `model_fn`  . `model_fn`的调用实参为  `mode=PREDICT & label=None` ，其中 `features` 由 `serving_input_reveiver_fn()` 提供。
+2. `restore` 参数：
+   1. 创建一个 新 `Session`, 
+   2. 默认会 `restores most rescent checkpoint into it`. 当然也可以 `restore` 其它 `ckpt`
+3. 导出模型：
+   1. 创建一个 `export_dir_base/<timestamp>` 的文件夹存放导出的 `SavedModel`.
 
 
 
