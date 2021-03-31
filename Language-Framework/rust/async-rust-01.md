@@ -1,3 +1,69 @@
+rust的异步编程模型
+
+* 异步方法：`async fn` ，调用一个 `async fn` 实际返回一个 `Future`. 这时实际上是没有什么计算的。
+
+* 如果要真实计算的话，需要在 `Executor` 上执行 `Future`
+
+* 关于 `Future` 的执行，有两种不同情况
+
+  * 在 `async fn` 中如何执行 `Future`
+    * `.await` 
+  * 在 普通 `fn` 中如何执行 `Future`
+
+* `Executor` 实际上就是在调度 `Future` 的执行
+
+* `Future` 是异步编程的核心，`Future` 是一个可以产生值的 异步计算。
+
+  * ```rust
+    trait SimpleFuture {
+        type Output;
+        fn poll(&mut self, wake: fn()) -> Poll<Self::Output>;
+    }
+    
+    enum Poll<T> {
+        Ready(T),
+        Pending,
+    }
+    ```
+
+  * `Future` 通过调用 `poll` 执行计算。如果计算完成，返回 `Pool::Ready(result)` . 如果此次计算未完成，那就返回 `Pool::Pending` 即可。
+
+  * `wake`: 如果 `Future` 返回 `Pool::Pending`, 那么该`Future` 就扔到未就绪队列了，如何将其再放到就绪队列中呢？就需要这个 `wake` 了，他可以是一个 `Timer`, 也可以是其它的一些东西。
+
+  * 一个简单的 `SocketRead` 代码可以如下所示
+
+    * ```rust
+      pub struct SocketRead<'a> {
+          socket: &'a Socket,
+      }
+      
+      impl SimpleFuture for SocketRead<'_> {
+          type Output = Vec<u8>;
+      
+          fn poll(&mut self, wake: fn()) -> Poll<Self::Output> {
+              if self.socket.has_data_to_read() {
+                  // The socket has data-- read it into a buffer and return it.
+                  Poll::Ready(self.socket.read_buf())
+              } else {
+                  // The socket does not yet have data.
+                  //
+                  // Arrange for `wake` to be called once data is available.
+                  // When data becomes available, `wake` will be called, and the
+                  // user of this `Future` will know to call `poll` again and
+                  // receive data.
+                  self.socket.set_readable_callback(wake); // 回调代码被封装起来了。
+                  Poll::Pending
+              }
+          }
+      }
+      ```
+
+* 
+
+
+
+
+
 # Why Async
 
 考虑一个任务，“并发的下载两个网页”，使用 Thread 解决方案的话，我们会这么组织代码
