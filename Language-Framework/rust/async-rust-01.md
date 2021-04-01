@@ -14,6 +14,8 @@ rust的异步编程模型
 
 * `Future` 是异步编程的核心，`Future` 是一个可以产生值的 异步计算。
 
+  * 
+
   * ```rust
     trait SimpleFuture {
         type Output;
@@ -371,5 +373,19 @@ Similarly, it isn't a good idea to hold a traditional non-futures-aware lock acr
 * `select!`: waits for one of several futures to complete 
 
 
+
+# 总结
+
+rust 异步编程核心： `trait Future `
+
+* `async fn` 关键字：调用异步函数返回一个 `Future`
+* `.await` : 用来执行 `Future`
+* `Executor`: 调度 `Future`
+
+
+
+
+
 # 参考资料
+
 [https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html](https://rust-lang.github.io/async-book/01_getting_started/03_state_of_async_rust.html)
