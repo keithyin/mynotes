@@ -32,8 +32,29 @@
 
 
 
-但是，AB测试成本过高，咋整呢？
+但是，如果AB测试成本过高，咋整呢？
 
 * 少开测试流量？
 * 换种方式？
+
+
+
+> Counterfactual Policy Evaluation 就是另一种方式。
+>
+> 通过历史旧策略的数据，而非AB实验获取新数据的方式，对新策略进行效果评估。
+
+
+
+# Counterfactual Policy Evaluation
+
+* 方法一:
+  * Direct Method: 从历史数据中学习出 reward function。然后根据学习出的 reward function来评估新策略。
+  * 这个方法存在一个问题：当训练集与Inference数据分布不一致的时候，即使训练集可以得到的很好的结果，那么Inference也会一塌糊涂。旧Policy产生的数据就是训练集，新策略产出的 action 就是 Inference数据，效果也不会很准。
+* 方法二：
+  * Inverse Propensity Score: 使用 importance weighting 纠正历史数据中 action 的分布。
+  * 这个方法存在的问题是：方差太大。
+* 方法三：
+  * Doubly Robust
+
+
 
