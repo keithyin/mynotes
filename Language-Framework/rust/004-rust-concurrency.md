@@ -163,7 +163,7 @@ fn main() {
 }
 ```
 
-* 多线程如何共享 Mutex?
+* 多线程如何共享 `Mutex` ?
 通过智能指针`Rc<T>`，可以使得一个值拥有多个owner。但是`Rc<T>` 无法用在多线程场景下。在多线程场景下，使用`Arc<T>` 来代替 `Rc<T>`
 ```rust
 use std::sync::{Arc, Mutex};
@@ -190,6 +190,69 @@ fn main() {
     println!("Result: {}", *counter.lock().unwrap());
 }
 ```
+
+## `Sync & Send` marker trait
+
+> `send` & `sync` 是 marker trait，什么是 `marker trait` 呢？就是编译器负责做标记，rust用户无法干预的 trait。
+
+
+
+`Send`: 如果一个类被标记了 `Send`，那么可以在**线程间传递其所有权**。
+
+一个常见的线程间传递所有权的场景为(和多线程共享 `Mutex` 使用同一份代码解释)：
+
+```rust
+use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    let counter = Arc::new(Mutex::new(0)); // Mutex<T> provides interior mutability
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter = Arc::clone(&counter);
+      	// main线程 counter 的所有权 移交给了 spawn 的线程
+        let handle = thread::spawn(move || { 
+            let mut num = counter.lock().unwrap();
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Result: {}", *counter.lock().unwrap());
+}
+```
+
+> rust中，几乎所有类型都是 `Send` 。 但是有一些特殊情况，比如 `Rc<T>` 就不是 `Send`，这是因为当我们 `clone` 一个 `Rc<T>` 将其移动到另一个线程的时候，两个线程有可能同时修改其 `reference count`，这会导致 `data race`。 
+>
+> 所以，目前来看，包含 引用计数的类，如果想 `Send` 的话，那么其 引用计数的修改必须要同步的，比如 `Arc<T>`.
+>
+> `Send` 的标记规则：如果一个类的所有字段是 `Send`, 那么该类就是 `Send`. Almost all primitive types are `Send`, aside from raw pointers,
+
+
+
+`Sync`: 如果一个类被标记了 `Sync` , 那么该类的对象可以被多个线程同时 引用( `Reference`). 比如：`Mutex<T>` 就可以被多个线程同时引用(`Arc<Mutex<T>>`) 。
+
+* `Sync` 表示的是一个对象是否可以被多个线程同时访问。`Mutex<T>` 就可以，`Cell<T>, RefCell<T>` 就不行。
+
+* 如果 `Arc<T>` 是 `Send` ，那么 `T` 是 `Sync`
+
+  
+
+所以多线程共享变量的基本流程为：
+
+1. 创建一个 `Sync` 对象，（想修改的话用 `Mutex`（不要用 `Cell, RefCell`）, 如果不想修改用原始值就OK了）
+2. 然后将其封装到 `Arc` 中构建出一个 `Send`. 
+3. 然后将其移动到不同的线程中。
+4. 多线程就可以共享 `Sync` 对象了。
+
+
+
+
 
 # async
 
@@ -563,7 +626,6 @@ async fn main() -> io::Result<()> {
 
 
 ## select
-
 
 
 
