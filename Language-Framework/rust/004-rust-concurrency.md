@@ -268,6 +268,14 @@ fn main() {
 
 # async
 
+* `async block` : 实际是一个 `Future object`
+
+* `async fn`: 调用返回的是一个 `Future object`
+
+`Future object` 包含了需要进行的操作，异步的调度器实际就是在调度 `Future object`。
+
+
+
 # tokio
 
 * Executor执行 task
@@ -352,7 +360,8 @@ async fn main() {
 * `'static` bound
 * `Send` bound
 
-`'static` ：task的type是`'static` 的含义是：`async block`中不能含有对外部变量的的引用。
+`'static` ：task 的 type是`'static` 的含义是：`async block`中不能含有对外部变量的的引用。
+
 > `'static` 并不意味着 lives forever
 ```rust
 use tokio::task;
@@ -421,6 +430,8 @@ async fn main() {
     });
 }
 ```
+
+
 
 ## Shared state
 
@@ -491,7 +502,10 @@ async fn process(socket: TcpStream, db: Db) {
 }
 ```
 
+
+
 ## Channels
+
 tokio实现了好多`channel`
 
 * `oneshot`: 单生产者，单消费者。 A single value can be sent.

@@ -2,6 +2,10 @@ rust的异步编程模型
 
 * 异步方法：`async fn` ，调用一个 `async fn` 实际返回一个 `Future`. 这时实际上是没有什么计算的。
 
+* 异步block：`async {}`, 该块会返回一个 `Future object` ，这时也没有啥计算。
+
+  
+
 * 如果要真实计算的话，需要在 `Executor` 上执行 `Future`
 
 * 关于 `Future` 的执行，有两种不同情况
