@@ -101,3 +101,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 ```
 
+
+
+## zero-sized type (ZST)
+
+https://runrust.miraheze.org/wiki/Zero-sized_type
