@@ -106,3 +106,6 @@ fn main() -> Result<(), Box<dyn Error>> {
 ## zero-sized type (ZST)
 
 https://runrust.miraheze.org/wiki/Zero-sized_type
+
+https://www.hardmo.de/article/2021-03-14-zst-proof-types.md
+
