@@ -59,3 +59,45 @@ struct Demo<'a>{
 **多态** 
 * 将实例传给trait对象，trait对象，实际就是 `Box<dyn SomeTrait>` `Box`也可以是其他指针？
 
+
+
+# rust中的高级类型
+
+* `Never type`: `!`  it stands in the place of the return type when a function will never return
+  * `!` never has a value
+
+```rust
+fn bar() -> ! {
+    // --snip--
+}
+```
+
+
+
+`Never Type` 有什么用呢？
+
+* `match arm` 中用.
+
+```rust
+let guess = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue, // 因为 guess 只能有一个确定的类型，所以 continue 返回的是 !
+        };
+```
+
+
+
+`fn main()` 函数很特别，其返回值类型并不能随意指定。其有两个可选的返回值类型 `(), Result<(), E>` .
+
+```rust
+use std::error::Error;
+use std::fs::File;
+
+// Box<dyn Error>: dyn Error 表示 对象实现了 Error trait。Box表示对象放在了堆上。
+fn main() -> Result<(), Box<dyn Error>> {
+    let f = File::open("hello.txt")?;
+
+    Ok(())
+}
+```
+
