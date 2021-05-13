@@ -655,3 +655,11 @@ async fn main() -> io::Result<()> {
 
 
 
+## mini_tokio
+
+* Executor 调度 task
+* task 封装了 future & sender
+  * future 代表要执行的操作
+  * sender 负责当 wake 的时候，将自己再 send 给 executor 的调度队列
+    * 该逻辑应该 `impl ArcWake for Task {fn wake_by_ref()}` 中实现。
+
