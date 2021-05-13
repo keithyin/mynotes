@@ -11,6 +11,7 @@ impl Value {
   
   // 方法。第一个形参有多种选择
   // `self`, `&self`, `&mut self`, `self: Box<Self>`, `self: Rc<Self>`, `self: Arc<Self>`, or `self: Pin<P>` (where P is one of the previous types except `Self`)
+  // self: &Rc<Self> 也行，应该意味着 `self: &Box<Self>`, `self: &Arc<Self>` 也👌
   pub fn do_something(&self) {
     
   }
