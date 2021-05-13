@@ -662,4 +662,5 @@ async fn main() -> io::Result<()> {
   * future 代表要执行的操作
   * sender 负责当 wake 的时候，将自己再 send 给 executor 的调度队列
     * 该逻辑应该 `impl ArcWake for Task {fn wake_by_ref()}` 中实现。
+  * task 即是 要执行的任务，也是 waker！自己唤醒自己。
 
