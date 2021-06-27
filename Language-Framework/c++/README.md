@@ -580,7 +580,13 @@ for (int i=0; i<10; ++i){
   * `gcc -c a.c`, 得到 `a.o` , 二进制机器码. 可以使用 `objdump -d a.o` 查看机器码
 * 链接：
   * `gcc a.o other.o -static`: `-static` 表示将其它的标准库都静态链接到一起。
-  * 
+  * `gcc -lpthread` : `-l` 接的是动态库。
+  * `gcc -rdynamic`  采用动态链接方式链接。
+* `gcc -D__some_macro__` 用来指定宏
+
+
+
+* `make -nB` 只打印编译日志，不进行真实编译
 
 
 
@@ -613,3 +619,30 @@ int main(int argc, char* argv[]) {
 # 其它
 
 * 字符串常量是直接存储在`二进制`文件中的。
+
+
+
+# 如何阅读源代码
+
+* 下载下来
+* `tree` 看一下目录结构
+* 从 `main` 开始看代码
+* 如何读汇编代码：
+  * 将内存画出来
+  * 将寄存器画出来
+  * 然后一步步读 
+
+# ABI vs API
+
+* `ABI`： 约定的是二进制文件格式
+* `API`： 程序源代码中的规范
+
+
+
+# 链接与加载
+
+* `size a.out` ： 看 `a.out` 的大小
+* `nm a.out`: 打印符号与地址
+* `objdump -d a.out`: 仅将 text 部分反汇编
+  * `objdump -D a.out`: 将所有部分反汇编
+* `readelf -a a.out` ：查看重定位信息
