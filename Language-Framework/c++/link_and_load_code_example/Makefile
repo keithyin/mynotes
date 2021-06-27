@@ -1,5 +1,5 @@
 BUILD_FLAGS = -O2 -fno-pic -ggdb -c
-LINK_FLAGS = -static
+LINK_FLAGS = -static -fno-pic -v
 
 a.out : a.o b.o main.o
 	gcc ${LINK_FLAGS} a.o b.o main.o
@@ -14,4 +14,4 @@ main.o: main.c
 	gcc ${BUILD_FLAGS} main.c
 
 clean:
-	rm *.o a.out
+	rm *.o *.out

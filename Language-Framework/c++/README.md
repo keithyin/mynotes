@@ -584,9 +584,15 @@ for (int i=0; i<10; ++i){
   * `gcc -rdynamic`  采用动态链接方式链接。
 * `gcc -D__some_macro__` 用来指定宏
 
-
-
 * `make -nB` 只打印编译日志，不进行真实编译
+
+
+
+### 动态链接
+
+* 运行时代码共享
+
+* `ldd a.out` 可以查看 当前程序需要链接的 动态链接库
 
 
 
@@ -646,3 +652,15 @@ int main(int argc, char* argv[]) {
 * `objdump -d a.out`: 仅将 text 部分反汇编
   * `objdump -D a.out`: 将所有部分反汇编
 * `readelf -a a.out` ：查看重定位信息
+
+
+
+> 程序执行的第一条指令是什么呢？`_start`。可以通过以下几个方式确认
+
+1. 看 `a.out` 的 elf，找到其 `Entry point`，然后看 `a.out` 的反汇编，确定地址对应的代码
+2. 使用 `gdb` 调试, 使用 `starti`
+
+
+
+* `strace` 可以查看程序的所有系统调用
+
