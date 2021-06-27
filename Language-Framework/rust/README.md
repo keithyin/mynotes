@@ -969,3 +969,21 @@ pub mod world{
 
 * 总结，如果想把代码 分 文件(夹) 管理起来，那就首先在代码中声明好，然后对应的文件创建起来，然后将代码移动过去
 
+
+
+
+
+# Glossary
+
+
+
+* `type constructors`: 
+  * 类型构造器，任何没有参数的范型。
+  * 比如：`Vec` 是一个 `type constructor`, 接收参数 `T`, 返回类型 `Vec<T>; ` `&`, `&mut`  同样也是 `type constructor` ，但是他们接收两个参数，一个是 `lifetime`, 一个是指向的 类型。
+* `variance`: 给定参数后， `type constructor` 的属性。说明了，how the subtyping of its inputs affects the subtyping of its outputs；也就是 如果 `type constructor` 参数是 subtyping 关系的话，得到的新类型是什么关系。
+  * `F` is *covariant* if `F<Sub>` is a subtype of `F<Super>`,  (subtyping "passes through")
+  * `F` is *contravariant* if `F<Super>` is a subtype of `F<Sub>` (subtyping is "inverted")
+  * `F` is *invariant* otherwise (no subtyping relationship exists)
+  * https://doc.rust-lang.org/nomicon/subtyping.html
+* 
+

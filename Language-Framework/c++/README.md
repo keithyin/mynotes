@@ -563,3 +563,53 @@ for (int i=0; i<10; ++i){
 
 
 
+# 预处理
+
+* `gcc -E a.c` : 预编译指令
+* `#inlcude` ：世纪就是将文件复制粘贴到该代码位置
+* `#include "file"` vs `#inlucde <file2>`: 
+  * `trick`: `gcc a.c --verbose` 可以看到更多的日志
+  * `#include <file>`: 会去系统的目录中找。如果想将一个目录添加到的系统目录中，可以使用 `gcc -I../` 这种方式添加。看着 `-I./` 语法有点诡异。如果需要将多个目录添加到系统搜索目录，那就多几个 `-I`; `gcc -Ipath1 -Ipath2`
+
+
+
+# 编译与链接
+
+* 编译：
+  * `gcc -S a.c`，  得到 `a.s` , 汇编代码。
+  * `gcc -c a.c`, 得到 `a.o` , 二进制机器码. 可以使用 `objdump -d a.o` 查看机器码
+* 链接：
+  * `gcc a.o other.o -static`: `-static` 表示将其它的标准库都静态链接到一起。
+  * 
+
+
+
+# C语言基础
+
+* 一切皆可取地址
+
+```c
+void printptr(void *p) {
+  printf("p = %p, *p = %016lx\n", p, *(long *)p);
+}
+
+int x;
+
+int main(int argc, char* argv[]) {
+  printptr(main);
+  printptr(&main);
+  printptr(&x);
+  printptr(&argc);
+  printptr(argv);
+  printptr(&argv);
+  printptr(argv[0]);
+}
+```
+
+
+
+
+
+# 其它
+
+* 字符串常量是直接存储在`二进制`文件中的。
