@@ -305,5 +305,5 @@ int main(int argv, char* argc[]) {
 * `readelf`：查看elf
 * `make`
   * `-nB` 不实际进行编译，只是将编译过程打印出来
-* `pmap $pid`: 查看内存的映射。
+* `pmap $pid`: 查看进程的内存空间映射。
 
