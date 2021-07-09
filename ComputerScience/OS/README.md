@@ -25,14 +25,15 @@
 为了让计算机可以执行我们的任意程序，一定会存在一些软件/硬件约定
 
 * CPU reset 后，处理器出于某个确定的状态。`9.1.1 Processor State After Reset`
-  * PC指针一般指向一段 memory-mapped ROM
+  * PC指针一般指向一段 memory-mapped ROM.
     * ROM存储了厂商提供的firm-ware
   * 处理器的大部分功能处于关闭状态
     * 缓存，虚拟存储，。。。
-* Firmware：U-boot(开源项目)
-  * 将用户数据加载到内存（磁盘上的数据->内存）
-    * 例如存储介质上的第二级loader
-    * 活着直接加载操作系统（嵌入式）
+* Firmware：
+  * 将用户数据加载到内存（磁盘上的数据->内存），然后跳转到加载的数据进行执行
+    * 例如存储介质上的第二级loader. 例如 bootloader（grub loader）
+    * 或者着直接加载操作系统（嵌入式）
+  * 还提供一些其它的功能：设置启动的顺序 etc.
   * Legcy bios 约定
     * legacy bios 会将引导盘第一个扇区（主引导扇区，MBR）加载到内存 `7c00` 位置
       * 处理器处于 16-bit 模式
@@ -40,6 +41,64 @@
     * 其它没有任何约束
     * https://www.usenix.org/legacy/event/usenix05/tech/freenix/full_papers/bellard/bellard.pdf
     * Seabios: qemu 默认的bios
+* U-boot(开源项目)：固件加载此 loader，该 loader 又可以加载各种各样的操作系统
+
+>  `memory-mapped`: cpu通过地址，从数据总线某个位置读数据。而非从内存条中读取数据 
+
+
+
+CPU Reset 行为：（CPU与firmware的约定）
+
+* 寄存器的初始状态：
+  * `EIP`: `0x0000fff0`
+  * `CR0`: `0x60000010` 16位工作模式
+  * `EFLAGS`: `0x00000002` 中断关闭状态
+* 硬件厂商，将固件以内存映射的方式映射到地址 `0x0000fff0` 地址上，那么固件程序就可以执行了
+  * `fff0` 通常是一条向 `firmware` 跳转的 `jump` 指令
+  * 
+
+firmware与系统程序员的约定
+
+* `firmware` 必须提供机制，将用户数据载入内存
+  * `legacy bios` 会将引导盘第一个扇区（主引导扇区，MBR）加载到内存 `7c00` 位置
+    * 这时候仅加载512byte的数据（加载过后实际就是过去执行了。
+    * 处理器处于 16-bit 模式
+    * 然后将 CS:IP 指向 `7c00`. 之后 cpu 就会执行 主引导扇区的代码了。
+  * 其它没有任何约束
+  * 这个时候就将代码控制权交到了我们的手里。（我们可以在512字节上搞事情。
+  * https://www.usenix.org/legacy/event/usenix05/tech/freenix/full_papers/bellard/bellard.pdf
+  * Seabios: qemu 默认的bios
+
+
+
+总结：操作系统加载操作
+
+* `CPU reset`
+  * `cpu reset` 后，`EIP` 会指向 `0x0000fff0`. 
+* 硬件厂商需要将固件以内存映射的方式映射到 `0x0000fff0` 
+  * 所以CPU reset 之后，一上来执行的就是 固件代码了
+* 硬件厂商与系统程序员约定了，会将主引导扇区的前512字节代码加载到内存地址 `0x7c00` 位置
+  * 前 512 字节代码就是系统程序员可以控制的了。
+* 一般加载操作系统的代码就在这前 512 字节上。
+
+
+
+调试操作系统加载过程
+
+```shell
+
+```
+
+
+
+* 查看 `cpu reset` 后的寄存器
+  * `info registers`
+* 查看 `0x7c00` 处的内存加载
+  * `watch *0x7c00`
+  * 查看加载磁盘的指令 `x/i ($cs * 16 + $rip)`
+  * 打印内存 `x/16xb 0x7c00`
+* 进入 `0x7c00` 代码执行
+  * `b *0x7c00, c`
 
 
 
@@ -64,8 +123,6 @@
 # 操作系统中的互斥
 
 > 注意不是应用程序的互斥哦。
-
-
 
 # malloc & free
 
@@ -306,4 +363,12 @@ int main(int argv, char* argc[]) {
 * `make`
   * `-nB` 不实际进行编译，只是将编译过程打印出来
 * `pmap $pid`: 查看进程的内存空间映射。
+* 二进制工具箱🧰
+  * `ld` 链接器，`as` 汇编器
+  * `ar` 静态库打包，`objcopy` 目标文件解析
+  * 其它工具：`nm, strings, size, objdump, readelf`
+
+
+
+
 
