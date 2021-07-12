@@ -350,6 +350,14 @@ int main(int argv, char* argc[]) {
 
 
 
+# 持久化 
+
+
+
+
+
+
+
 # 常用工具
 
 * gdb notes: http://csapp.cs.cmu.edu/3e/docs/gdbnotes-x86-64.pdf
@@ -367,8 +375,6 @@ int main(int argv, char* argc[]) {
   * `ld` 链接器，`as` 汇编器
   * `ar` 静态库打包，`objcopy` 目标文件解析
   * 其它工具：`nm, strings, size, objdump, readelf`
-
-
-
-
+* `lspci -tv`, `lsusb -tv`: 查看总线上的设备
+* `resource`: 有限的资源。计算机中哪些资源是有限的？
 
