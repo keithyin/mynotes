@@ -396,7 +396,7 @@ rust 异步编程核心： `trait Future `
 
 
 
-# async
+# async & .awati
 
 * `async block` : 实际是一个 `Future object`
 
@@ -406,7 +406,7 @@ rust 异步编程核心： `trait Future `
 
 
 
-async block 代码转成 future 的规则是如何的呢？见下面
+`async block` 代码转成 `future` 的规则是如何的呢？见下面
 
 ```rust
 use std::future::Future;
@@ -504,21 +504,46 @@ impl Future for MainFuture {
 
 
 
+* `.await` :
+  * 在生成匿名`Enum` 时 切分了 `Future` 的 `State`。
+  * 在 匿名 `Enum` 中的 `poll` 实现中也对应了一个 `poll` 调用。
+
+
+
 # tokio
 
 > Task, executor 调度的基本单位。
 >
 > 如何实现 task 在 网络请求的时候就挂起。
 >
-> 如果实现当 task 就绪时，重回调度队列。
+> 如何实现当 task 就绪时，重回调度队列。
 
 
 
+三个重点抽象：
+
+* `Executor`: `tokio` 调度器
+* `Task`： `tikio` 的基本调度单位
+* `Future`: `rust` 提供
 
 
-* Executor执行 task
-* task是 tokio.spawn的`async block`
-* `async fn` 里面才能执行 `.await`
+
+想要实现的基本功能：
+
+* `Executor` 中存在一个调度队列，在里面的 `task` 会被 `executor` 轮训调度。
+
+* 调度的 `Task` 如果发生阻塞，`Executor` 就找下一个 `Task` 进行调度。
+* 如果阻塞的 `Task` `ready` 了，就回到 `Executor` 的调度队列中。
+
+> 在 mini_tokio 部分会详细介绍，该如何实现
+
+
+
+> * `Executor` 执行 `task`
+> * `task` 是 `tokio.spawn` 的`async block`
+> * `async fn` 里面才能执行 `.await`
+
+
 
 ```rust
 #[tokio::main]
@@ -576,9 +601,9 @@ async fn main() {
 ```
 
 **tasks**
-tokio 的task 是一个 异步green thread. 通过 将一个 `async block` 传给 `tokio.spawn` 来创建。`tokio.spawn` 返回一个 `JoinHandle`，调用者可以通过这个 `JoinHandle` 来和 `spawned task` 进行交互。`async block` 可以返回值，调用者可以通过在 `JoinHandle` 上调用 `await` 来获取返回值。
+tokio 的task 是一个 异步`green thread`. 通过 将一个 `async block` 传给 `tokio.spawn` 来创建。`tokio.spawn` 返回一个 `JoinHandle`，调用者可以通过这个 `JoinHandle` 来和 `spawned task` 进行交互。`async block` 可以返回值，调用者可以通过在 `JoinHandle` 上调用 `await` 来获取返回值。
 
-`tasks` 是 tokio scheduler 管理的最小执行单元。` Spawning the task` 会将 `task` 提交给 `Tokio scheduler`, 由`Tokio scheduler`决定该如何调度。`spawned task` 可能在 `spawn` 它的 线程上执行，也可能在不同的线程上执行。`spawned task` 可以在 不同的线程之间来回移动。 
+`tasks` 是 `tokio scheduler` 管理的最小执行单元。` Spawning the task` 会将 `task` 提交给 `Tokio scheduler`, 由`Tokio scheduler`决定该如何调度。`spawned task` 可能在 `spawn` 它的线程上执行，也可能在不同的线程上执行。`spawned task` 可以在 不同的线程之间来回移动。 
 
 ```rust
 #[tokio::main]
@@ -595,7 +620,9 @@ async fn main() {
 }
 ```
 
-`JoinHandle.await`返回的是`Result`，当task在执行的时候碰到错误(task panic or task is forcefully cancelled by the runtime shutting down)，`JoinHandle.await`就会返回`Err`. 
+`JoinHandle.await`返回的是`Result`，当`task` 在执行的时候碰到错误(task panic or task is forcefully cancelled by the runtime shutting down)，`JoinHandle.await`就会返回`Err`. 
+
+
 
 **task必须满足的几个条件**
 
@@ -673,8 +700,6 @@ async fn main() {
     });
 }
 ```
-
-
 
 ## Shared state
 
@@ -901,10 +926,100 @@ async fn main() -> io::Result<()> {
 
 ## mini_tokio
 
-* Executor 调度 task
-* task 封装了 future & sender
-  * future 代表要执行的操作
-  * sender 负责当 wake 的时候，将自己再 send 给 executor 的调度队列
+* `Executor` 调度 `Task`
+* `Task` 封装了 `future & sender`
+  * `future` 代表要执行的操作
+  * `sender` 负责当` wake` 的时候，将自己再` send` 给 `executor` 的调度队列
     * 该逻辑应该 `impl ArcWake for Task {fn wake_by_ref()}` 中实现。
   * task 即是 要执行的任务，也是 waker！自己唤醒自己。
+
+
+
+```rust
+struct MiniTokio {
+    scheduled: channel::Receiver<Arc<Task>>,
+    sender: channel::Sender<Arc<Task>>,
+}
+
+struct Task {
+    // The `Mutex` is to make `Task` implement `Sync`. Only
+    // one thread accesses `future` at any given time. The
+    // `Mutex` is not required for correctness. Real Tokio
+    // does not use a mutex here, but real Tokio has
+    // more lines of code than can fit in a single tutorial
+    // page.
+    future: Mutex<Pin<Box<dyn Future<Output = ()> + Send>>>,
+    executor: channel::Sender<Arc<Task>>,
+}
+
+impl MiniTokio {
+    fn run(&self) {
+        while let Ok(task) = self.scheduled.recv() {
+            task.poll();
+        }
+    }
+
+    /// Initialize a new mini-tokio instance.
+    fn new() -> MiniTokio {
+        let (sender, scheduled) = channel::unbounded();
+        MiniTokio { scheduled, sender }
+    }
+
+    /// Spawn a future onto the mini-tokio instance.
+    /// The given future is wrapped with the `Task` harness and pushed into the
+    /// `scheduled` queue. The future will be executed when `run` is called.
+    fn spawn<F>(&self, future: F)
+        where
+            F: Future<Output = ()> + Send + 'static,
+    {
+        Task::spawn(future, &self.sender);
+    }
+}
+
+impl Task {
+    fn schedule(self: &Arc<Self>) {
+        self.executor.send(self.clone());
+    }
+}
+
+impl ArcWake for Task {
+    fn wake_by_ref(arc_self: &Arc<Self>) {
+        arc_self.schedule();
+    }
+}
+impl Task {
+    fn poll(self: Arc<Self>) {
+        // Create a waker from the `Task` instance. This
+        // uses the `ArcWake` impl from above.
+        let waker = task::waker(self.clone());
+        let mut cx = Context::from_waker(&waker);
+
+        // No other thread ever tries to lock the future
+        let mut future = self.future.try_lock().unwrap();
+
+        // Poll the future
+        let _ = future.as_mut().poll(&mut cx);
+    }
+
+    // Spawns a new taks with the given future.
+    //
+    // Initializes a new Task harness containing the given future and pushes it
+    // onto `sender`. The receiver half of the channel will get the task and
+    // execute it.
+    fn spawn<F>(future: F, sender: &channel::Sender<Arc<Task>>)
+        where
+            F: Future<Output = ()> + Send + 'static,
+    {
+        let task = Arc::new(Task {
+            future: Mutex::new(Box::pin(future)),
+            executor: sender.clone(),
+        });
+
+        let _ = sender.send(task);
+    }
+
+}
+```
+
+
 
