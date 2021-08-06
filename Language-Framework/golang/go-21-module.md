@@ -99,3 +99,5 @@ golang 对于 module 的命令 一般都包含两个影响：1）修改 go.mod �
 # 参考资料
 https://blog.golang.org/using-go-modules
 https://zhuanlan.zhihu.com/p/311969770
+
+https://golang.org/doc/go1.16: go1.16 release note, 其中有包含 go command （module 相关）的最新说明
