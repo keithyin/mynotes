@@ -1,3 +1,8 @@
+# 寄存器
+
+## 通用寄存器
+> 应用程序代码可以随便用的
+
 | 寄存器 | 描述        |
 | ------ | ----------- |
 | %rax   | 返回值      |
@@ -42,6 +47,29 @@ caller保存：如果**调用者**使用了这些寄存器，那么在执行 `ca
 管理变长栈帧：
 
 * `%rbp`: base pointer, 基指针 
+
+## GDTR & IDTR
+* DGTR: global descriptor table register。指明全局描述表位置的寄存器
+* IDTR: interrupt descriptor table register。指明中断描述符表的寄存器
+
+```asm
+lgdt operand
+lidt operand
+```
+* operand：是一个6bytes(48bits)的值。前16位表示表的大小，后32位表示表的基址。
+https://c9x.me/x86/html/file_module_x86_id_156.html
+
+注意：
+* The LGDT and LIDT instructions are used only in operating-system software; they are not used in application programs
+* They are the only instructions that directly load a linear address (that is, not a segment-relative address) and a limit in protected mode
+* They are commonly executed in real-address mode to allow processor initialization prior to switching to protected mode.
+
+
+## 段寄存器
+* `cs`: 代码段寄存器
+* `ds`: 数据段寄存器
+* `es`: 附加段寄存器
+* `ss`: 栈段寄存器
 
 
 
