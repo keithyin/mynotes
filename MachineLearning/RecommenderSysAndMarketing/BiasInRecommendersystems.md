@@ -48,6 +48,42 @@
 
 * 使用 content feature 可以增强系统的泛化能力  和 应对冷启动的能力
 
+
+
+### real negative matter: continuous training with real negatives for delayed feedback modeling
+
+
+
+* observed feature distribution：当前时刻，用来训练模型的样本分布（可能存在一些其它时刻样本的injection）
+* actural feature distribution：当前时刻，应该用来训练模型的样本分布
+
+
+
+为什么需要 continuous training
+
+* Data distribution is dynamiclly shifting
+* 有效的广告在变化，系统不时的会有一些特殊的活动，比如：双11。商家的营销活动可能也会变化
+* 因为有以上变化，所以continuous leaning是非常有必要的
+
+
+
+ continuous training如何做
+
+* ctr，cvr。都是等待一个窗口时间。如果窗口时间内发生了 点击/转化，就是正样本。如果没有发生转化。就是负样本
+  * 该做法存在的问题：因为是continuous training，所以窗口时间不可能太长
+    * 对于cvr这种存在delayed feedback的场景来说，很容易会引入fake negatives
+    * 之前对这个问题的解决方法是：超出了等待窗口之后，就将其标记为 negative。如果后来又有了转化，就将其搞成 positive example 再扔到训练样本中。这里再加上 importance sampling 来矫正 positive example 带来的训练样本偏差问题。
+
+
+
+本文认为之前的解决方法都不好：本文改进
+
+* 不仅 inject real positive。而且还 inject real negative    
+
+
+
+
+
 # 参考资料
 
 [https://www.quora.com/What-does-the-concept-of-presentation-feedback-bias-refer-to-in-the-context-of-machine-learning](https://www.quora.com/What-does-the-concept-of-presentation-feedback-bias-refer-to-in-the-context-of-machine-learning)
