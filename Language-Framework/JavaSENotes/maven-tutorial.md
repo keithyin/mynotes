@@ -189,10 +189,120 @@ provided
 
 ## 依赖
 
+* `test` 范围的依赖是不可以传递的。
+
 * 依赖的传递性：依赖一个子模块，就不用care其依赖的模块了
-* 
+
+* 依赖的排除：
+
+  * 子模块引入的模块进行排除。（如果那个jar包不稳定的话，就可以去排除）
+
+  * 排除了会不会影响原来的包？不会，因为之前的包已经是打包好的，排除的包的代码已经包含在里面了
+
+  * ```xml
+    <dependency>
+    	<groupId>..</groupId>
+      <artifactId>..</artifactId>
+      <exclusions>
+      	<exclusion>
+          <groupId></groupId>
+          <artifactId></artifactId> <!-- 这里不需要版本号-->
+        </exclusion>
+      </exclusions>
+    <dependency>
+
+* 依赖的原则：解决jar包冲突的问题。项目A依赖了B1，B2. B1，B2依赖了不同的 C版本。那么依赖的传递会传递给 A什么版本的C呢？
+
+  * 就近优先原则，距离最短的优先。
+  * 如果是相同的路径长度：先声明者优先，在 denpendency 中的声明位置
+  * **没有按照 版本号来进行优先度评判**
+
+* 统一管理依赖的版本
+
+  * 在 `properties` 标签内使用自定义标签统一声明版本号
+
+  * 在需要统一版本的位置，使用 `${label_name}` 引用声明的版本号
+
+  * ```xml
+    // pom.xml
+    
+    <properties>
+    	<labelName>value</labelName>
+    	<labelName2>value2</labelName2>
+    </properties>
+    
+    <dependency>
+    	<groupId>..</groupId>
+      <artifactId>..</artifactId>
+      <version>${labelName}</version>
+    </dependency>
+    ```
 
 
+
+## 继承
+
+* 统一管理版本依赖问题。
+
+* 将junit依赖统一提取到父工程中，在子工程声明时不指定版本
+
+* 父工程：创建一个maven工程作为父工程。注意，打包的方式为 pom
+
+* 在子工程声明对父工程的引用
+
+  * ```xml
+    <!-- 子模块的 pom.xml -->
+    
+    <!--  -->
+    
+    <parent>
+    	<groupId></groupId>
+      <artifactId></artifactId>
+      <version></version>
+      
+      <relativePath>../SomePath/pom.xml</relativePath> <!-- 父工程的pom相对路径-->
+    </parent>
+    ```
+
+  * 
+
+* 在父工程中统一 junit 依赖
+
+  * ```xml
+    <dependencyManagement>
+    	<dependencies>
+      	<dependency>
+        	<groupId></groupId>
+          <artifactId></artifactId>
+          <version></version>
+          <scope></scope>
+        </dependency>
+      
+      </dependencies>
+    </dependencyManagement>
+    ```
+
+  * 
+
+* 在子工程删除对junit 的版本号
+
+
+
+## 聚合
+
+* 做了继承之后，一定要先安装 父工程，否则子工程无法安装
+
+* 一键安装各个模块工程:  可以如此配置
+
+  * ```xml
+    <!-- 可以在父项目中配置-->
+    <modules>
+    	<module>../Path</module>
+      <module>../Path2</module>
+    </modules>
+    ```
+
+  * 
 
 ## maven as build tool
 
