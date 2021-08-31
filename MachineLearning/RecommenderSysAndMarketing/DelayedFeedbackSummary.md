@@ -47,3 +47,13 @@ http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.650.6087&rep=rep1&type=
 
 https://arxiv.org/pdf/1802.00255.pdf
 
+将 Modeling Delayed Feedback in Display Advertising 中的对于delayed feedback 的分布 从指数分布换成了 non-parametric 分布。其余一致
+
+
+
+
+
+# A Feedback Shift Correction in Predicting Conversion Rates under Delayed Feedback
+
+> 2020 https://arxiv.org/pdf/2002.02068.pdf
+
