@@ -340,8 +340,38 @@ sendBroadcast(intent) // 发送
 >
 > * service 是运行在主线程中，和渲染线程一样。所以 service 不适合 **直接** 处理长时间任务
 > * service 依赖创建 service 的应用程序，如果该程序被销毁，那么 service也会被销毁
+> * 每个service只有一个实例！
 
 
 
 
+
+
+
+# 碰到的错误及其解决方案
+
+* https://stackoverflow.com/questions/55909804/duplicate-class-android-support-v4-app-inotificationsidechannel-found-in-modules/56815162
+
+
+
+
+
+# Kotlin
+
+## 判空辅助
+
+```kotlin
+a?.do() // .?操作符，当 a 为 null时，什么都不做，当 a不为 null时，执行 do()
+
+val c = d ?: e // ?: 操作符，就像是 sql 中的 coalesce. 如果 d!=null, c = d, 如果 d==null, c = e
+
+a!!.do() // 程序员保证不为 null，编译器不会做 null 指针检查。可能会引起运行时错误
+
+
+a?.let{
+    it.do1（）
+    it.do2()
+    ...
+} // 当a为空时，啥都不做，a不为空时，会执行 let 里面的代码块
+```
 
