@@ -1,4 +1,11 @@
+
+
+
+
+
+
 # Review
+
 刚开始看uplift modeling时候让我最迷的一点就是对于Treatment Group & Control Group含义的理解。因为之前接触过推荐，所以自然的就理解成 基础策略为Control Group，新策略为Treatment Group。但是实际上并不是这样。拿发红包来说，有一个基础的发券策略S1，A发5元，B发10元。。。 经过模型优化，我们又来了一个策略S2，A发6元，B发5元。S1 和 S2并不是ControlGroup 和 TreatmentGroup。ControlGroup为A发5元，B发5元，C发5元。。。，TreatmentGroup为A发10元，B发10元，C发10元。。。。这个要搞清楚。
 
 
@@ -19,8 +26,9 @@
 ## Causal Inference
 
 符号含义
-* $Y_i(1)$ : person i 接受 treatement 后的 outcome  (实验组)
-* $Y_i(0)$ : person i 接受 control treatement 后的 outcome (对照组)
+* $Y_i(1)$ : **如果** person i 接受 treatement，其 outcome会是多少。
+* $Y_i(0)$ : **如果** person i 接受 control treatement，其 outcome会是多少。
+  * $Y_i(1), Y_i(0)$ 在 **观测样本** 中是不可能同时存在的，但是每个人都会存在这两种状态
 * $\tau_i$ : person i 的 causal effect
 
 $$
