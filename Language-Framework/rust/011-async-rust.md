@@ -1143,12 +1143,61 @@ pub fn main() {
     Test::init(test2.as_mut());
     println!("a: {}, b: {}", Test::a(test1.as_ref()), Test::b(test1.as_ref()));
     println!("a: {}, b: {}", Test::a(test2.as_ref()), Test::b(test2.as_ref()));
-
+		// 这里的 swap 就会报错了
     std::mem::swap(test1.get_mut(), test2.get_mut());
 }
 ```
 
 
 
+```rust
+use std::pin::Pin;
+use std::marker::PhantomPinned;
 
+#[derive(Debug)]
+struct Test {
+    a: String,
+    b: *const String,
+    _marker: PhantomPinned,
+}
+
+impl Test {
+    fn new(txt: &str) -> Pin<Box<Self>> {
+        let t = Test {
+            a: String::from(txt),
+            b: std::ptr::null(),
+            _marker: PhantomPinned,
+        };
+        let mut boxed = Box::pin(t);
+        let self_ptr: *const String = &boxed.as_ref().a;
+        unsafe { boxed.as_mut().get_unchecked_mut().b = self_ptr };
+
+        boxed
+    }
+
+    fn a<'a>(self: Pin<&'a Self>) -> &'a str {
+        &self.get_ref().a
+    }
+
+    fn b<'a>(self: Pin<&'a Self>) -> &'a String {
+        unsafe { &*(self.b) }
+    }
+}
+
+pub fn main() {
+    let mut test1 = Test::new("test1");
+    let mut test2 = Test::new("test2");
+
+    println!("a: {}, b: {}",test1.as_ref().a(), test1.as_ref().b());
+    println!("a: {}, b: {}",test2.as_ref().a(), test2.as_ref().b());
+}
+```
+
+
+
+
+
+# 其它
+
+一些核心功能的接口定义好。接口定义了就确定了输出是什么类型。这些类型又会对其属性进行一些限制。就达到了安全的目的
 
