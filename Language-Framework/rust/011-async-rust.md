@@ -1023,3 +1023,132 @@ impl Task {
 
 
 
+
+
+# Pining
+
+* Pin 是为了解决 self reference 存在的
+
+* Self reference 问题指的是啥
+
+* 为什么 pin 能够解决 self reference 问题
+
+* pin的底层原理是什么？即：是如何做到 pin 的
+
+
+
+> self-referential type: 自引用类型。类型中 **某个字段** 引用了 **类型中的某个字段**
+
+为什么 self-referential type 是个问题呢？仔细看以下代码。
+
+```rust
+#[derive(Debug)]
+struct Test {
+    a: String,
+    b: *const String,
+}
+
+impl Test {
+    fn new(txt: &str) -> Self {
+        Test {
+            a: String::from(txt),
+            b: std::ptr::null(),
+        }
+    }
+
+    fn init(&mut self) {
+        let self_ref: *const String = &self.a;
+        self.b = self_ref;
+    }
+
+    fn a(&self) -> &str {
+        &self.a
+    }
+
+    fn b(&self) -> &String {
+        assert!(!self.b.is_null(), "Test::b called without Test::init being called first");
+        unsafe { &*(self.b) }
+    }
+}
+
+fn main() {
+    let mut test1 = Test::new("test1");
+    test1.init();
+    let mut test2 = Test::new("test2");
+    test2.init();
+
+    println!("a: {}, b: {}", test1.a(), test1.b());
+    std::mem::swap(&mut test1, &mut test2);
+    println!("a: {}, b: {}", test2.a(), test2.b());
+
+}
+```
+
+```
+a: test2, b: test1
+a: test1, b: test1
+```
+
+从上面可以看出，一旦 `self-referential type` 被移动，该对象就不安全了。
+
+
+
+那么 pin 对于 `self-referential type` 移动导致的不安全的情况的解决方案是是什么呢？既然移动不安全，那就干脆别移动了。通过rust类型系统来禁止 该对象的移动。并能够在编译期检查出来代码中移动 该对象的情况，并报错？
+
+```rust
+use std::pin::Pin;
+use std::marker::PhantomPinned;
+
+#[derive(Debug)]
+struct Test {
+    a: String,
+    b: *const String,
+    _marker: PhantomPinned, // 这个字段划重点，正式他阻止了 对象的移动
+}
+
+
+impl Test {
+    fn new(txt: &str) -> Self {
+        Test {
+            a: String::from(txt),
+            b: std::ptr::null(),
+            _marker: PhantomPinned, // This makes our type `!Unpin`
+        }
+    }
+    fn init(self: Pin<&mut Self>) {
+        let self_ptr: *const String = &self.a;
+        let this = unsafe { self.get_unchecked_mut() };
+        this.b = self_ptr;
+    }
+
+    fn a(self: Pin<&Self>) -> &str {
+        &self.get_ref().a
+    }
+
+    fn b(self: Pin<&Self>) -> &String {
+        assert!(!self.b.is_null(), "Test::b called without Test::init being called first");
+        unsafe { &*(self.b) }
+    }
+}
+
+pub fn main() {
+    // test1 is safe to move before we initialize it
+    let mut test1 = Test::new("test1");
+    // Notice how we shadow `test1` to prevent it from being accessed again
+    let mut test1 = unsafe { Pin::new_unchecked(&mut test1) };
+    Test::init(test1.as_mut());
+
+    let mut test2 = Test::new("test2");
+    let mut test2 = unsafe { Pin::new_unchecked(&mut test2) };
+    Test::init(test2.as_mut());
+    println!("a: {}, b: {}", Test::a(test1.as_ref()), Test::b(test1.as_ref()));
+    println!("a: {}, b: {}", Test::a(test2.as_ref()), Test::b(test2.as_ref()));
+
+    std::mem::swap(test1.get_mut(), test2.get_mut());
+}
+```
+
+
+
+
+
