@@ -1027,6 +1027,16 @@ impl Task {
 
 # Pining
 
+https://rust-lang.github.io/async-book/04_pinning/01_chapter.html
+
+https://docs.rs/pin-project/1.0.8/pin_project/
+
+https://doc.rust-lang.org/stable/std/pin/struct.Pin.html
+
+https://blog.cloudflare.com/pin-and-unpin-in-rust/
+
+
+
 * Pin 是为了解决 self reference 存在的
 
 * Self reference 问题指的是啥
