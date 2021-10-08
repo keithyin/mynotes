@@ -296,6 +296,7 @@ fn bar() -> impl Future<Output = u8> {
 ### `async` 的生命周期
 `async` 的生命周期，即：`async` 返回的 `Future` 的生命周期，`async` 只有在 `Future` 被调用的时候，才会执行。对于形参是引用的`async fn`，需要在 引用失效之前调用 `.await`
 Unlike traditional functions, async fns which take references or other non-'static arguments return a Future which is bounded by the lifetime of the arguments:
+
 ```rust
 // This function:
 async fn foo(x: &u8) -> u8 { *x }
@@ -362,13 +363,21 @@ fn move_block() -> impl Future<Output = ()> {
     }
 }
 ```
+
+
 ### 多线程executor上使用 .await
+
 当使用多线程 `Future` executor的时候，`Future`可能会在线程之间进行移动，任何的`.await`都有可能导致一次线程的切换。所以使用在 `async` bodies中的变量必须可以在 线程之间移动。
+
+> Future在线程之间的移动表示的含义是，？原始 Future就在那里，不同的线程使用，就需要进行 `clone`，这个`clone` 过程需要Future对象里面的多有元素都是 `Sync` 的。
+
 This means that it is not safe to use `Rc`, `&RefCell` or any other types that don't implement the `Send` trait, including references to types that don't implement the `Sync` trait.
 
 (Caveat: it is possible to use these types so long as they aren't in scope during a call to .await.)
 
 Similarly, it isn't a good idea to hold a traditional non-futures-aware lock across an .await, as it can cause the threadpool to lock up: one task could take out a lock, `.await` and yield to the executor, allowing another task to attempt to take the lock and cause a deadlock. To avoid this, use the Mutex in `futures::lock` rather than the one from `std::sync`.
+
+
 
 # Executing Multiple Futures at a Time
 
@@ -1033,7 +1042,7 @@ https://docs.rs/pin-project/1.0.8/pin_project/
 
 https://doc.rust-lang.org/stable/std/pin/struct.Pin.html
 
-https://blog.cloudflare.com/pin-and-unpin-in-rust/
+
 
 
 
