@@ -57,3 +57,37 @@ print('name' in Person)
 print('wrong_key' in Person)
 Person("Alice", 11)
 ```
+
+
+
+# 窗口函数
+
+```sql
+aggr_func() over ([partition by ] [order by])
+```
+
+
+
+```sql
+select 
+ user_id,
+ price,
+ sum(price) over (partition by user_id) as user_tot_price
+from some_table
+```
+
+* `over (partition by )` 用来表示表示窗口。` partition by user_id` 既表示了窗口切分规则。也表示当前记录应该属于哪个窗口
+* `sum()` 用于该窗口的聚合函数
+
+
+
+可用的聚合函数
+
+```sql
+row_number()  over(partition by x order by y) 
+rank()  over(partition by x order by y)         --分相同的排名一样，但是后面的名次会跳跃
+dense_rank()over(partition by x order by y)     --分相同的排名一样，且后面名次不跳跃
+first_value() over(partition by x order by y)   --第一次出现的值赋值给 本窗口内的所有记录
+last_value() over(partition by x order by y)    
+```
+
