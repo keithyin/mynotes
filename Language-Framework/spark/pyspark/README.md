@@ -85,9 +85,71 @@ from some_table
 
 ```sql
 row_number()  over(partition by x order by y) 
-rank()  over(partition by x order by y)         --分相同的排名一样，但是后面的名次会跳跃
-dense_rank()over(partition by x order by y)     --分相同的排名一样，且后面名次不跳跃
-first_value() over(partition by x order by y)   --第一次出现的值赋值给 本窗口内的所有记录
-last_value() over(partition by x order by y)    
+rank()  over(partition by x order by y)         -- 分相同的排名一样，但是后面的名次会跳跃
+dense_rank()over(partition by x order by y)     -- 分相同的排名一样，且后面名次不跳跃
+first_value() over(partition by x order by y)   -- 第一次出现的值赋值给 本窗口内的所有记录
+last_value() over(partition by x order by y)    -- 最后一次出现的值赋值给本窗口的所有记录
+sum(*) over(partition by x order by y)          -- 分组内汇总值 加order by则是组内截止当前排序汇总值（等同于rows between unbounded preceding and current row），不加排序则是分组内汇总值
+
+count(*) over(partition by x order by y)        -- 分组内记录值加order by则是组内截止当前排序记录值（等同于rows between unbounded preceding and current row），不加排序则是分组内总记录
+
+cume_dist() over(partition by x order by y)     -- 返回小于等于当前值的行数/分组内总行数,需加order by，不加没意义
+min(*) over(partition by x order by y)          -- 分组内最小值加order by则是组内截止当前排序最小（等同于rows between unbounded preceding and current row），不加排序则是分组内最小值
+
+max(*) over(partition by x order by y)
+percent_rank() over(partition by x order by y)    -- 计算给定行的百分比排名。可以用来计算超过了百分之多少的人。如360小助手开机速度超过了百分之多少的人. (当前行的rank值-1)/(分组内的总行数-1)
+
+
+lag(col,n,DEFAULT) over(partition by x order by y) -- 窗口内当前行往前数n 行的值。
+lead(col,n,DEFAULT) over(partition by x order by y) -- 窗口内当前行往后数n 行的值。
+NTILE(n) OVER(partition by x order by y)            -- 分片。将窗口内数据按照顺序切成 n 片。并返回当前行所在的分片数 
+```
+
+
+
+# cube & rollup & grouping sets
+
+> group by 常用工具
+
+
+
+```sql
+select 
+	dt,
+	first_cat,
+	second_cat,
+	count(*) as num
+from some_table
+group by dt, first_cat, second_cat with cube
+
+-- 等价于 分别 group by dt, first_cat, second_cat 任意组合(2^n 个)。然后 union all 起来
+```
+
+```sql
+select 
+	dt,
+	first_cat,
+	second_cat,
+	count(*) as num
+from some_table
+group by dt, first_cat, second_cat with rollup
+
+-- 等价于 分别 group by dt, 
+--            group by dt, first_cat, 
+--            group by dt, first_cat, second_cat. 然后 union all 起来！！
+```
+
+
+
+```sql
+select 
+	dt,
+	first_cat,
+	second_cat,
+	count(*) as num
+from some_table
+group by dt, first_cat, second_cat
+	grouping sets((dt, first_cat), (first_cat, second_cat), (second_cat))
+-- 对指定的进行 group by，然后 union all 起来
 ```
 
