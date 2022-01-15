@@ -118,6 +118,11 @@ https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 
 > rust 中的生命周期标注主要是解决悬垂指针问题的。生命周期标注可以和泛型对照去理解
 
+
+https://hashrust.com/blog/lifetimes-in-rust/
+
+https://doc.rust-lang.org/stable/book/ch10-03-lifetime-syntax.html
+
 ```rust
 fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 
