@@ -113,4 +113,3 @@ https://www.cl.cam.ac.uk/techreports/UCAM-CL-TR-798.pdf
 	5. 最终，只有一条路：`std::sync::Mutex`, 使用 `Arc<Mutex<T>>` 就ok了。而且这种形式，也保证了 data race 不会发生。
 	6. 总结：`Arc` 保证了多线程情况下，引用计数能够正确的加减。`Mutex` 提供了同步机制 & 内部可变性机制。`Arc<Mutex<T>>` 等价于单线程情况下的 `Rc<RefCell<T>>` 
 
-

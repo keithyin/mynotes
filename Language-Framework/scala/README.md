@@ -6,6 +6,7 @@
 // 对象是 HelloScala$ 类型的一个静态对象 MODULE$
 // 当编写一个 object HelloScala的时候，底层会生成两个.class文件，分别是HelloScala, HelloScala$， 即：会生成两个class 文件。
 // object HelloScala 对应的是 HelloScala$ 的一个静态对象（所以就是单例咯）
+// 伴生对象里面放的是静态方法 和 静态属性！
 object HelloScala{
     // def 表示一个方法，是一个关键字
     // main 表示方法的名字，表示程序的入口
@@ -33,17 +34,17 @@ println(s"${age + 10}")
 # 变量 & 类型
 
 * scala 中：小数默认为 double，整数默认为 int
-* `val` ： 数值不可变，不可修改
+* `val` ： 数值不可变，不可修改。只是表示的引用不可变，但是引用的对象内部是可以变的
 * `var`:  变量可以修改
 * scala中数据都是对象，没有原生类型
 * scala中数据类型分为两大类，AnyVal（值类型）,AnyRef(引用类型)，这两种也都是对象
 * AnyVal: 
-  * Byte, Short, Int, Long, FLoat, Double, Boolean, Char, StringOps, Uint
+  * Byte, Short, Int, Long, FLoat, Double, Boolean, Char, StringOps, **Uint**(等价于空值)
 * AnyRef:
-  * Scala Collections, All Java Classes, Other Scala Classes
+  * Scala Collections, All Java Classes, Other Scala Classes，String
 * 底层类
-  * Null：所有AnyRef的子类，只有一个值 null
-  * Nothing: 所有类的子类：在开发中，Noting的值可以赋值给任意类型的对象，常用于抛出异常
+  * Null：所有AnyRef的子类，只有一个值 null，这个对象可以赋值给任意其他引用类的对象  （Unit：空值，Null：空引用）
+  * Nothing: 所有类的子类：在开发中，Noting的值可以赋值给任意类型的对象，如果函数没法正常返回（抛出异常时候），会返回该类型的对象
   * 这个需要和object理解：object是所有类型的父类
     * java中的object对应scala中的 Any
 * 隐式转换：
@@ -78,15 +79,60 @@ class Dog {
   var name : String = _
 }
 ```
-* Char: 2字节 unicode码
-* Boolean: 只有 true 和 false, 不能用 1 或 0
+* Char: 2字节（16位） unicode 码
+* Boolean: 只有 `true` 和 `false`, 不能用 1 或 0
 * Unit: 只有一个实例对象 ()
 * Null: 只有一个实例对象 null, 任何 AnyRef 的子类
-* Nothing: 主要只用来抛异常的
+* Nothing: 主要只用来抛异常的, 如果一个方法抛出了异常，调用该方法的返回值就变成了 `Nothing` 的对象，这里需要和scala的异常处理一起理解
 * Any: 相当于 java 的 object
 * Char 与 Byte, Short 不能互相隐式转换, 三者可以混合计算, 计算的时候会转成 int 然后计算. Byte 和 Short 可以互相转换
 * 类型判断 `a.isInstanceOf[Int]`
 * 类型转换? `a.asInstanceOf[Int]`
+
+
+
+```scala
+object HelloWorld {
+    
+    def main(args: Array[String]): Unit = {
+        val v1 = m1();
+        println(v1) // 打印出来的就是 ()
+        
+    }
+    
+    def m1(): Unit = {
+        println("hello")
+    }
+    
+    def m2(): Nothing = {
+        throw new NullPointerException
+    }
+    
+    def m3(a: Int): Int = {
+        if (a == 0) {
+            throw new NullPointerException // 返回Nothing
+        } esle {
+            return a //返回 Int, 因为 方法的返回值可以放返回值的 父类。所以使用 Int 就可以了
+        }
+    }
+    
+    
+}
+```
+
+
+
+## 自动类型转换
+
+
+
+
+
+## 隐式类型转换
+
+
+
+
 
 
 ## 强制类型转换
@@ -96,6 +142,7 @@ class Dog {
 val a: Int = 10
 val aStr: String = 10 + ""; // +个空串 就 ok 了
 aStr.to??
+2.7.toInt //秀啊
 ```
 
 
@@ -117,6 +164,13 @@ import scala.io._ //引入该包下的所有东西
 ```
 
 # 运算符
+* `+`: 可以用来字符串相加
+* `*`: 可以用来字符串的 倍数拷贝
+* `/`: 
+* `==, !=, <, >, <=, >=`
+  * `==`: 判断值是否相等（会调用equals的方法重载），使用 `s1.eq(s2)` 用来判断地址是否相等 （这里和 java 不一样）
+* `=, +=, -=, *=, /=, %=, <<=, >>=, &=, ^=, |=` 
+* `&, |, ^, ~, <<, >>, >>>`
 * scala 支持代码块返回值
 
 ```scala
@@ -126,22 +180,50 @@ val res = {
 ```
 * 三元运算符 `val num if(5>4) 5 else 4`
 * 命令行输入`val val = StdIn.readLine()`
+* 方法调用
+
+```scala
+
+val n1 = 10
+val n2 = 11
+
+n1.+(n2) // 原始方法调用写法
+n1 +(n2) // .可以省略
+n1 + n2 // 如果方法的参数只有一个，那么小括号也可以省略
+
+"1".toInt()
+"1".toInt // 如果没有参数，小括号可以省略
+"1" toInt
+
+```
 
 # 分支控制
 * 没有 switch
 * for 循环
 ```scala
+// if else 是有返回值的，定义为代码块的最后一行！！！！
+
 if (expression) {
 
 } else if (expression2) {
 
 }
 
+
+val n1 = if(true) {
+    // doSomething
+    10
+} else {
+    // doSomething
+    11
+}
+
+
 // for 表达式, for 推导式
 // 1 to 3 :  两边都是 闭合
 // 1 until 3: 前闭 后 开
 // 也可以这样直接对集合进行遍历
-
+// to 实际也是一个方法调用！！！
 for(i <- 1 to 3){
 
 }
@@ -151,22 +233,50 @@ for (i <- 1 to 3 if i!=2) {
 
 }
 
+// 循环步长, 步长为2
+for (i <- 1 to 3 by 2) {
+    
+}
+
+// 反转遍历
+
+for (i <- 1 to 3 reverse) {
+    
+}
+
 // for 引入变量
 for (i <- 1 to 3; j = 4-i) {
 
 }
-
 // 等价于
-for (i <- 1 to 3; ) {
+for (i <- 1 to 3) {
     j = 4-i
     ...
 }
-
-// 嵌套循环, 等价于嵌套循环的
-for (i<-1 to 3; j <-1 to 3){
+// 引入变量可以写多行
+for {
+    i <- 1 to 3
+    j = 4-i
+    z = 3 + j
+    }{
+    
+	...    
 }
 
-// 循环返回值, 将遍历过程中产生的值放到一个 vector 中去， 使用yield关键字
+
+// 嵌套循环, 等价于嵌套循环的
+for (i <- 1 to 3; j <- 1 to 3){
+}
+// 等价于
+for (i <- 1 to 3) {
+    for (j <- 1 to 3) {
+        
+    } 
+}
+
+
+
+// 循环返回值, 将遍历过程中产生的值放到一个 vector 中去， 使用yield关键字. 如果不用 yield，编译器会认为返回的 Unit
 val res = for(i<-1 to 10) yield i
 
 // yield + 代码块返回值
@@ -177,7 +287,7 @@ val res2 = for(i<-1 to 10) yield {
     	"not even"
 }
 ```
-* while 循环
+* while 循环（不建议使用）
 
 ```scala
 while (expression) {
