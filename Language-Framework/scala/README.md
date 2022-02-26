@@ -295,35 +295,35 @@ while (expression) {
 }
 ```
 
-* 循环中断
+* 循环中断 (`使用抛出异常的方式来退出循环`)
 
 ```scala
 // breakable 高阶函数，接收函数的函数
 // breakable(op: =>Unit) 接收一个没有形参，没有输出的函数，
 // breakable 对 op 抛出的异常 进行捕获处理
 // 当传入的是代码块的时候， 一般会将 小括号 转成 大括号
-breakable(
+Breaks.breakable( // 用来 catch 异常
     while (i < 20) {
         n += 1
         if (n == 18) {
-            break() //没有 break 关键字，只有个函数，该函数只是扔出一个异常
+            Breaks.break() //没有 break 关键字，只有个函数，该函数只是扔出一个异常
         }
     }
 )
 // 当传入的是代码块的时候， 一般会将 小括号 转成 大括号
-breakable{
+Breaks.breakable{
     while (i < 20) {
         n += 1
         if (n == 18) {
-            break() //没有 break 关键字，只有个函数，该函数只是扔出一个异常
+            Breaks.break() //没有 break 关键字，只有个函数，该函数只是扔出一个异常
         }
     }
 }
 ```
 
 * 如何实现 continue
-  * 使用 if else
-  * 也可以使用循环守卫
+  * 使用 `if else`
+  * 也可以使用 `循环守卫`
 
 * 模式匹配: match-case
 
@@ -331,8 +331,17 @@ breakable{
 
 # 函数式编程
 
+> 函数式编程 vs 命令式编程（面向对象，面向过程）
+>
+> 命令式编程：对计算机友好
+>
+> 函数式编程：对程序员友好 （最好所有的 值都是常量，剩下的交给编译期优化），没有副作用，幂等性
+
 * 推荐递归解决问题
 * 方法和函数几乎可以等同：定义，使用，运行机制一样
+  * 函数：为完成某一功能的语句的集合
+  * 方法：类中的函数称之为方法。（注意：伴生对象中的函数是函数而不是方法）
+  * `scala` 中的函数可以随处定义（`除了 类 和 伴生对象 外不能定义`）
   * 函数的使用方式更加的灵活多样，（方法转函数）
   * scala 中，函数是一等公民，函数也是对象，函数的创建不依赖类或者对象。java中的函数创建要依赖类，抽象类，或者接口。
 
@@ -344,11 +353,17 @@ object HelloWorld{
         val f1 = dog.sum _ // 方法转函数
         f1(1, 2)
         
-        // 直接定义函数
+        // 这个是 lambda 表达式吧
         val f2 = (n1: Int, n2: Int) => {
             n1 + n2
         }
         f2(1, 2)
+      	// 直接定义函数
+      	def sayHi(): Unit = {
+          	println("hi")
+        }
+      sayHi()
+      
     }
 }
 class Dog {
@@ -363,14 +378,13 @@ class Dog {
   * `def func_name(paraname: type):ReturnType = {func_body}`
   * `def func_name(paraname: type) = {func_body}`: 表示自动推断返回值类型
   * `def func_name(paraname: type){func_body}`: 表示没有返回值
-  * 如果没有return，默认认为执行的最后一句的值作为返回值
+  * 如果没有return，`默认认为执行的最后一句的值作为返回值`
   * 如果没有返回值，return不生效
-
 * 函数的调用机制：依旧是压栈出栈来完的
 * 细节总结：
   * 函数如果没有形参，调用的时候可以不加括号
   * 省略 `: Type` 会进行返回参数类型推断
-    * 使用返回值类型推断的时候 不要使用 `return` 进行返回
+    * `使用返回值类型推断的时候` 不要使用 `return` 进行返回
   * 如果省略了 `: Type =` ： 表示该函数没有返回值，这时候即使写了 `return` 也是无效的。
     * 如果使用`: Unit = ` ： 也是表示没有返回值，这时候即使写了 `return` 也是无效的。
   * 如果不确定返回值类型，最好使用自动类型推断
@@ -380,6 +394,217 @@ class Dog {
   * 递归程序不能使用类型推断！！！必须指定返回的数据类型
   * 支持可变参数： `def sum(args: Int*)` 
   * **过程**： 没有返回值的函数（方法）
+* 函数至简原则
+  * return 可以省略
+  * 如果函数体只有一行代码，花括号可以省略
+  * 返回值的类型如果能推断出来，就可以省略 `:Type` 一起省略
+  * 如果有`return`，必须要指定返回值类型
+  * 如果函数指定了返回类型 `Unit` ，那么在函数体内写`return` 也是没用的
+  * 如果期望是无返回值类型，可以直接省略 `=`, `def func() {}`
+  * 如果函数没有形参
+    * 如果函数声明时有小括号，调用时小括号可加可不加
+    * 如果函数声明时没有小括号，调用是不能加小括号
+  * 如果不关心名称，只关心处理逻辑，那么`函数名 & def` 可以省略
+
+```scala
+// lambda 表达式，匿名函数
+(name: String) => {println(name)}
+
+val fun = (name: String) => {println(name)}
+fun("hello")
+
+//函数类型 String => Unit. 前面是参数，后面是返回值
+```
+
+
+
+* 匿名函数的精简原则
+  * 形参的省略
+    * 形参的类型可以省略，这个可以自行推倒
+    * 如果形参只有`一个参数`，括号可以省略, 没有参数和多个参数，不能省略
+  * 函数体的省略
+    * 如果函数体只有一行，花括号可以省略
+  * 参数名称的省略
+    * 如果形参在函数体中只出现一次，那么形参可以省略，且后面的参数可以用 `_` 代替 （=> 也可以省略）
+      * 如果形参有多个，也可以这么使用，但是首先前提是，形参在函数体中只出现一次，且出现的顺序和形参顺序一致！！
+    * 如果可以推断出当前传入的  是匿名函数的函数体，而不是调用语句，那么 `_` 都可以省略
+
+```scala
+def f(func: String -> Unit) {
+  func("hello")
+}
+
+f((name: String) => {println(name)})
+f(name => {println(name)})
+f(name => println(name))
+f(println(_))
+f(println)
+
+```
+
+
+
+```scala
+// 函数作为值传递
+
+def f(i: Int){println(i)}
+
+val f1 = f _ //(注意，当函数作为值传递的时候，不能直接用 函数名，因为 scala 中，直接用函数名表示的是函数调用，所以 scala 使用 f _ 方式来表示函数整体)
+val f2: Int=>Unit = f // 这种是可以直接使用 函数名传递的， println(f2) 这里打印出来的就是地址了
+
+
+// 函数作为参数
+
+
+
+// 函数作为函数返回值
+
+def fff(): Int=>Unit = {
+ 	def inner(i: Int) {
+    println(i)
+  } 
+  inner
+}
+```
+
+## 闭包
+
+> 内层函数，访问了外层函数的变量，然后这个内层函数被返回出来了。
+
+
+
+```scala
+def addBy(a: Int): Int => Int = {
+  def addB(b: Int): Int  = {
+    a + b
+  }
+  addB
+}
+
+val addBy4 = addBy(4) _ 
+val bPlus4 = addBy4(10)
+
+
+// 精简
+def addBy(a: Int): Int => Int = {
+  (b: Int) => {
+    a + b
+  }
+}
+
+def addBy(a: Int): Int => Int = {
+  b => {
+    a + b
+  }
+}
+
+def addBy(a: Int): Int => Int = {
+    a + _
+}
+
+def addBy(a: Int): Int => Int = a + _
+```
+
+
+
+## 函数科里化
+
+* 把一个参数列表的多个参数，变成多个参数列表。有啥用的呢？
+* 函数编程中，接收多个 `参数的函数` 都可以转化为接收 单个参数的函数，这个转化过程就是科里化。
+* 科里化只是证明了参数只需要一个参数而已。
+
+```scala
+def mul(x: Int)(y: Int) = x * y
+mul(10)(20)
+```
+
+```scala
+// 一个函数只是处理一件事情的思想
+
+```
+
+```scala
+def add(a: Int, b: Int): Int = {
+  
+}
+
+// 这个的底层实现就是闭包
+def add2(a: Int)(b: Int): Int = {
+  
+}
+```
+
+
+
+## 递归
+
+> Scala 中的递归必须声明函数的返回值类型
+
+```scala
+def fact(n: Int): Int = {
+	if (n == 0) return 1
+  fact(n-1) * n
+}
+```
+
+* 尾递归优化 (编译期可以对栈帧进行优化)
+  * 最后一句只返回自身的调用，不会引用其它地方的值。
+
+```scala
+def tailFact(n: Int):Int = {
+  @tailrec // 这个注解会让 scala 来检查这个是不是正确的 尾递归实现
+  def loop(n: Int, currRes: Int): Int = {
+    if (n == 0) return currRes
+    loop(n-1, currRes * n)
+  }
+  loop(n, 1)
+}
+```
+
+
+
+## 控制抽象
+
+* 值调用：调用方法的时候传入值
+* 名调用：调用方法的时候将代码传过去
+
+```scala
+// 值作为形参
+def f0(a: Int) {
+  println(a)
+}
+
+def f1():Int = {
+  println("1")
+  12
+}
+
+f0(23) // 值调用
+f0(f1()) // 值调用
+
+// 代码块作为形参, =>Int 表示代码块的返回值为 Int
+def f2(a: =>Int):Unit = {
+  println(a) // a 代码块会执行!!!，代码块会有返回值
+}
+
+f2(23) // 23 也是代码块
+f2(f1()) // f1() 也是代码块。因为一行，所以 {} 省略掉了
+f2({
+  println("hello")
+  29
+})
+
+// 实参是代码块的话，小括号是可以省略的
+f2{
+  println("hello")
+  29
+}
+
+```
+
+
+
+
 
 ## 惰性函数
 
@@ -394,10 +619,14 @@ class Dog {
 ```scala
 lazy val i = 100 // 这个变量值也是在使用的时候才会真正的分配
 lazy val res = func() //这时候并没有实际调用
-println(res) // 这时候才会真正调用！
+println(res) // 这时候才会真正调用！但是只会调用一次。
+println(res) // 这里不会再调用 func 了。
 ```
 
+
+
 ## 偏函数 partial function
+
 * 应用场景: 对于符合某个条件, 而非所有元素进行操作, (包在 大括号里的一堆 case)
 ```scala
 val list = List(1, 2, 3, "hello")
@@ -467,23 +696,6 @@ def test2(x: Int) = {
 
 ```
 
-## 函数科里化
-
-* 函数编程中，接收多个 参数的函数 都可以转化为接收 单个参数的函数，这个转化过程就是科里化。
-* 科里化只是证明了参数只需要一个参数而已。
-
-```scala
-def mul(x: Int)(y: Int) = x * y
-mul(10)(20)
-```
-
-
-
-```scala
-// 一个函数只是处理一件事情的思想
-
-```
-
 
 
 
@@ -523,6 +735,53 @@ def f11(a: String){
 
 # 面向对象基础
 
+基本语法：
+
+* 包：package 包名：1）区分相同的名字，2）用来管理类，3）控制访问范围
+  * 命名规范：com.公司名.项目名.业务模块名
+* 两种包管理方式. 包是一个逻辑上的管理结构。和物理文件目录没啥太大关系
+  * 一种是 java 方式
+  * 另一种 scala 方式: 源文件中直接指明包结构
+    * 一个文件可以写多个包
+    * 子包里的类可以 **直接** 引用父包声明的东西。外层**不能直接**访问内层，需要显式导入包
+
+```scala
+package com {
+  package company {
+    package demo {
+      
+    }
+  }
+}
+```
+
+* 包对象：给一个包定义一个同名的对象，作为该包下的所有 class 和 object 的共享变量
+
+```scala
+// 包对象的声明需要和包放在同一级下
+package object packageName {
+  
+  val name = "hello"
+  def func() {
+    println("what")
+  }
+}
+
+// 如何用，在相同包的 源代码中，可以直接访问！
+```
+
+
+
+* 导入包说明
+  * 源文件开头导入
+  * 任意位置导入（函数体中，类中。。。）
+  * `import java.util._` 通配符导入
+  * `import java.util.{ArrayList => AL}` : 起别名
+  * `import java.util.{HashSet, ArrayList}` : 引入多个
+  * `import java.util.{ArrayList =>_, _}` 将 ArrayList 屏蔽
+
+
+
 ```scala
 object Demo{
     def main(args: Array[String]){
@@ -533,18 +792,52 @@ object Demo{
     }
 }
 
+// 类默认是 public
 class Cat {
     // 默认是 private
     // 同时会生成两个 public 方法 name()负责getter, name_$eq()，负责 setter
     var name: String = "name" //一定是要给初始值的
-    var age: Int = _ // _ 表示默认值
+    
+  	// scala 会默认生成 getter setter 方法。这些不符合 java bean 的规范
+  	var age: Int = _ // _ 表示默认值
+  
+  	// scala 不会生成 getter setter 方法，需要我们手动实现
+  	private var career = _
+  	
+  	@BeanProperty // 生成符合 javaBean 规范的 getter setter
+  	var height: Double = _
 }
 ```
 
-* 基本语法 `[修饰符] class 类名`，修饰符默认 public
+* 基本语法 `[修饰符] class 类名`，修饰符默认 `public`, 一个源文件只能有一个 public 类，且这个名字需要和文件名字一致
 * 属性定义：`[修饰符] val name: Type = DefaultValue`
   * 必须显示给初始值
 * scala 一个文件可以包含多个类， 默认都是 public 的
+
+## 访问权限
+
+* 类默认 `public`。属性：默认为 `public`, 是通过 scala 生成 getter 和 setter 方法来实现的
+* private: 只有在类中和伴生对象中才可以使用
+* Protected : 只有子类可以访问
+* private[packageName]: (属性的访问权限) 包名下的其他类可以使用。其余包不能使用
+
+
+
+```scala
+class Person{
+  private var id: Int = _
+  protected var name: String = _
+  var sex: String = _
+  private[packageName] var age: Int = _
+  
+  
+}
+```
+
+
+
+
+
 
 
 ## 方法
@@ -553,11 +846,12 @@ class Cat {
 
 ## 构造器
 
-* scala 构造器包括 主构造器 和 辅助构造器
+* scala 构造器包括 `主构造器` 和 `辅助构造器`
 
 ```scala
-class Name[形参列表] { // 主构造器
-    def this(){      // 辅助构造器
+class Name(形参列表) { // 主构造器
+    
+  	def this(){      // 辅助构造器,必须只能是 this。辅助构造器只能直接或者间接的调用 主构造器
         
     }
     def this(){      // 辅助构造器
@@ -566,9 +860,10 @@ class Name[形参列表] { // 主构造器
 }
 
 
-// 这样 主构造器就私有化了, inName 是局部变量, 如果用 val 修饰一下, otherName 就是个 只读的私有属性了. 如果用 var 修饰, 就变成了可读写属性!
+// 这样 主构造器就私有化了, inName 是局部变量. 如果用 val 修饰一下, otherName 就是个只读的私有属性了. 如果用 var 修饰, 就变成了可读写属性!
 class Person private (inName: String, inAge: Int, val otherName: String, var ootherName: String) {
-    // 这部分底层实际上是包装到 一个构造函数里的
+    
+  	// 这部分底层实际上是包装到 一个构造函数里的（主构造器）
     var name: String = inName
     var age: Int = inAge
     
@@ -591,7 +886,148 @@ class Person private (inName: String, inAge: Int, val otherName: String, var oot
   * 主构造器：**实际上是将 除 函数的语句 都包装到一个 构造器里。**
   * 辅助构造器：第一行一定要调用主构造器（直接或者间接）
   * BeanProperty: 对于属性 @BeanProperty 就自动生成了其 setXXX 和 getXXX 方法. 原来自动生成的方法也可以使用!
-  * 
+
+* 主构造器的形参：三种类型
+  * 无任何修饰符，这个参数就是一个局部变量
+  * var 修饰，作为类的成员属性使用， 可读可写
+  * val 修饰，作为类的成员属性使用，可读不可写
+
+
+
+## 继承 & 多态
+
+```scala
+// 先父类构造器，再子类构造器
+class Father(var name: String, var age: String) {
+  
+}
+
+// extends 后面指明 父类的哪个构造器被调用。
+class SubClass(name: String, age: String) extends FatherClass(name, age) {
+  
+}
+```
+
+
+
+## 抽象类
+
+```scala
+// 不能基于抽象类 构建对象
+abstract class Person {
+  val name: String // 可以不指定初始值。也就只有 抽象类里面可以这么写了
+  def hello(): Unit // 没有函数体
+}
+```
+
+* 重写非抽象方法需要用 `override`， 重写抽象方法无需 `override`
+* 子类调用父类的方法，使用 `super` 关键字。 `super.??`
+* 父类属性如果是 `val` 子类可以 `override` 之。父类属性如果是`var`，子类直接重新赋值就可以了。
+
+
+
+## 匿名子类
+
+```scala
+abstract class Person {
+	var name: String
+  def hello(): Unit
+}
+
+
+val person = new Person{
+  override var name: String = _
+  override def hello(){
+  	println(name)
+  }
+}
+```
+
+
+
+## 单例对象 & 伴生对象
+
+> 里面放的是 静态成员
+>
+> 伴生类，伴生对象 之间的属性方法 是可以互相调用的。
+>
+> 伴生类，伴生对象，需要在同一个文件里。名字要完全一致
+
+伴生对象一个特殊的方法: apply
+
+```scala
+object Student {
+  
+  def apply(){} // 通过 Student() 调用的就是这个 apply 方法
+}
+```
+
+
+
+## Trait （类似 java接口interface）
+
+> 抽象方法，抽象属性，具体方法，具体属性。都可以有。。。。 和抽象类不就重复了？？？？？
+
+* 没有父类：`class ClassName extends Trait1 with Trait2 with Trait3... {}`
+* 有父类: `class ClassName extends FatherClass with Trait1 with Trait2 ...{}`
+
+```scala
+
+trait Talent {
+  
+}
+
+class Student{
+  
+}
+
+// 创建对象的时候才 搞出来一个 特质， trait 的动态汇入 mixup. 
+// 如果继承的时候发生了冲突，子类需要重写。重写的时候可能用 super, 方法叠加是从后向前
+// super. ..... super[Talent].  ......
+val studentWithTalent = new Student with Talent {
+  
+}
+
+```
+
+
+
+## 特征的自身类型（self type）
+
+> 等价于 类的 继承。 trait 的继承叫 trait self type
+
+```scala
+class User(val name: String, val pwd: String)
+trait UserDao {
+  
+  _: User =>  // 写了这句之后，UserDao 就能假设自己有一个 User 对象？
+  
+  def insert(){
+    println(this.name) // 可以使用 this 调用 User 的属性了
+  }
+}
+
+
+class RegisterUser(name: String, pwd: String) extends User(name, pwd) with UserDao
+
+val ru = new RegisterUser("a", "b")
+ru.insert
+
+```
+
+
+
+## 类型检查与转换
+
+```scala
+a.isInstanceOf[T]
+b.asInstanceOf[T] // 
+classOf(obj) // 获取对象的类名
+```
+
+
+
+
 
 
 ## 打包 & import
