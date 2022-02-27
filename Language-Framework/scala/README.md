@@ -130,7 +130,75 @@ object HelloWorld {
 
 ## 隐式类型转换
 
+**当编译器一次编译失败的时候，会在当前的环境中查找让代码通过编译的方法，用于将类型进行转换，实现二次编译**
 
+* 隐式函数
+  * 隐式转换可以在不修改任何代码的情况下，扩展某个类的功能
+* 隐式参数
+  * 函数的形参可以通过`implicit` 关键字声明为隐式参数，调用的时候如果 调用者不传入该形参，编译器就会在相应的作用域中寻找符合条件的隐式值
+    * 同一个作用域中，相同类型的隐式值只能有一个  （**同一个作用域如何理解**？？）
+    * 编译器按照隐式值的类型找值，于隐式值的名字无关
+    * 隐式参数优先于默认参数
+* 隐式类：扩展类的功能 （2.10+）
+  * 其所带的构造参数有且只能有一个
+  * 隐式类必须被定义在 "类/半生对象/包对象" 中，即隐式类不能是顶级的
+* 隐式解析机制
+  * 首先会在代码的作用域下查找隐式转换操作，如果找不到
+  * 在隐式参数的类型作用域里查找。类型的作用域是指与类型相关的 伴生对象，和类型所在包的包对象。
+
+```scala
+class MyRichInt(val self: Int) {
+    def myMax(i: Int): Int = if(self < i) i else self
+}
+
+object TestImplicitFunction {
+    implicit def convert(arg: Int): MyRichInt = {
+        new MyRichInt(arg)
+    }
+    
+    def main(args: Array[String]): Unit = {
+        // 如果第一次编译错误，那么编译器就会在当前作用域范围内查找对应调用功能的转化规则，这个调用是由编译器完成的，所以称之为隐式转换
+        2.myMax(6)
+    }
+    
+}
+
+```
+
+
+
+```scala
+object TestImplicitVar{
+    implicit val str: String = "hello world"
+    
+    def hello(implicit arg: String = "good bye") {
+        
+    }
+    
+    def main(args: Array[String]) {
+        hello
+        
+        implicit[String] // 获取String类型的隐式变量
+    }
+}
+```
+
+
+
+```scala
+object TestImplicitClass {
+	implicit class MyRichInt(arg: Int) {
+        def myMax(i: Int): Int = {
+            if (arg < i) i else arg
+        }
+    }
+    
+    def main(args: Array[String]) {
+        1.myMax(3)
+    }
+    
+}
+```
 
 
 
@@ -713,7 +781,7 @@ try{
     case ex: ValueError => {}
     case ex: Exception => {}
 }finally{
-    
+    // 不管有没有捕获异常，都会执行 finally
 } 
 
 def test(): Nothing = {
@@ -1027,6 +1095,40 @@ classOf(obj) // 获取对象的类名
 
 
 
+## 枚举类与应用类
+
+* 枚举类：需要继承 `Enumeration`
+* 应用类：需要继承 `App`
+
+```scala
+object Color extends Enumeration {
+    val RED = Value(1, "red")
+    val YELLOW = Value(2, "yellow")
+}
+
+object Test {
+    
+    def main(args: Array[String]): Unit = {
+        
+        println(Color.YELLOW)
+        
+    }
+    
+}
+
+```
+
+
+
+```scala
+// 只能用 object 来继承
+object TestApp extends APP {
+    println("这里就可以直接执行了，不用定义main，因为 APP 已经帮我们处理好了")
+}
+```
+
+
+
 
 
 
@@ -1090,6 +1192,10 @@ implicit class People(s: String) {
 
 
 
+## sealed 密封类
+
+**当前类** 的 **子类** 是不能定义在当前 源文件 之外的！！！！
+
 
 
 # 伴生类与伴生对象
@@ -1114,7 +1220,7 @@ object Clerk{
 # scala 集合包
 
 * 同时支持 **可变集合** 和 **不可变集合** ， **不可变集合可以安全的并发访问**
-  * 不可变集合：集合本身不可变， 元素个数不可变，但是存储的值可以变换的。
+  * 不可变集合：集合本身不可变， 元素个数不可变，但是 **存储的值可以变** 的。
   * 可变集合：可动态增长
 * 两个主要的包
   * `scala.collection.immutable`
@@ -1122,23 +1228,46 @@ object Clerk{
 * scala 默认采用不可变集合（几乎所有）。
 * 集合有三大类型： `Seq, Set, Map`
 
-## 数组
+## Array
 
 ```scala
-// 定长数组, scala中小括号进行索引， [泛型]
+// 定长数组, scala中小括号进行索引， [泛型]。对应的可变数组叫 ArrayBuffer
 val arr = new Array[Int](10)
 for (item <- arr) {
     println(item)
 }
-// 可以修改
+// 只能改查
+// 修改, arr(3) ： 实际调用的是 类中定义的 apply 方法
+// arr(3) = 10 实际调用的类中定义的 update 方法
 arr(3) = 10
 
+// 查
+for (element <- arr) {
+    println(element)
+}
+
+val iterator = arr.iterator
+while (iterator.hasNext) {
+    println(iterator.next)
+}
+
+
+arr.foreach(println)
+
+
 // 第二种方式 定义数组，直接初始化数组，数组的类型和初始化的类型的是有关系的
-// 这里其实使用的 object Array
+// 这里其实使用的 object Array。使用伴生对象创建 Array
 var arr02 = Array("1", 1)
 for (index <- 0 until arr02.length) {
     arr02(index)
 }
+
+// 创建一个新的数组，将当前的ele copy 过去，然后将新数组返回。想添加元素，必须要创建要给新的数组
+val arr2 = arr.:+(10) // 10加到数组的后面去
+val arr3 = arr.+:(30) // 30加到数组的前面去
+
+arr :+ 10    // 带冒号的运算符，冒号距离 操作的对象比较近
+10 +: arr
 ```
 
 
@@ -1146,7 +1275,11 @@ for (index <- 0 until arr02.length) {
 ```scala
 // 变长数组
 val arr = ArrayBuffer[Int]()
-arr.append(7)
+arr.append(7) //:+ 主要是给不可变数组使用的。
+arr += 19 // 屁股后面添加元素， 对应 append
+19 +=: arr // 前面加。  重点这个冒号.  对应 insert
+
+
 arr.append(8)
 // 可变参数
 arr.append(7,9,0) 
@@ -1155,7 +1288,14 @@ arr.remove(idx)
 
 // 到 定长 和 变长 之间的转换
 arr.toArray.toBuffer 
+
+
+// 删除元素
+remove
+arr -= 13 // 找到数值为 13 的值，将其删除
 ```
+
+
 
 
 
@@ -1169,6 +1309,17 @@ for (item <- arr) {
     for (item2 <- item) {
         
     }
+}
+
+for (i <- 0 until arr.length; j <- 0 until arr(i).length) {
+    
+    println(arr(i)(j))
+    
+}
+
+
+for (i <- arr.indices; j <- arr(i).indices) {
+    println(arr(i)(j))
 }
 
 ```
@@ -1190,6 +1341,9 @@ tuple1.productElement(0)
 for (item <- tuple1.productIterator) {
     
 }
+
+// 二元组的特殊写法
+“a” -> 2
 ```
 
 
@@ -1204,7 +1358,7 @@ val list = List(1, 2, 3)
 val nullList = Nil // 空集合
 
 // 访问
-list(1)
+list(1) // list(1) = 10, 这个操作是不行的。因为没有 update 方法
 
 // 遍历
 for (item <- list) {
@@ -1216,11 +1370,14 @@ for (item <- list) {
 val list2 = 4 +: list
 val list3 = list2 :+ 5
 
-// Nil 一定要放到最右边， 最右边的一定是一个集合。
-// 得到的结果是 从左到又 依次放到 Nil 集合中去
+// Nil 一定要放到最右边， 最右边的一定是一个集合。 冒号结尾的运算符，调用顺序是 从右到左
+// 得到的结果是 从左到又 依次放到 Nil 集合中去.   :: 实际是一个 List 的子类
 val list5 = 1 :: 2 :: 3 :: list3 :: Nil
-// ::: list 内容展开然后放到 集合中去
+// ::: list 内容展开然后放到 集合中去 ！！！   冒号结尾的运算符，调用顺序是从右向左
 val list6 = 1 :: 2 :: 3 :: list3 ::: Nil
+
+// ++ 也是两个list合并到一起！！
+list1 ++ list2
 ```
 
 * ListBuffer: 可变的 list 集合
@@ -1229,6 +1386,7 @@ val list6 = 1 :: 2 :: 3 :: list3 ::: Nil
 var lb = ListBuffer[Int](1,2,3)
 // 访问
 lb(2)
+lb(2) = 100
 
 // 遍历
 for (item <- lb) {
@@ -1238,7 +1396,9 @@ for (item <- lb) {
 // 添加
 lb += 10
 lb.append(11)
-lb ++= lb2 // 一个集合加到另外一个集合中去， 元素级别相加
+lb ++= lb2 // 一个集合加到另外一个集合中去， 元素级别相加。lb2添加到 lb中
+lb ++=: lb2 //lb 添加到 lb2中
+
 val lst2 = lst1 ++ lst3 // 同上
 val lst5 = lst :+ 5 // lst 不变
 val nullLb = new ListBuffer[Int]
@@ -1271,6 +1431,11 @@ q.head // 第一个元素
 q.last // 最后一个元素
 q.tail // 返回除了第一个元素以外的所有元素 (返回的是一个队列)
 t1.tail.tail // 
+
+
+
+// Immutable Queue
+val queue2 = Queue("a", "b", "c") // 入队，出队操作会产生新的 Queue 对象
 ```
 
 
@@ -1283,6 +1448,20 @@ t1.tail.tail //
 * map 的底层是  Tuple2 类型
 
 ```scala
+val iMap = immutable.Map("a" -> 1, "b" -> 2)
+iMap.foreach(println)
+
+iMap.foreach((kv:(String, Int)) => println(kv))
+
+for (key <- iMap.keys) {
+    
+}
+
+for (val <- iMap.values) {
+    
+}
+
+
 val map = mutable.Map("a"->1, "b"->2)
 val map2 = new mutable.Map[String, Int]
 val map3 = mutable.Map(("A", 1), ("B", 2))
@@ -1316,6 +1495,9 @@ map2 += ("D"->4, "E"->5)
 // 删除, 直接写 key 就可以了， key不存在 也不会报错
 map2 -= ("D", "E")
 
+map1 ++= map2
+map1 ++ map2
+
 ```
 
 
@@ -1324,11 +1506,20 @@ map2 -= ("D", "E")
 
 ```scala
 val set = Set(1, 2, 3)
+
+// set 因为不用考虑 末尾加，还是开头加 所以没有 : 引入
+set + 4 // 加一个元素
+set1 ++ set2 // 合并两个集合
+set1 - 13 //删除一个元素
+set1 -- set2 //从一个集合删除另一个集合
+
 val mutableSet = mutable.Set(1, 2, 3)
 
 // 添加
 mutableSet += 4
 mutableSet += (4)
+
+mutableSet ++= mutableSet2
 
 // 删除
 mutableSet.remove(2)
@@ -1339,8 +1530,47 @@ mutableSet -= 4
 
 
 
+## 并行集合
+
+```scala
+// Thread.currentThread.getName, getId
+
+// par表示是并行计算
+(1 to 100).par.map()
+```
+
+
+
+
+
 # 集合操作
 
+* 长度或者大小
+  * `size, length`
+* 迭代
+  * `for (ele <- list),   for(ele <-list.iterator)`
+* 转成 string
+  * `mkString`
+* 包含
+  * `contains`
+* `.head, .tail， .last, init`: 不是头，剩下的就是尾！！ 
+* 反转 ： `reverse`
+* `take(3), takeRight(3)`
+* `drop`
+* `union(并集), intersect（交集）, diff（差集）`
+* `zip!` 
+* 滑窗 `list.sliding(3), list.window`
+* 计算
+  * `list.sum, list.product, list.max, list.min`
+  * `list.sorted, list.sorted.reverse, list.sorted(Ordering[Int].reverse)`
+* 高级函数
+  * `filter`: true 的会保留
+  * `map`
+  * `flatten` : 如果 list 的单元素是个 list，就会将内部的 list 进行展平
+  * `flatMap`： 实际上是先 map操作，我们实现的只需要是 map 操作，map 的结果进行 flat
+  * `group` : 之后得到的是一个 Map。相同组放在相同的key
+  * `reduce, reduceRight, reduceLeft`:   （不需要传初始聚合状态）
+  * `fold`: 需要传一个初始聚合状态
 * map 操作
 
 ```scala
@@ -1358,7 +1588,7 @@ def myPrint() {
     println("hello world")
 }
 
-// 为什么要有 _ 这个神奇的操作， 因为 scala 中对于 无参的函数，可以不加 () 直接调用，所以如果想将一个 函数赋值一个变量的话，那就需要 后面显式的加上一个 _ 高速编译器，不要计算函数的值。
+// 为什么要有 _ 这个神奇的操作， 因为 scala 中对于 无参的函数，可以不加 () 直接调用，所以如果想将一个 函数赋值一个变量的话，那就需要 后面显式的加上一个 _ 告诉编译器，不要计算函数的值。
 val f1 = myPrint _
 ```
 
@@ -1410,7 +1640,25 @@ for (item <- videwdemo) {
 }
 ```
 
+
+
+```scala
+// map 合并
+map1.foldLeft(map2) (
+(mergedMap, kv) => {
+    val k = kv._1
+    val v = kv._2
+    mergedMap(key) = mergedMap.getOrElse(0) + value
+    mergedMap
+})
+```
+
+
+
+
+
 # 操作符重载
+
 ```scala
 class Dog {
     def -(i: Int) {
@@ -1429,11 +1677,14 @@ class Dog {
 // 中置操作符: a op b  等价于 a.op(b)
 ```
 
+
+
 # 模式匹配
+
 * match case 模式匹配, 两个都是关键字
 * 如果都没有匹配上, 就会匹配 `case _`
-* 如果没有匹配上, 且没有 `case _` 那就回抛出异常
-* 
+* 如果没有匹配上, 且没有 `case _` 那就回抛出异常 `MatchError` !!!
+* 即使多行代码，花括号也是可用，可不用的
 
 ```scala
 
@@ -1448,14 +1699,15 @@ variable match {
 ```
 * match 中的守卫
 ```scala
+// _ 只是用来接收当前的值
 variable match {
-    case _ if (expression) => do something
+    case i if (i < 10) => do something
     case _ => do something
     
 }
 
 varable match {
-    // 意味着 mychar varable, 这个一直是会匹配上的
+    // 意味着 mychar varable, 这个一直是会匹配上的. 这个玩意等价于 case _ => do something
     case mychar => do something
 }
 
@@ -1488,7 +1740,8 @@ arr match {
     // 匹配有两个元素的数组, 并将两个元素 赋值给 x, y
     case Array(x,y) => x + "=" + y
     // 匹配 以 0 开头的数组
-    case Array(0, _*) =>
+    case Array(0, _*) => do something
+    case Array(1, x, y) => do something
     
     case _ => ""
 }
@@ -1501,6 +1754,10 @@ arr match {
 list match {
     // 只有 0 的
     case 0 :: Nil => '0'
+    
+    case List(0) => "只有一个0的"
+    case List(1, x) => "两个元素，第一个是 1"
+    case List(0, _*) => "N个元素，第一个是0"
     
     case x::y::Nil => x + " " + y
     // 0 打头的
@@ -1517,12 +1774,34 @@ tuple match {
     case (0, _) => 
     // 第二个元素是 0 的二元组
     case (y, 0) =>
+    
 }
 
+val (x, y) = (10, "hello")  // 元组的匹配。用在变量声明上
+val List(first, second, rest) = List(1, 2, 3)
+val List(first, second, _*) = List(1, 2, 3, 4, 5, 6)
+val fir :: sec :: rest = List(1, 2, 3, 4, 5)
+
+
+
+val tupleList = List((1, 2), (2, 3))
+for ((a, b) <- tupleList) {
+    
+}
+
+// 有点像循环守卫
+for ((1, _) <- tupleList) {
+    
+}
 ```
 
+* 
 * 对象匹配
-> 如果 对象的 unpply 返回 Some集合 则认为匹配成功
+> 如果 对象的 `unapply` 返回 Some集合 则认为匹配成功
+>
+> apply: 构建对象
+>
+> unapply: 解构对象
 ```scala
 object Square {
     // 对象提取器: 
@@ -1546,7 +1825,10 @@ for ( (k, 0) <- map) {
 }
 ```
 
+
+
 # 样例类
+
 ```scala
 abstract class Amount
 
@@ -1554,4 +1836,30 @@ abstract class Amount
 // 样例类对应的 伴生对象 也提供了 apply, unapply 方法. 会自动生成一堆方法.
 case class Dollar(value: Double) extends Amount
 ```
-* 密封类: 只能在当前文件中定义.
+* 样例类：一个类被声明成了样例类
+  * 编译器会自动生成其伴生对象（自动生成伴生对象的 apply, unapply 方法自动生成）
+  * 样例类声明时的 构造器的参数，默认为 val
+* 
+
+
+
+# 泛型
+
+* 又称 类型构造器！
+* 逆变，协变，不变，是需要 类型构造器的编写者 指定的！！！
+
+```scala
+class ClassName[+T]; // 协变  如果 Apple 是 Fruit 的子类，那么 ClassName[Apple] 是 ClassName[Fruit] 的子类
+class ClassName[-T]; // 逆变  如果 Apple 是 Fruit 的子类，那么 ClassName[Apple] 是 ClassName[Fruit] 的父类
+class ClassName[T];  //不变   如果 Apple 是 Fruit 的子类，那么 ClassName[Apple] 是 ClassName[Fruit] 没有关系
+```
+
+
+
+* 泛型的上下限
+
+```scala
+class ClassBuilder[T<:Person] // 泛型上限, 
+class ClassBuilder[T>:Person] // 泛型下限
+```
+
