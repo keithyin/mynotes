@@ -695,10 +695,12 @@ println(res) // 这里不会再调用 func 了。
 
 ## 偏函数 partial function
 
-* 应用场景: 对于符合某个条件, 而非所有元素进行操作, (包在 大括号里的一堆 case)
+* 应用场景: 
+  * 对于符合某个条件进行操作, 对不符合条件的不进行操作, (包在 大括号里的一堆 case)
+  * 多个偏函数组合在一起可以构成一个完整的操作
 ```scala
 val list = List(1, 2, 3, "hello")
-// Any 表示输入是 Any 类型, 返回是 Int 类型
+// Any 表示输入是 Any 类型, 返回是 Int 类型。两个泛型参数，第一个输入类型，第二个是返回值类型
 val parFunc = new PartialFunction[Any, Int] {
     // 如果返回 true, 交给 apply 处理, 如果返回 false, 则不处理
     override def isDefinedAt(x: Any) = x.isInstanceOf[Int]
@@ -706,6 +708,11 @@ val parFunc = new PartialFunction[Any, Int] {
         v1.asInstanceOf[Int] + 1
     }
 }
+
+val parFunc2: PartialFunction[List[Int], Int] = {
+    case x :: y :: _ => y
+}
+
 // 这里不要使用 map, 使用 collect 哦
 list.collect(parFunc)
 
@@ -716,6 +723,46 @@ def f2:PartialFunction[Any, Int] = {
 
 // 更简写形式........
 list.collect{case i: Int => i + 1}
+
+
+
+
+val list = List(("a", 2), ("b", 4))
+list.map(tuple => (tuple_1, tuple_2 * 2))
+
+list.map(tuple => {
+    typle match {
+        case (word, count) => (word, count * 2)
+    }
+})
+
+
+// 省略 lambda 表达式的写法, 得到一个偏函数的写法
+
+list.map{
+    case (word, count) => (word, count * 2)
+}
+
+
+
+
+// 偏函数 demo，求绝对值
+
+val posAbs: PartialFunction[Int, Int] = {
+    case x if x > 0 => x
+}
+
+val negAbs: PartialFunction[Int, Int] = {
+    case x if x < 0 => -1
+}
+
+val zeroAbs: PartialFunction[Int, Int] = {
+    case 0 => 0
+}
+
+// 多个偏函数构建称一个整体的函数
+def abs(x: Int): Int = (posAbs orElse negAbs orElse zeroAbs) (x)
+
 ```
 
 ## 作为参数的函数
