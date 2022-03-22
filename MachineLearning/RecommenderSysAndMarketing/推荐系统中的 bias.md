@@ -1,5 +1,15 @@
 
 
+# 推荐系统 Bias
+
+* selection bias
+* exposure bias
+* Position bias
+* ...
+* ...
+
+
+
 
 
 ### Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendation
