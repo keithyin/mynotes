@@ -10,6 +10,31 @@
 
 
 
+## The Deconfounded Recommender: A Causal Infernece Approach to Recommendation
+
+> 因果方式建模推荐系统的 bias
+>
+> Key word：Matrix Factorization, Causal Inference, Recommendation System, Exposure Bias
+
+如何用因果推断的方式建模推荐系统
+
+* 在预估的时候，推荐系统实际是在回答一个这样的问题：如果我们给该用户看此电影，用户会给其如何评分呢？实际这就是一个关于 `intervention` 的问题。**因果推断的一个信条就是：预估干预结果和传统的 `out-of-sample` 预估是不一样的**
+
+
+
+建模：
+
+* $a_{ui}$ : indicator of whether user $u$ rated movie $i$
+* $y_{ui}(1)$: potential outcome. 如果 $u$ 看了 $i$ ，会给打多少分。
+* $y_{ui}(0)$: potential outcome, 如果 $u$ 没有看 $i$, 会给打多少分。
+
+两个数据集
+
+* $\{a_{ui}\}$: 用户 $u$ 是否看了电影 $i$
+* $\{y_{ui}(a_{ui}), \text{for (u,i) such that } a_{ui}=1 \}$ : 对于观测数据，用户的评分是多少
+
+
+
 
 
 ### Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendation
