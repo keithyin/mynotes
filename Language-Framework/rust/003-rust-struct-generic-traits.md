@@ -2,30 +2,26 @@
 
 ```rust
 struct Value {
-  
+
 }
 
 impl Value {
   // 如果第一个形参 不是 self，那么就类似于 c++ 的静态方法。
   pub fn new() -> Self{Value{}}
-  
+
   // 方法。第一个形参有多种选择
   // `self`, `&self`, `&mut self`, `self: Box<Self>`, `self: Rc<Self>`, `self: Arc<Self>`, or `self: Pin<P>` (where P is one of the previous types except `Self`)
   // self: &Rc<Self> 也行，应该意味着 `self: &Box<Self>`, `self: &Arc<Self>` 也👌
   pub fn do_something(&self) {
-    
+
   }
-  
+
   // Box::new(Value::new()).do_something2();
   pub fn do_something2(self: Box<Self>) {
-    
+
   }
 }
 ```
-
-
-
-
 
 # Generic Data Types
 
@@ -59,6 +55,39 @@ fn main() {
     let float = Point { x: 1.0, y: 4.0 };
 }
 ```
+
+## 自动类型推断
+
+rust 可以通过1）实参，2）返回值 进行自动类型推断，当然我们也可以显式指定泛型类型
+
+```rust
+// 通过该函数签名可以看出：无法通过实参进行类型自动推断，
+// 所以只能显式指定，或者利用返回值进行自动推断
+// let a = demo_init::<TypeA>(10); 显式指定
+// let a: TypeA = demo_init(10); 返回值类型自动推断
+
+fn<T: Init> demo_init(i: i32) -> T {
+    T::init(0)
+}
+
+// 通过函数签名就可以 自动类型推断
+fn<T: Mul> demo_mul(val: T) -> T {
+    val.mul(3)
+}
+
+//
+
+impl<T> for TypeA {
+    // 这个方法就只能通过返回值 进行自动类型推断。 甚至无法手动指定。
+    fn new(val: i32) -> Self {
+        T::do_some()
+    }    
+}
+
+
+```
+
+
 
 # trait（函数集合）
 
@@ -105,18 +134,46 @@ impl Summary for Tweet {
 
 ## trait 作为形参
 
+[Why does `dyn Trait` require a Box? - help - The Rust Programming Language Forum](https://users.rust-lang.org/t/why-does-dyn-trait-require-a-box/23471)
+
+[Difference between returning dyn Box&lt;Trait&gt; and impl Trait - #3 by H2CO3 - The Rust Programming Language Forum](https://users.rust-lang.org/t/difference-between-returning-dyn-box-trait-and-impl-trait/57640/3)
+
 ```rust
 // 所有实现了 Summary 的 对象都可以传进去（传的是引用）
+// 静态派发
 pub fn notify(item: &impl Summary) {
     println!("Breaking news! {}", item.summarize());
 }
+
+// 所有实现了 Summary 的 对象都可以传进去（传的是对象）
+pub fn notify(item: impl Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+
+// 动态派发！ (dyn Summary 是 Unsized 的，不能直接搞这么一个类型，只能通过引用。)
+// 调用时传对象引用
+pub fn notify(item: &dyn Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
+pub fn notify(item: Box<dyn Summary>) {
+    println!("Breaking news! {}", item.summarize());
+}
+// 编译会报错
+pub fn notify(item: dyn Summary) {
+    println!("Breaking news! {}", item.summarize());
+}
 ```
+
+
 
 ## Trait bound syntex
 
 上述的 `&impl Summary`这种做法实际是 `Trait bound syntext` 的 `syntex sugar`
 
 ```rust
+// 静态派发。编译器会为调用生成特定代码。
+// T:Summary, trait 约束。
 pub fn notify<T: Summary>(item: &T) {
     println!("Breaking news! {}", item.summarize());
 }
@@ -131,7 +188,11 @@ pub fn notify<T: Summary>(item1: &T, item2: &T) {}
 ## 如果有多个 Trait bound, 怎么写呢
 
 ```rust
+pub fn notify(item: &dyn Summary + Display) {}
+
 pub fn notify(item: &(impl Summary + Display)) {}
+pub fn notify(item: impl Summary + Display) {}
+
 pub fn notify<T: Summary + Display>(item: &T) {}
 
 // 使用 where clause 使得语法更清晰
@@ -171,11 +232,12 @@ impl<T: Display + PartialOrd> Pair<T> {
 ```
 
 * Using Trait Objects That Allow for Values of Different Types. `Box<dyn Draw>`:which is a trait object; it’s a stand-in for any type inside a Box that implements the Draw trait!!
-```rust
-pub struct Screen {
+  
+  ```rust
+  pub struct Screen {
     pub components: Vec<Box<dyn Draw>>,
-}
-```
+  }
+  ```
 
 ## trait 的 type placeholder
 
@@ -202,8 +264,6 @@ impl Iterator for Counter {
     }
 }
 ```
-
-
 
 ```rust
 // 使用范型

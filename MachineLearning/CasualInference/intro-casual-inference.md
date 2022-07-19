@@ -7,7 +7,16 @@
 * $(Y_i(1), Y_i(0)) \perp\perp T | X$
   * conditional exchangeability: 给定了 条件 X 后，就满足了 exchangeability
   * Unconfoundedness, conditional ignorability, conditional exchangebility (一堆名字)
-* 
+
+## backdoor criterion
+
+1. 如果以下条件为 true，那么说明变量集 $W$ 满足关于 $T\rightarrow Y$ 的 backdoor criterion
+   
+   1. $W$ blocks all backdoor paths from $T$ to $Y$
+   
+   2. $W$ does not contain any descendants of $T$
+   
+   
 
 
 
