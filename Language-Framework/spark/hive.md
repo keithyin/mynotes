@@ -125,7 +125,7 @@ cluster by s.symbol 等价于 distribute by s.symbol sort by s.symbol
 
 
 ```java
-package com.sankuai.meituan.hive.udf;
+package com.ky.udf;
 
 import org.apache.hadoop.hive.ql.exec.Description;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
@@ -142,11 +142,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Description(
-        name = "L2NormalizeUDF",
-        value = "_FUNC_(String inp) - Returns l2-normed result"
-)
 
 /**
  * select ToJsonUDF(
