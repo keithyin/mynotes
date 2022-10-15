@@ -124,6 +124,270 @@ cluster by s.symbol 等价于 distribute by s.symbol sort by s.symbol
    3. 
 
 
+```java
+package com.sankuai.meituan.hive.udf;
+
+import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
+import org.apache.hadoop.hive.ql.metadata.HiveException;
+import org.apache.hadoop.hive.ql.udf.generic.GenericUDF;
+import org.apache.hadoop.hive.serde2.objectinspector.ListObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.PrimitiveObjectInspector;
+import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+@Description(
+        name = "L2NormalizeUDF",
+        value = "_FUNC_(String inp) - Returns l2-normed result"
+)
+
+/**
+ * select ToJsonUDF(
+ *   'a', array(1,2,3), false,
+ *   'b', array('1', '2', '3'), false,
+ *   'c', '{"first":10, "second": "20", "third": true}', true,
+ *   'd', '{"first":10, "second": "20", "third": true}', false,
+ *   'e', array('{"four": 10}', '{"five": 5}'), true
+ * )
+ * 结果。
+ * {
+ *     "a":[
+ *         1,
+ *         2,
+ *         3
+ *     ],
+ *     "b":[
+ *         "1",
+ *         "2",
+ *         "3"
+ *     ],
+ *     "c":{
+ *         "third":true,
+ *         "first":10,
+ *         "second":"20"
+ *     },
+ *     "d":"{\"first\":10, \"second\": \"20\", \"third\": true}",
+ *     "e":[
+ *         {
+ *             "four":10
+ *         },
+ *         {
+ *             "five":5
+ *         }
+ *     ]
+ * }
+ */
+public class ToJsonUDF extends GenericUDF {
+    private List<List<ObjectInspector>> ois= new ArrayList();
+
+    private List<Boolean> isListFlag = new ArrayList<>();
+
+    private PrimitiveObjectInspector outputOI;
+    /**
+     * ToJsonUDF(
+     *      key1, val1, ori_val_is_json1
+     *      key2, val2, ori_val_is_json2
+     *      ...
+     * )
+     * key：JsonKey，必须是String类型
+     * val：JsonValue。支持 int,long,float,double,string,boolean. 同时支持与之对应的 list 结构
+     * ori_val_is_json1。标识对应的val是不是jsonStr。boolean。
+     *
+     * @param objectInspectors
+     * @return
+     * @throws UDFArgumentException
+     */
+    @Override
+    public ObjectInspector initialize(ObjectInspector[] objectInspectors) throws UDFArgumentException {
+        if (objectInspectors.length % 3 != 0) {
+            throw new RuntimeException("invalid arguments, arguments.length % 3 != 0");
+        }
+        ois = new ArrayList<>(); // 注意每次调用都要初始化！！这个东西并不是一个对象仅调用一次 initialize
+        isListFlag = new ArrayList<>();
+        for (int i=0; i < objectInspectors.length; i++) {
+            if (i % 3 == 0) {
+                ois.add(new ArrayList<>());
+            }
+
+            ois.get(ois.size()-1).add(objectInspectors[i]);
+
+
+            if (i % 3 == 0) {
+                if (objectInspectors[i].getCategory() != ObjectInspector.Category.PRIMITIVE ||
+                        ((PrimitiveObjectInspector)objectInspectors[i]).getPrimitiveCategory()
+                                != PrimitiveObjectInspector.PrimitiveCategory.STRING
+                ) {
+                    throw new RuntimeException(String.format(
+                            "invalid json key type, pos:[%d] is not String", i));
+                }
+            }
+
+            if (i % 3 == 2) {
+                if (objectInspectors[i].getCategory() != ObjectInspector.Category.PRIMITIVE ||
+                        ((PrimitiveObjectInspector)objectInspectors[i]).getPrimitiveCategory()
+                                != PrimitiveObjectInspector.PrimitiveCategory.BOOLEAN
+                ) {
+                    throw new RuntimeException(String.format(
+                            "invalid json key type, pos:[%d] is not boolean", i));
+                }
+            }
+
+            if (i % 3 == 1) {
+                if (objectInspectors[i].getCategory() == ObjectInspector.Category.PRIMITIVE) {
+                    isListFlag.add(false);
+                } else if (objectInspectors[i].getCategory() == ObjectInspector.Category.LIST) {
+
+                    isListFlag.add(true);
+                } else {
+                    throw new RuntimeException("");
+                }
+            }
+
+        }
+
+        outputOI = PrimitiveObjectInspectorFactory.javaStringObjectInspector;
+        return outputOI;
+    }
+
+    @Override
+    public Object evaluate(DeferredObject[] deferredObjects) throws HiveException {
+        List<List<DeferredObject>> values = new ArrayList<>();
+        for (int i = 0; i < deferredObjects.length; i++) {
+            if (i % 3 == 0) {
+                values.add(new ArrayList<>());
+            }
+            values.get(values.size()-1).add(deferredObjects[i]);
+        }
+
+        if (ois.size() != values.size()) {
+            throw new RuntimeException(String.format("OI.size(%d) != values.size(%d)", ois.size(), values.size()));
+        }
+
+        JSONObject jo = new JSONObject();
+        try {
+            for (int i = 0; i < ois.size(); i++) {
+                PrimitiveObjectInspector keyOI = (PrimitiveObjectInspector) ois.get(i).get(0);
+                PrimitiveObjectInspector isJsonStrOI = (PrimitiveObjectInspector) ois.get(i).get(2);
+                ObjectInspector valueOI = ois.get(i).get(1);
+		// DeferredObject 需要.get() 才能将 Object 取出来。OI 可以对其进行 getPrimitiveJavaObject 操作！
+                String key = keyOI.getPrimitiveJavaObject(values.get(i).get(0).get()).toString();
+                boolean isJsonStr = (boolean) isJsonStrOI.getPrimitiveJavaObject(values.get(i).get(2).get());
+
+                Object deferredVal = values.get(i).get(1).get();
+                if (deferredVal == null) continue;
+
+                if (isJsonStr) {
+                    // jsonStr or list of jsonStr
+                    if (valueOI.getCategory() == ObjectInspector.Category.PRIMITIVE) {
+                        PrimitiveObjectInspector valuePOI = (PrimitiveObjectInspector) valueOI;
+                        String value = valuePOI.getPrimitiveJavaObject(deferredVal).toString();
+                        jo.put(key, new JSONObject(value));
+
+                    } else if (valueOI.getCategory() == ObjectInspector.Category.LIST) {
+                        ListObjectInspector valueLOI = (ListObjectInspector) valueOI;
+                        PrimitiveObjectInspector listElementValuePOI = (PrimitiveObjectInspector) valueLOI.getListElementObjectInspector();
+                        JSONArray jsonArray = new JSONArray();
+                        jo.put(key, jsonArray);
+                        for (int eleIdx = 0; eleIdx < valueLOI.getListLength(deferredVal); eleIdx++) {
+                            Object listElementVal = valueLOI.getListElement(deferredVal, eleIdx);
+                            JSONObject inner = new JSONObject(listElementValuePOI.getPrimitiveJavaObject(listElementVal).toString());
+                            jsonArray.put(eleIdx, inner);
+                        }
+                    }
+
+                } else { // 如果不是 jsonStr，那么支持两种（主类型，List类型）. 当前仅是支持一层 List。还不支持 List of json str
+
+                    if (valueOI.getCategory() == ObjectInspector.Category.LIST) {
+                        ListObjectInspector valueLOI = (ListObjectInspector) valueOI;
+                        PrimitiveObjectInspector listElementValuePOI = (PrimitiveObjectInspector) valueLOI.getListElementObjectInspector();
+                        JSONArray jsonArray = new JSONArray();
+                        jo.put(key, jsonArray);
+                        for (int eleIdx = 0; eleIdx < valueLOI.getListLength(deferredVal); eleIdx++) {
+                            Object listElementVal = valueLOI.getListElement(deferredVal, eleIdx);
+                            switch (listElementValuePOI.getPrimitiveCategory()) {
+                                case INT:
+                                    jsonArray.put(eleIdx, (int) listElementVal);
+                                    break;
+                                case LONG:
+                                    jsonArray.put(eleIdx, (long) listElementVal);
+                                    break;
+                                case FLOAT:
+                                    jsonArray.put(eleIdx, (float) listElementVal);
+                                    break;
+                                case DOUBLE:
+                                    jsonArray.put(eleIdx, (double) listElementVal);
+                                    break;
+                                case STRING:
+                                    jsonArray.put(eleIdx, listElementVal.toString());
+                                    break;
+
+                                case BOOLEAN:
+                                    jsonArray.put(eleIdx, (boolean) listElementVal);
+                                    break;
+                                default:
+                                    throw new RuntimeException(String.format("not supported type %s", listElementValuePOI.getPrimitiveCategory()));
+
+                            }
+
+                        }
+
+
+                    } else {
+                        PrimitiveObjectInspector valuePOI = (PrimitiveObjectInspector) valueOI;
+
+                        switch (valuePOI.getPrimitiveCategory()) {
+                            case INT:
+                                jo.put(key, (int) valuePOI.getPrimitiveJavaObject(deferredVal));
+                                break;
+                            case LONG:
+                                jo.put(key, (long) valuePOI.getPrimitiveJavaObject(deferredVal));
+                                break;
+                            case FLOAT:
+                                jo.put(key, (float) valuePOI.getPrimitiveJavaObject(deferredVal));
+                                break;
+                            case DOUBLE:
+                                jo.put(key, (double) valuePOI.getPrimitiveJavaObject(deferredVal));
+                                break;
+                            case STRING:
+                                jo.put(key, valuePOI.getPrimitiveJavaObject(deferredVal).toString());
+                                break;
+
+                            case BOOLEAN:
+                                jo.put(key, (boolean) valuePOI.getPrimitiveJavaObject(deferredVal));
+                                break;
+                            default:
+                                throw new RuntimeException(String.format("not supported type %s", valuePOI.getPrimitiveCategory()));
+
+                        }
+
+                    }
+
+                }
+
+            }
+        }catch (JSONException e) {
+            throw new RuntimeException(e.toString());
+        }
+
+        return jo.toString();
+    }
+
+    @Override
+    public String getDisplayString(String[] strings) {
+        return null;
+    }
+}
+	
+
+```
+
 
 ## UDAF
 
