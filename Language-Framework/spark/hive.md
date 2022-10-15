@@ -138,4 +138,5 @@ https://riptutorial.com/hive/example/22316/udtf-example-and-usage
 ## 参考资料
 
 https://blog.dataiku.com/2013/05/01/a-complete-guide-to-writing-hive-udf
+
 https://www.hadoopdoc.com/hive/hive-udf-intro
