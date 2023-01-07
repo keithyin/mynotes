@@ -1,3 +1,122 @@
+# 标准库对于async的支持
+
+1. `trait Future, enum Poll, struct Context, struct Waker`
+
+2. `async/.await`
+
+```rust
+pub trait Future {
+    /// The type of value produced on completion.
+    type Output;
+    /// Attempt to resolve the future to a final value, 
+    /// registering the current task for wakeup if the value is not yet available.
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>;
+}
+
+pub enum Poll<T> {
+    /// Represents that a value is immediately ready.
+    Ready(#[stable(feature = "futures_api", since = "1.36.0")] T),
+
+    /// Represents that a value is not ready yet.
+    ///
+    /// When a function returns `Pending`, the function *must* also
+    /// ensure that the current task is scheduled to be awoken when
+    /// progress can be made.
+    Pending,
+}
+
+/// 异步task的上下文
+///
+/// 当前，`Context` 只负责提供对于 &Waker 的访问
+/// &Waker 是用来唤醒当前 task
+#[stable(feature = "futures_api", since = "1.36.0")]
+pub struct Context<'a> {
+    waker: &'a Waker,
+    // Ensure we future-proof against variance changes by forcing
+    // the lifetime to be invariant (argument-position lifetimes
+    // are contravariant while return-position lifetimes are
+    // covariant).
+    _marker: PhantomData<fn(&'a ()) -> &'a ()>,
+}
+
+// A Waker is a **handle** for waking up a task 
+// Waker是一个 handle(句柄)
+// 目的是：唤醒一个task
+// 通过什么做到：通过通知 executor 该 task 可以继续执行
+// Waker里面的 wake, wake_by_ref 都是调用 RawWaker里面对应的方法来实现的
+pub struct Waker {
+    waker: RawWaker,
+}
+
+// RawWaker 允许 implementor of a task executor 去创建一个 Waker
+// 新创建的 Waker 提供定制化的 wakeup 行为
+// 一个原始数据的指针！，一个虚表
+pub struct RawWaker {
+    /// A data pointer, which can be used to store arbitrary data as required
+    /// by the executor. This could be e.g. a type-erased pointer to an `Arc`
+    /// that is associated with the task.
+    /// The value of this field gets passed to all functions that are part of
+    /// the vtable as the first parameter.
+    data: *const (), // 这个指针指向的是Task
+    /// Virtual function pointer table that customizes the behavior of this waker.
+    vtable: &'static RawWakerVTable, // 这个table存储的也是Task里面的对应方法
+}
+
+// 虚表，一个结构体，里面都是函数指针。好奇的一点是这里为啥不用 trait。
+pub struct RawWakerVTable {
+    /// This function will be called when the [`RawWaker`] gets cloned, e.g. when
+    /// the [`Waker`] in which the [`RawWaker`] is stored gets cloned.
+    ///
+    /// The implementation of this function must retain all resources that are
+    /// required for this additional instance of a [`RawWaker`] and associated
+    /// task. Calling `wake` on the resulting [`RawWaker`] should result in a wakeup
+    /// of the same task that would have been awoken by the original [`RawWaker`].
+    clone: unsafe fn(*const ()) -> RawWaker,
+
+    /// This function will be called when `wake` is called on the [`Waker`].
+    /// It must wake up the task associated with this [`RawWaker`].
+    ///
+    /// The implementation of this function must make sure to release any
+    /// resources that are associated with this instance of a [`RawWaker`] and
+    /// associated task.
+    wake: unsafe fn(*const ()),
+
+    /// This function will be called when `wake_by_ref` is called on the [`Waker`].
+    /// It must wake up the task associated with this [`RawWaker`].
+    ///
+    /// This function is similar to `wake`, but must not consume the provided data
+    /// pointer.
+    wake_by_ref: unsafe fn(*const ()),
+
+    /// This function gets called when a [`RawWaker`] gets dropped.
+    ///
+    /// The implementation of this function must make sure to release any
+    /// resources that are associated with this instance of a [`RawWaker`] and
+    /// associated task.
+    drop: unsafe fn(*const ()),
+}
+
+
+```
+
+
+
+整体概念：
+
+1. Executor 应该有一个任务队列，不停的 for loop 来遍历该队列，取出任务来执行
+   
+   1. 取出Task的时候，得到任务相关的waker。
+   
+   2. 从任务中取出 Future，poll 一下，如果 pending。将其扔到一个独立的线程，就不管了， 该线程来检查Future是不是可以继续走了，如果可以继续走了，就将其唤醒（Waker负责将该Task重新扔回Executor的执行队列）。
+
+2. Task 表示任务，里面得包含一个 Future, Executor来调度Task。Waker也得在Task里。
+   
+   1. 或者Future自己是Task，Future自己包含一个 Waker
+   
+   2. Task 要实现 ArcWake. `impl ArcWake for Task`.  Waker的核心就是将自己发送到Executor 的队列中！
+
+
+
 # RawWakerVTable
 
 虚表：虚表在C++中是一个函数指针表，指向虚函数，RawWakerVTable也是类似作用
@@ -41,8 +160,6 @@ impl RawWaker {
     }
 }
 ```
-
-
 
 关于 `Waker`, 也就将 `RawWaker` 包装了起来，然后提供了一些方法
 
@@ -144,6 +261,4 @@ impl fmt::Debug for Waker {
             .finish()
     }
 }
-
 ```
-
