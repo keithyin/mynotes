@@ -602,5 +602,6 @@ add_executable(AtenDemo1 ${SOURCE_FILES})
 [https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html](https://www.cs.umd.edu/class/fall2002/cmsc214/Tutorial/makefile.html) 
 
 [https://cmake.org/cmake-tutorial/](https://cmake.org/cmake-tutorial/)
+[https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html](https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html)
 
 [http://www.elpauer.org/stuff/learning_cmake.pdf](http://www.elpauer.org/stuff/learning_cmake.pdf)
