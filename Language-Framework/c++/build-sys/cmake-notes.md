@@ -212,8 +212,86 @@ target_link_libraries(my_lib compiler_flags)
 ```
 
 # 5. Install and Testing
+> 将 demo1 可执行文件 与 my_lib 进行安装
+```shell
+cmake --install .
+cmake --install . --config Release
+
+# cmake变量 CMAKE_INSTALL_PREFIX 用来指定安装root。可通过命令行指定
+cmake --install . --prefix "/home/myuser/installdir"
+```
+
+```cmake
+# subdir
+
+add_library()
+
+set(installable_libs MathFunctions tutorial_compiler_flags)
+install(TARGETS ${installable_libs} DESTINATION lib)
+install(FILES MathFunctions.h DESTINATION include)
+```
+
+```cmake
+# topdir
+
+set(CMAKE_INSTALL_PREFIX "/Users/yinkeith/Projects/installed")
+
+install(TARGETS demo1 DESTINATION bin)
+install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
+  DESTINATION include
+  )
+```
+
+# 6. 测试
+
+# 7. 系统自省
+> Change implementation based on available system dependencies.
+1. 通过在CMakeLists.txt中编译小段代码来确定某特性是否存在
+2. 通过target_compile_definitions来设置编译的definitions
+3. 代码中通过确定宏是否定义，来决定编译哪个分支
+
+```cmake
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+  #include <cmath>
+  int main() {
+    std::log(1.0);
+    return 0;
+  }
+" HAVE_LOG)
+check_cxx_source_compiles("
+  #include <cmath>
+  int main() {
+    std::exp(1.0);
+    return 0;
+  }
+" HAVE_EXP)
 
 
+if(HAVE_LOG AND HAVE_EXP)
+  #执行这句的话，cmake会帮助定义宏
+  target_compile_definitions(MathFunctions
+                             PRIVATE "HAVE_LOG" "HAVE_EXP")
+endif()
+```
+
+```c++
+#include <cmath>
+
+double my_func(double x) {
+
+#if defined(HAVE_LOG) && defined(HAVE_EXP)
+  double result = std::exp(std::log(x) * 0.5);
+  std::cout << "Computing sqrt of " << x << " to be " << result
+            << " using log and exp" << std::endl;
+#else
+  double result = x;
+
+  return result;
+}
+```
+
+# 8. 添加一个Custom Command 和 Generated File
 
 
 # 常用cmake变量名总结
