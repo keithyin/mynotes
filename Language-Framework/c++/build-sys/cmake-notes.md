@@ -4,7 +4,7 @@
 **最上层** CmakeLists.txt需要包含
 ```
 # 所需的cmake版本, 非上层的CMakeLists.txt可以不用指定cmake版本
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.15.0)
 
 # 设置项目名 和 版本号。该行紧跟 cmake_minimum_required 后面
 project(demo1 VERSION 0.1.0)
@@ -176,7 +176,49 @@ target_include_directories(Tutorial PUBLIC
 #endif
 ```
 
-# Usage Requirements for a Library
+# 3. Usage Requirements for a Library
+> library自己定义自己的 使用所需条件。一旦定义了，该使用条件就会传递给调用方。具体的例子为，在上面的demo中，上层target依赖子目录taget的时候，需要 target_include_directories 和 target_link_libraries。如果子目录定义了使用自己时所需的头文件，那么 上层CMakeLists.txt中就不用 target_include_directories 了。
+
+
+```cmake
+# subdirectory CMakeLists.txt
+add_library(my_lib lib.cpp)
+
+# 加上下面这行。 上层再用的话，就不用 target_include_directories 了
+# INTERFACE 意味着，使用该lib的都会include CMAKE_CURRENT_SOURCE_DIR，但是 my_lib本身不会 include CMAKE_CURRENT_SOURCE_DIR
+target_include_directories(my_lib
+          INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+          )
+```
+
+# 4. Generator Expressions
+
+## interface library
+> 通过 interface library 来设置C++版本
+
+```cmake
+# TOP
+add_library(compiler_flags INTERFACE)
+target_compile_features(compiler_flags INTERFACE cxx_std_11)
+
+target_link_libraries(demo1 PUBLIC ${EXTRA_LIBS} tutorial_compiler_flags)
+```
+
+```cmake
+# subdir
+add_library(my_lib my_lib.cpp)
+# 加上这个
+target_link_libraries(my_lib compiler_flags)
+```
+
+# 5. Install and Testing
+
+
+
+
+# 常用cmake变量名总结
+* `CMAKE_CURRENT_SOURCE_DIR`: CMakeLists.txt所在源代码目录
+* 
 
 
 # 参考资料
