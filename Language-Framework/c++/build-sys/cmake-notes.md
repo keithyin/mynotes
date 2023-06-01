@@ -457,9 +457,52 @@ include ( "${CMAKE_CURRENT_LIST_DIR}/MathToolsTargets.cmake" )
 
 # 目标文件依赖项使用范围
 > target_** 中的 PUBLIC PRIVATE INTERFACE
+> [https://zhuanlan.zhihu.com/p/82244559](https://zhuanlan.zhihu.com/p/82244559)
+
+* PRIVATE 自己用，不会向上暴露
+* INTERFACE 自己不用，但是会向上暴露
+* PUBLIC 自己用，且向上暴露
+
+target_include_directories(hello-world PRIVATE hello)
+> 自己编译的时候 搜索 hello 目录，但是上一级如果 link 当前lib的话，不会自动搜索 hello 目录
+
+target_include_directories(hello-world INTERFACE hello)
+> 自己编译的时候不需要 搜索 hello 目录，但是上一级如果 link 当前lib的化，就会自动搜索hello目录
+
+target_include_directories(hello-world PUBLIC hello)
+> 自己编译的时候 搜索 hello 目录，但是上一级如果 link 当前lib的化，也会自动搜索 hello 目录
+
+
+
+target_link_libraries(hello-world PRIVATE hello)
+> 自己编译的时候 用到 libhello.a，但是上一级如果 link 当前lib的话不会用到 libhello.a
+
+target_link_libraries(hello-world INTERFACE hello)
+> 自己编译的时候 不用 libhello.a，但是上一级如果 link 当前lib的话 会用到 libhello.a
+
+target_link_libraries(hello-world PUBLIC hello)
+> 自己编译的时候 用到 libhello.a，但是上一级如果 link 当前lib的话 会用到 libhello.a
+
 
 # interface target
 
+# 常用函数介绍
+
+1.  `find_package(lib_name [REQUIRED])`
+
+[https://zhuanlan.zhihu.com/p/97369704](https://zhuanlan.zhihu.com/p/97369704)
+
+调用完之后，系统会生成以下几个变量
+*  `<Lib_name>_FOUND` : 用来判断是否找到了，如果加了 REQUIRED，找不到的话，在find_package部分就会报错
+*  `<Lib_name>_INCLUDE_DIR`: 这个用来放到 target_include_directories
+*  `<Lib_name>_INCLUDES`
+*  `<Lib_name>_LIBRARY`: 这个用来放到 target_link_libraries
+*  `<Lib_name>_LIBRARIES`
+
+
+2. `add_library`
+
+[https://cmake.org/cmake/help/latest/command/add_library.html](https://cmake.org/cmake/help/latest/command/add_library.html)
 # 参考资料
 
 [https://cmake.org/cmake/help/latest/guide/tutorial/index.html](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
