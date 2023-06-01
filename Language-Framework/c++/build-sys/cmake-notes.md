@@ -292,13 +292,175 @@ double my_func(double x) {
 ```
 
 # 8. 添加一个Custom Command 和 Generated File
+> 通过一个executable先生成源代码文件，然后再执行后续的编译链接操作
+
+1. 需要一个生成源码文件的可执行文件
+2. 生成的源码文件被用来后续的源码编译、链接
+
+```cmake
+# 可执行文件target
+add_executable(MakeTable MakeTable.cpp)
+
+# 使用构建好的可执行文件执行下述命令
+add_custom_command(
+  OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/Table.h
+  COMMAND MakeTable ${CMAKE_CURRENT_BINARY_DIR}/Table.h
+  DEPENDS MakeTable
+  )
+
+# 定义编译链接的lib
+add_library(mathfuncs 
+        funcs.cpp 
+        ${CMAKE_CURRENT_BINARY_DIR}/Table.h)
+
+# 编译时的 include 
+target_include_directories(mathfuncs 
+    INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+    PRIVATE ${CMAKE_CURRENT_BINARY_DIR}
+    )
+```
+
+# 9. 打包一个安装包
+> 打包一个安装包，下载下来，解压就能用。和下载源码下来然后 install 不一样的，省了一步编译操作
+
+```cmake
+include(InstallRequiredSystemLibraries)
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
+set(CPACK_PACKAGE_VERSION_MAJOR "${Tutorial_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${Tutorial_VERSION_MINOR}")
+set(CPACK_SOURCE_GENERATOR "TGZ")
+include(CPack)
+```
+
+```shell
+# 在binary directory执行
+cpack
+
+# -G 指定generator，生成zip还是 tgz。-C指定配置
+cpack -G ZIP -C Debug
+```
+
+# 10. static lib 还是 shared lib
+通过设置Cmake变量 `BUILD_SHARE_BIBS` 的值来决定 `add_library()` 的默认行为。通常通过 `option` 来指定，这样就可以从命令行空值该值。
+
+```cmake
+cmake_minimum_required(VERSION 3.0.0)
+project(demo1 VERSION 0.1.0)
+
+
+configure_file(Config.h.in Config.h)
+
+option(USE_MATH_TOOLS "是否使用math tools" ON)
+
+add_library(compiler_flags INTERFACE)
+target_compile_features(compiler_flags INTERFACE cxx_std_17)
+
+# 使用option的话，可以通过命令行来空值该值 cmake .. -DBUILD_SHARED_LIBS=OFF
+# option(BUILD_SHARED_LIBS "build using shared libs" ON)
+set(BUILD_SHARED_LIBS ON)
+
+add_subdirectory(math_tools)
+
+
+add_executable(demo1 main.cpp)
+
+target_link_libraries(demo1 PUBLIC math_tools compiler_flags)
+
+target_include_directories(demo1 PUBLIC 
+    "${PROJECT_BINARY_DIR}"
+    )
+```
+
+# 11. Adding Export Configuration
+> 添加必要的信息，是的其它CMake项目可以使用我们的项目。从 build 目录、本地安装 或者 安装包
+
+1. install(TARGETS) 不仅需要指定 DESTINATION ，同时也要指定  EXPORT
+2. 然后在TOP CMakeLists install export的东西
+3. 为了find_package可以找到，还需要生成一个 MathToolsTargetsConfig.cmake
+   1. 需要一个模板文件
+
+
+```cmake
+# subdir
+add_library(math_tools funcs.cpp)
+
+# 编译的时候将 CMAKE_CURRENT_SOURCE_DIR 添加到 include 搜索路径。
+# install的时候将 include 添加到 include 搜索路径
+# BUILD_INTERFACE,INSTALL_INTERFACE是个generator expressions 是一种特殊的语法，用于在编译时和安装时根据不同的上下文生成不同的代码
+target_include_directories(math_tools 
+    INTERFACE 
+     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+     $<INSTALL_INTERFACE:include>
+    )
+
+target_link_libraries(math_tools PUBLIC compiler_flags)
+set(installable_libs math_tools compiler_flags)
+install(TARGETS ${installable_libs}
+    EXPORT MathToolsTargets
+    DESTINATION lib
+)
+
+install(FILES funcs.h DESTINATION include)
+```
+
+```cmake
+#top dir, 会安装到 PREFIX到该目录下，生成对应的.cmake文件，后续find_library()会用到
+install(EXPORT MathToolsTargets
+  FILE MathToolsTargets.cmake
+  DESTINATION lib/cmake/MathFunctions
+)
+
+
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/MathToolsTargetsConfig.cmake"
+  INSTALL_DESTINATION "lib/cmake/example"
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+  )
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/MathToolsTargetsConfigVersion.cmake"
+  VERSION "${Tutorial_VERSION_MAJOR}.${Tutorial_VERSION_MINOR}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/MathToolsTargetsConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/MathToolsTargetsConfigVersion.cmake
+  DESTINATION lib/cmake/MathFunctions
+  )
+
+```
+
+```cmake
+# Config.cmake.in 模板文件
+@PACKAGE_INIT@
+include ( "${CMAKE_CURRENT_LIST_DIR}/MathToolsTargets.cmake" )
+```
+
+# 12. debug 与 release 包
+
+
+
 
 
 # 常用cmake变量名总结
 * `CMAKE_CURRENT_SOURCE_DIR`: CMakeLists.txt所在源代码目录
 * 
 
+# cmake与源码文件协同总结
+1. 通过配置文件(一个配置头文件Config.h.in，里面定义了一些占位符，cmake会将其填充，然后生成一个头文件 Config.h)
+   1. cmake变量, Config.h.in, @CMAKE_VAR_NAME@, configure_file()
+   2. option,  Config.h.in, #cmakedefine, configure_file()
+2. 通过传宏名字。这样代码中就可以使用 `#if defined(MACRO1) && defined(MACRO2)` 来进行判断
+   1. target_compile_definitions(lib_name PRIVATE "MACRO1" "MACRO2")
+
+# 目标文件依赖项使用范围
+> target_** 中的 PUBLIC PRIVATE INTERFACE
+
+# interface target
 
 # 参考资料
 
 [https://cmake.org/cmake/help/latest/guide/tutorial/index.html](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
+[https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source](https://stackoverflow.com/questions/25676277/cmake-target-include-directories-prints-an-error-when-i-try-to-add-the-source)
