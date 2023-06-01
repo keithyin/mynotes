@@ -492,12 +492,12 @@ target_link_libraries(hello-world PUBLIC hello)
 
 [https://zhuanlan.zhihu.com/p/97369704](https://zhuanlan.zhihu.com/p/97369704)
 
-调用完之后，系统会生成以下几个变量
-*  `<Lib_name>_FOUND` : 用来判断是否找到了，如果加了 REQUIRED，找不到的话，在find_package部分就会报错
-*  `<Lib_name>_INCLUDE_DIR`: 这个用来放到 target_include_directories
-*  `<Lib_name>_INCLUDES`
-*  `<Lib_name>_LIBRARY`: 这个用来放到 target_link_libraries
-*  `<Lib_name>_LIBRARIES`
+调用完之后，系统会生成以下几个变量 (Lib名字需要全大写！！！！)
+*  `<LIB_NAME>_FOUND` : 用来判断是否找到了，如果加了 REQUIRED，找不到的话，在find_package部分就会报错
+*  `<LIB_NAME>_INCLUDE_DIR`: 这个用来放到 target_include_directories
+*  `<LIB_NAME>_INCLUDES`
+*  `<LIB_NAME>_LIBRARY`: 
+*  `<LIB_NAME>_LIBRARIES`: 这个用来放到 target_link_libraries
 
 
 2. `add_library`
