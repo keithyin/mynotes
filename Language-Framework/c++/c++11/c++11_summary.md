@@ -77,6 +77,85 @@ function<int(int, int)> f = fp1;
 ```
 
 
+```c++
+int add(int a, int b) {
+  return a + b;
+}
+
+int main() {
+  // 定义了一个函数指针（未初始化）。该指针可以指向一个 int(int, int)函数
+  int (*pf) (int, int);
+
+  pf = add; // 当使用函数名作为 值时，会自动转成指针
+  pf = &add; // 该语句和上面的等价
+  
+  pf(2, 3);
+  (*pv)(2, 3); // 这两个调用也是等价的
+  
+  int (*pf2) (int, int) = add; // 声明并初始化
+}
+
+
+```
+
+
+函数类型
+```c++
+// Func 和 Func2 是函数类型
+typedef bool Func(const string&, const string&);
+typedef decltype(lengthCompare) Func2; // equivalent type
+
+// FuncP 和 FuncP2是函数指针类型。注意和定义函数指针的区别！！decltype 返回的是函数类型，而不是函数指针类型！
+typedef bool(*FuncP)(const string&, const string&);
+typedef decltype(lengthCompare) *FuncP2; // equivalent type
+
+
+// 虽然 一个用函数类型，一个用函数指针类型，但是下面的声明是等价的。第一种情况，编译器会自动将 Func 转成指针类型
+void useBigger(const string&, const string&, Func);
+void useBigger(const string&, const string&, FuncP2);
+
+
+// 返回函数指针的函数
+using F = int(int*, int); // F is a function type, not a pointer
+using PF = int(*)(int*, int); // PF is a pointer type
+
+PF f1(int); // ok: PF is a pointer to function; f1 returns a pointer to function. f1是一个函数，int为形参，返回一个 函数指针
+F f1(int); // error: F is a function type; f1 can’t return a function。这里要和函数类型作为 函数参数区分开。奇奇怪怪
+F *f1(int); // ok: explicitly specify that the return type is a pointer to function。f1是一个函数，int为形参，返回一个指针，该指针指向一个函数
+
+int (*f1(int))(int*, int); // f1是一个函数，int为形参，返回一个指针，该指针指向一个函数
+
+
+auto f1(int) -> int (*)(int*, int); //使用 trailing return 声明一个变量
+
+
+// 一个map，保存函数指针.  int ()(int, int) 函数类型。int (*) (int, int) 函数指针。
+map<string, int(*)(int,int)> binops;
+```
+
+std::function保存任何callable对象
+```c++
+// ordinary function
+int add(int i, int j) { return i + j; }
+// lambda, which generates an unnamed function-object class
+auto mod = [](int i, int j) { return i % j; };
+// function-object class
+struct divide {
+  int operator()(int denominator, int divisor) {
+    return denominator / divisor;
+  }
+};
+
+
+function<int(int, int)> f1 = add; // function pointer
+function<int(int, int)> f2 = divide(); // object of a function-object class。这个是一定要注意的！！！传一个可调用对象
+function<int(int, int)> f3 = [](int i, int j) // lambda
+  { return i * j; };
+cout << f1(4,2) << endl; // prints 6
+cout << f2(4,2) << endl; // prints 2
+cout << f3(4,2) << endl; // prints 8
+```
+
 
 ## enum class
 
