@@ -28,7 +28,7 @@ fn main() {
   for i in 0..val.len() {
       let ptr = SendableI32Pointer(val.as_mut_ptr());
       thread::sparwn(move || {
-          let v = &ptr; // 这句似乎得留着，不然可能还会报错。奇怪？难道是编译器优化的问题？
+          let _ = &ptr; // 这句似乎得留着，不然可能还会报错。奇怪？难道是编译器优化的问题？
           let raw_ptr = ptr.0;
           *raw_ptr.add(i) += 1;
       })
