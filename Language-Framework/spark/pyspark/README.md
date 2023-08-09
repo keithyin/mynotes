@@ -153,3 +153,9 @@ group by dt, first_cat, second_cat
 -- 对指定的进行 group by，然后 union all 起来
 ```
 
+
+# 参考资料
+
+1. https://sparkbyexamples.com/pyspark/pyspark-window-functions/
+2. https://sparkbyexamples.com/pyspark/pyspark-groupby-explained-with-example/
+3. https://stackoverflow.com/questions/35247168/spark-sql-row-number-partitionby-sort-desc 
