@@ -158,4 +158,5 @@ group by dt, first_cat, second_cat
 
 1. https://sparkbyexamples.com/pyspark/pyspark-window-functions/
 2. https://sparkbyexamples.com/pyspark/pyspark-groupby-explained-with-example/
-3. https://stackoverflow.com/questions/35247168/spark-sql-row-number-partitionby-sort-desc 
+3. https://stackoverflow.com/questions/35247168/spark-sql-row-number-partitionby-sort-desc
+4. https://stackoverflow.com/questions/35322764/apache-spark-assign-the-result-of-udf-to-multiple-dataframe-columns   pyspark udf 如何返回多个值
