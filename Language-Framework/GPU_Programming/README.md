@@ -206,3 +206,10 @@ __global__ void use_shared_memory_2(float* array){
   * 如果 stream 多的话，这个问题就不用考虑了吧。
 * ​
 
+## Cuda 中的线程层级
+
+* 线程
+* 线程束：32个线程，GPU任何时候都不会执行低于 32 个线程
+
+
+CPU内存和GPU内存是通过PCIe进行数据传输的。两者进行数据传输还会经过L3
