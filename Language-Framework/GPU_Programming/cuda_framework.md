@@ -67,3 +67,37 @@
 ## 疑问
 
 * 不同 kernel 间如何进行数据通信
+
+# Cuda 中的线程层级
+
+线程：
+线程束：32个线程，GPU任何时候都不会执行低于 32 个线程
+
+CPU内存和GPU内存是通过PCIe进行数据传输的。两者进行数据传输还会经过L3
+
+# CUDA编程
+
+## 初始化 与 GPU信息查询
+
+```c++
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include "cuda.h"
+
+int num_gpus;
+cudaGetDeviceCount(&num_gpus); //  获取本机有多少个gpu
+
+cudaError_t cuda_status, cuda_status2;
+cuda_status = cudaSetDevice(0);
+
+cudaDeviceProp gpu_properties;
+cudaGetDeviceProperties(&gpu_properties, 0);
+
+unsigned long supported_k_blocks, supported_m_blocks, max_thr_per_block;
+char supported_blocks[100];
+
+
+gpu_properties.maxGridSize[0];
+gpu_properties.maxGridSize[1];
+gpu_properties.maxGridSize[2];
+```
