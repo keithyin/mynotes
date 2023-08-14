@@ -468,9 +468,157 @@ context.execute_cv([int(0), int(0), int(inputD1), int(outputD1)])
 ## 多Context与多Stream
 > 怎样重叠计算和数据拷贝时间，增加GPU利用率？
 
+要点：
+1. 使用cuda event 和 cuda stream
+2. 使用 pinned memory
+   1. 通常使用CPU端内存是可分页的，可以被交换到磁盘文件中，以解决内存使用量。而pin memory是不可分页的，一定会扎根在内存里
+   2. 所有cuda异步调用，在cpu端看都是立刻返回的，即便操作是被放到了stream，还没有立即被执行。当那部分代码需要被执行的时候，其需要的内存如果被交换到文件中去，需要被换回来，会浪费非常多的时间。所以需要pin memory
+4. 使用 *async函数 和 context.execute_async_v2 方法
+
+一个stream中的调用，会按照传入stream中的顺序按序执行，不同stream间的调用，是无法保证其调用顺序的。
+但是可以在各stream之间插入cudaEvent，来控制cudaStream的执行次序
+
+```python
+
+context = engine.create_execution_context()
+context.set_binding_shape(0, [nB, nC, nH, nW])
+_, stream0 = cudart.cudaStreamCreate()
+_, stream1 = cudart.cudaStreamCreate()
+_, event0 = cudart.cudaEventCreate()
+_, event1 = cudart.cudaEventCreate()
+
+data = np.random.rand(nB * nC * nH * nW).astype(np.float32).reshape(nB, nC, nH, nW)
+inputSize = trt.volume(context.get_binding_shape(0)) * np.array([0], dtype=trt.nptype(engine.get_binding_dtype(0))).nbytes
+outputSize = trt.volume(context.get_binding_shape(1)) * np.array([0], dtype=trt.nptype(engine.get_binding_dtype(1))).nbytes
+# pinned memory
+_, inputH0 = cudart.cudaHostAlloc(inputSize, cudart.cudaHostAllocWriteCombined)
+_, inputH1 = cudart.cudaHostAlloc(inputSize, cudart.cudaHostAllocWriteCombined)
+_, outputH0 = cudart.cudaHostAlloc(outputSize, cudart.cudaHostAllocWriteCombined)
+_, outputH1 = cudart.cudaHostAlloc(outputSize, cudart.cudaHostAllocWriteCombined)
+_, inputD0 = cudart.cudaMallocAsync(inputSize, stream0)
+_, inputD1 = cudart.cudaMallocAsync(inputSize, stream1)
+_, outputD0 = cudart.cudaMallocAsync(outputSize, stream0)
+_, outputD1 = cudart.cudaMallocAsync(outputSize, stream1)
+
+# Count time of end to end
+for i in range(nWarmUp):
+  context.execute_async_v2([int(inputD0), int(outputD0)], stream0)
+
+trtTimeStart = time()
+cudart.cudaEventRecord(event1, stream1)
+
+# split the loop into odd and even iterations
+for i in range(nTest//2):
+  cudart.cudaMemcpyAsync(inputD0, inputH0, inputSize, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice, stream0)
+
+  cudart.cudaStreamWaitEvent(stream0,event1,cudart.cudaEventWaitDefault)
+  context.execute_async_v2([int(inputD0), int(outputD0)], stream0)
+  cudart.cudaEventRecord(event0,stream0)
+  cudart.cudaMemcpyAsync(outputH0, outputD0, outputSize, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost, stream0)
+
+  cudart.cudaMemcpyAsync(inputD1, inputH1, inputSize, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice, stream1)
+
+  #  会等待 cudart.cudaEventRecord(event0,stream0) 在GPU上执行完，才会往下走。这样就控制了 不同stream的kernel的次序！
+  cudart.cudaStreamWaitEvent(stream1,event0,cudart.cudaEventWaitDefault)
+  context.execute_async_v2([int(inputD1), int(outputD1)], stream1)
+  cudart.cudaEventRecord(event1,stream1)
+  cudart.cudaMemcpyAsync(outputH1, outputD1, outputSize, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost, stream1)
+
+cudart.cudaEventSynchronize(event1)
+trtTimeEnd = time()
+print("%6.3fms - 2 stream, DataCopy + Inference" % ((trtTimeEnd - trtTimeStart) / nTest * 1000))
+
+```
+
+> 一个 engine 供多个线程使用
+使用context
+
+```python
+context_list = [engine.create_execution_context() for idx in range(n_context)]
+
+```
+1. 不再需要多个 OptimizationProfile.
+2. 仅占用一个显存的情况下，供多个线程进行推理计算
+3. 推理计算的核心占用 和 显存占用 可能发生一定的重叠，节约时间 和 空间
+
 ## CUDA Graph
+> Launch Bound，cpu发起执行请求 和 GPU 调度执行 的时间gap较大。在CPU - GPU交互比较频繁的场景中经常出现。在trt的表现是 推理计算有显著一部分时间 浪费在 非计算 和 拷贝上
+> 单纯优化kernel 和 内存拷贝 不能有效的解决
+
+优点：
+1. 降低 CPU launch cost: 将大部分准备工作提前完成
+2. cuda工作流优化: 提前静态统筹Kernel调用，充分利用GPU资源，比手工控制stream能够获得更好的加速效果
+3. 缓解大量kernel调用时的 launch bound。
+
+要点：
+1. 步骤：
+   1. graph 定义：借助stream来捕获一系列的计算过程
+   2. graph实例化：将捕获到的过程进行验证和优化，执行大部分工作时的设置和初始化，并生成一个可执行的计算图
+   3. graph执行：实际执行可执行图。可以反复调用
+3. Dynamic Shape模式中，实际数据形状发生改变时（调用 context.set_binding_shape）, 要先跑一遍 context.execute 再重新捕获Graph，最后再实例化和执行graph
+
+```python
+# CUDA Graph capture 首次捕获 cudaGraph
+cudart.cudaStreamBeginCapture(stream, cudart.cudaStreamCaptureMode.cudaStreamCaptureModeGlobal)
+for i in range(nInput):
+  cudart.cudaMemcpyAsync(bufferD[i], bufferH[i].ctypes.data, bufferH[i].nbytes, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice, stream)
+#for i in range(nIO):  # no need to reset the address if unchanged
+#    context.set_tensor_address(lTensorName[i], int(bufferD[i]))
+context.execute_async_v3(stream)
+for i in range(nInput, nIO):
+  cudart.cudaMemcpyAsync(bufferH[i].ctypes.data, bufferD[i], bufferH[i].nbytes, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost, stream)
+
+# 上面没有真正的执行计算，是没有输出的！！！？？？ 有点奇怪，需要确认下
+#cudart.cudaStreamSynchronize(stream)  # no need to synchronize within the CUDA graph capture
+_, graph = cudart.cudaStreamEndCapture(stream)
+
+#_, graphExe, _ = cudart.cudaGraphInstantiate(graph, b"", 0)  # for CUDA < 12
+_, graphExe = cudart.cudaGraphInstantiate(graph, 0)  # for CUDA >= 12   
+
+# do inference with CUDA graph。 准备cpu buffer
+bufferH[1] *= 0  # set output buffer as 0 to see the real output of inference
+
+#然后就执行这个就可以了！！！！
+cudart.cudaGraphLaunch(graphExe, stream)   # 这里才是真实的计算。
+cudart.cudaStreamSynchronize(stream)
+
+
+# 如果输入尺寸发生了改变，需要重新捕获CUDA graph，然后执行
+context.set_input_shape(lTensorName[0], [2, 3, 4])
+
+data = np.arange(2 * 3 * 4, dtype=np.float32).reshape(2, 3, 4)
+bufferH = []
+bufferH.append(np.ascontiguousarray(data))
+for i in range(nInput, nIO):
+  bufferH.append(np.empty(context.get_tensor_shape(lTensorName[i]), dtype=trt.nptype(engine.get_tensor_dtype(lTensorName[i]))))
+bufferD = []
+for i in range(nIO):
+  bufferD.append(cudart.cudaMalloc(bufferH[i].nbytes)[1])
+for i in range(nInput):
+  cudart.cudaMemcpyAsync(bufferD[i], bufferH[i].ctypes.data, bufferH[i].nbytes, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice, stream)
+for i in range(nIO):
+  context.set_tensor_address(lTensorName[i], int(bufferD[i]))  # set address of all input and output data in device buffer
+context.execute_async_v3(stream)
+for i in range(nInput, nIO):
+  cudart.cudaMemcpyAsync(bufferH[i].ctypes.data, bufferD[i], bufferH[i].nbytes, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost, stream)
+
+# CUDA Graph capture again
+cudart.cudaStreamBeginCapture(stream, cudart.cudaStreamCaptureMode.cudaStreamCaptureModeGlobal)
+for i in range(nInput):
+  cudart.cudaMemcpyAsync(bufferD[i], bufferH[i].ctypes.data, bufferH[i].nbytes, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice, stream)
+#for i in range(nIO):  # no need to reset the address if unchanged
+#    context.set_tensor_address(lTensorName[i], int(bufferD[i]))
+context.execute_async_v3(stream)
+for i in range(nInput, nIO):
+  cudart.cudaMemcpyAsync(bufferH[i].ctypes.data, bufferD[i], bufferH[i].nbytes, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost, stream)
+#cudart.cudaStreamSynchronize(stream)  # no need to synchronize within the CUDA graph capture
+_, graph = cudart.cudaStreamEndCapture(stream)
+#_, graphExe, _ = cudart.cudaGraphInstantiate(graph, b"", 0)  # for CUDA < 12
+_, graphExe = cudart.cudaGraphInstantiate(graph, 0)  # for CUDA >= 12
+```
 
 ## Timing Cache
+> engine 构建时间太长，怎么节约 **多次** 构建时的时间
 
 ## Algorithm Selector
 
