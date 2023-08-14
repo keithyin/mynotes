@@ -161,6 +161,94 @@ INT8模式-PTQ
 INT8模式-QAT
 1. 。。。
 
+tensorrt运行期
+1. 生成trt内部表示
+   1. `serialized_network = builder.build_serialized_network(network, config)`
+  
+2. 生成 engine
+   1. `engine = trt.Runtime(logger).deserialized_cuda_engine(serialized_network)`
+      1. 常用成员：`engine.num_io_tensors   (engine绑定的输入输出张量总数，N+M), engine.num_layers`
+      2. 常用方法:
+         1. `engine.get_tensor_name(i)`
+         2. `engine.get_tensor_dtype(t_name)`  
+         3. `engine.get_tensor_shape(t_name)`  DynamicShape模式下结果可能含-1
+         4. `engine.get_tensor_mode(t_name)` 输入张量还是输出张量
+   3. `l_tensor_name = [engine.get_tensor_name(i) for i in range(engine.num_io_tensors)]`
+  
+3. 创建 context （相当于CPU进程，负责资源管理）
+   1. `context = engine.create_execution_context()`
+   2. 常用方法
+      1. `context.set_input_shape(t_name, shape_of_inp_tensor)`
+      2. `context.get_tensor_shape(t_name)`
+      3. `context.set_tensor_address(t_name, address)`
+      4. `context.execute_v3(stream)`  explict batch模式的异步执行
+  
+4. 绑定输入输出 (Dynamic Shape模式 必须)
+   1. `context.set_input_shape(l_tensor_name[0], [3, 4, 5])`  trt8.5开始 binding系列api全部 deprecated，换成tensor系列api
+  
+5. 准备 `buffer`
+   1. `input_host = np.ascontiguousarray(input_data.reshape(-1))`
+   2. `output_host = np.empty(context.get_tensor_shape(l_tensor_name[1]), trt.ntype(engine.get_tensor_dtype(l_tensor_name[1])))`
+   3. `input_device = cudart.cudaMalloc(inputHost.nbytes)[1]`
+   4. `output_device = cudart.cudaMalloc(outputHost.nbytes)[1]`
+   5. `context.set_tensor_address(l_tensor_name[0], input_device)`   用到的GPU指针提前在这里设置，不再传入 execute_v3 函数
+   6. `context.set_tensor_address(l_tensor_name[1], output_device)`
+  
+6. 执行计算
+   1. `cudart.cudaMemcpy(input_device, input_host.ctypes.data, input_host.nbytes, cudart.cudaMemcpyKind.cudaMemcpyHostToDevice)`
+   2. `context.execute_async_v3(0)`
+   3. `cudart.cudaMemcpy(output_host.ctypes.data, output_device, output_host.nbytes, cudart.cudaMemcpyKind.cudaMemcpyDeviceToHost)`
+  
+7. 释放显存
+   1. `cudart.cudaFree(input_device)`
+   2. `cudart.cudaFree(outptu_device)`
+
+
+CUDA异构计算
+1. 同事准备CPU端内存和GPU端显存
+2. 计算前将 数据从内存拷贝到 显存
+3. 计算过程中的 输入输出数据均在 GPU端读写
+4. 计算完成后 结果从 显存 拷贝到 内存
+
+engine构建一次，反复使用进行计算
+1. 序列与反序列化
+   1. 将serialized network保存为文件，下次跳过构建直接使用
+   2. 注意环境统一（硬件环境+CUDA+CUDNN+tensorrt环境）
+      1. engine包含硬件相关优化，不能跨硬件平台使用
+      2. 不同tensorrt生成的engine不能相互兼容
+      3. 同平台同环境多次生成的 engine 可能不同
+     
+   3. tensorrt runtime 与 engine 版本不同时的报错信息
+      1. engine plan file is not compatible ...
+      2. serialization error in deserialize ...
+     
+   4. 
+
+使用ONNX
+```python
+torch.onnx.export(net,
+   t.randn(1, 1, height, width, device="cuda"),
+   "./model.onnx",
+   example_outputs = [t.randn(1, 10, device="cuda"), t.randn(1, device="cuda")],
+   input_names = ["x"],
+   output_names = ["y", "z"],
+   do_constant_folding = True,
+   verbose = True,
+   keep_initializers_as_inputs = True,
+   opset_version = 12,
+   dynamic_axes = {"x"{0: "nBatchSize"}, "z": {0: "nBatchSize"}}
+)
+
+
+with open(onnx_file, "rb") as model:
+   if not parser.parse(model.read()):
+      print("failed parsing onnx file")
+      for err in range(parser.num_errors):
+         print(parser.get_error(err))
+
+context = engine.create_execution_context()
+
+```
 
 
 
