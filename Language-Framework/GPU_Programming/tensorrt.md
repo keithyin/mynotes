@@ -1,3 +1,5 @@
+# tensorrt整体介绍
+
 tensorrt 做了啥：
 1. 构建期
    1. 模型解析、建立 （加载onnx等其它格式的模型，使用原生API搭建模型）
@@ -250,7 +252,38 @@ context = engine.create_execution_context()
 
 ```
 
+trtexec, onnx-graphsurgeon, plugin都是使用parser使用时的必备知识
 
+tensorrt开发环境
+1. 推荐使用 nvidia-optimized docker
+2. python库
+   1. nvidia-pyindex, cuda-python(pytyhon>=3.7), pycuda, onnx, onnx-surgeon, onnxruntime-gpu, opencv-python, polygraphy
+  
+3. 推荐使用
+   1. 最新的tensorrt8，更多的图优化，优化过程和推理过程显存使用量更少
+   2. buidlerConfig api, 功能覆盖旧版本的 builder API, 旧版 builder api将被废弃
+   3. explicit batch + dynamic shape模式。onnx格式默认模式，灵活性和应用场景更广，使模型适应性更好
+   4. cuda-python库，完整的cuda api支持，修复pycuda库可能存在的问题（如遇其它框架交互使用时的同步操作等）
+  
+
+# 开发辅助工具
+
+1. trtexec （tensorrt命令行工具，主要的e2e性能测试工具）
+2. netron（网络可视化）
+3. onnx-graphsurgeon （onnx计算图编辑）
+4. polygraphy （结果验证与定位，图优化）
+5. nsight systems （性能分析）
+
+希望解决的问题：
+1. 不想写脚本来跑tensorrt （使用命令行）
+2. 怎么进行简单的推理性能测试 （测试延迟，吞吐量等）
+3. 网络结构可视化
+4. 计算图上有哪些节点阻碍tensorrt自动优化
+5. 怎么处理tensorrt不支持的网络结构
+6. 怎么检验tensorrt上计算结果正确性、精度？
+7. 怎么找出计算错误，精度不足的层
+8. 怎么进行简单的计算图优化
+9. 怎么找出最耗时的层
 
 # 参考资料
 
