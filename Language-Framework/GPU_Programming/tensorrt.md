@@ -663,6 +663,12 @@ config.set_tactic_source(
 # TensorRT性能优化
 
 ## 概述
+1. 性能优化的核心是充分发挥GPU算力
+2. Nsight system是分析 **性能瓶颈** 的关键工具
+3. trtexec除了构建engine，也是非常实用的性能测试工具
+4. 计算图优化 和 trt plugin 是性能优化的主要手段
+5. 本次讲座 主要基于 Frameword -> ONNX -> trt workflow
+
 
 ## 性能分析工具
 
