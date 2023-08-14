@@ -621,14 +621,56 @@ _, graphExe = cudart.cudaGraphInstantiate(graph, 0)  # for CUDA >= 12
 > engine 构建时间太长，怎么节约 **多次** 构建时的时间
 
 ## Algorithm Selector
+> 某些Layer的算法导致较大的误差，能不能精确选择算法。使用Algorithm Selector
+
 
 ## Refit
+> 想更新模型的权重，但是又不想重新构建 engine。使用 refit
+
+要点：
+1. BuilderConfig 中设置相应Flag
+2. 可以开启或关闭 cuBLA、cuBLSASLt、cuDNN.  tensorrt优化的时候，会自动从里面选性能最好的。我们可以手动开关是否使用某个库
+3. 优点
+   1. 节约部分内存、显存，减少构建时间   （这里的构建应该是生成engine文件，而不是load engine文件时的构建）
+  
+4. 缺点：
+   1. 不能使用某些优化，可能导致性能下降
+   2. 可能导致构建失败
+  
+5. 后续版本中，Tensort将彻底断开对外部library的依赖
+
+```python
+config.set_tactic_source(
+   1 << int(trt.TacticSource.CUBLAS) | \
+   1 << int(trt.TacticSource.CUBLAS_LT) | \
+   1 << int(trt.TacticSource.CUDNN))
+```
 
 ## Tactic Source
+> 构建期、运行期 显存占用过大，怎么减少。 tactic source
+
+
+
 
 ## Hardward compatibility 和 Version compatibility
+> 8.6 才开始解决 兼容性问题
+
+
 
 ## 更多工具
+
+
+# TensorRT性能优化
+
+## 概述
+
+## 性能分析工具
+
+## 性能优化技巧
+
+## 性能优化实例
+
+
 
 # 参考资料
 
