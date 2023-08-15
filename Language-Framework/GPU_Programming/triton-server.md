@@ -542,6 +542,11 @@ tritonserver --model-reposity=/path/to/model/repo
 # check server readiness
 curl -v <server_ip>:8000/v2/health/ready
 
+# 客户端控制模型加载  --model-control-mode=explicit 生效  （其它模式不允许）
+curl -X POST http://localhost:8000/v2/repository/models/model_name/load
+
+# 客户端控制模型卸载 --model-control-mode=explicit 生效 （其它模式不允许）
+curl -X POST http://localhost:8000/v2/repository/models/model_name/unload
 ```
 
 
@@ -549,7 +554,7 @@ curl -v <server_ip>:8000/v2/health/ready
 --log-verbose  <integer>  (0 disable verbose logging and values>=1 enable verbose logging)
 --strict-model-config <boolean> if true, model config.pbtxt file must be provided and all required configruation settings must be specified.
    if false the model config.pbtxt may be absent or only partially specified and the server will attempt to derive the missing required configuration
---strict-readiness <boolean> if true, the server is reponsive only when all models are ready
+--strict-readiness <boolean> if true, the server is reponsive only when all models are ready. (检查ready的时候，什么时候会返回ready)
    if false, the server is responsive if some/all models unavailable
 --exit-on-error <boolean> if false, even when some of models fail to be loaded the server will still be launched.
 --http-port <integer> default 8000
@@ -559,12 +564,114 @@ curl -v <server_ip>:8000/v2/health/ready
 --repository-poll-secs <integer> interval in seconds between each poll of model repository to check for changes. valid only when --model-control-mode=poll is specified
 --load-model <string> name of the model to be loaded on server startup. Only take affet if --model-control-model=explicit is true
 
+--pinned-momory-pool-byte-size <integer> total byte size that can be allocated as pinned system memory which is used for accelerating data transfer between host and devices. default is 256M
+--cuda-memory-pool-byte-size <integer>:<integer> total byte size that can be allocated as cuda memory for gpu device. default is 64M
+--backend-directory <string> The global directory searched for backend shared libraries. default is '/opt/tritonserver/backends'
+--repoagent-directory <string> the global directory searched for repository agent sharedlibraries. default is '/opt/tritonsrever/repoagents'
+   模型库加密的东西可以放这里
 ```
 
+* --model-control-mode
+  * none：启动会load所有模型。但是后期的model更改不会被更新到server
+  * poll：轮询方式加载模型。（启动时会load所有模型，如果model由更新，会重新load模型）
+  * explicit: 可以通过客户端控制 模型的加载和卸载
 
 ## configure an ensemble model
 
+* 一个例子
+  * 一个数据预处理模型。
+  * 后面接两个模型：一个是 分类模型，一个是分割模型
+ 
+```
+# ensemble 目录需要一个 config.pbtxt 文件。然后创建要给 *空* 的 版本目录
+name: "ensemble_model"
+
+platform: "ensemble"
+max_batch_size:1
+
+input [
+   {
+      name: "IMAGE"
+      data_type: TYPE_STRING
+      dims: [1]
+
+   }
+]
+
+output [
+   {
+      name: "classification"
+      data_type: TYPE_FP32
+      dims: [1000]
+   },
+   {
+      name: "segmentation"
+      data_type: TYPE_FP32
+      dims: [3, 244, 244]
+   }
+]
+
+ensemble_scheduling {
+   step [
+      {
+         model_name: "image_preprocess_model"
+         model_version: -1
+         input_map {
+            key: "RAW_IMAGE"                       # key is input/output tensor name in real models
+            value: "IMAGE"                         # 这里的 IMAGE 对应 input 中的 name   。 value 是用来连接不同的输入输出的！
+         }
+         output_map {
+            key: "preprocessed_output"
+            vlaue: "preprocessed_image"
+         }
+      },
+
+      {
+         model_name : "classification_model"
+         model_version : -1
+         imput_map {
+            key: "FORMATTED_IMAGE"
+            value: "preprocessed_image"
+         }
+
+         output_map {
+            key: "classification_output"
+            value: "classification"            # 和整个模型的 输出（output中配置的） 保持一致
+         }
+
+      },
+
+      {
+         model_name : "segmentation_model"
+         model_version : -1
+         imput_map {
+            key: "FORMATTED_IMAGE"
+            value: "preprocessed_image"
+         }
+
+         output_map {
+            key: "segmentation_output"
+            value: "segmentation"
+         }
+
+      }
+      
+   ]
+}
+
+
+```
+
+**notice**
+* if one of the models is stateful model, then the inference request should contain the information mentioned in stateful models
+* the models composing the ensemble have their own scheduler
+* if models in ensemble are all framework backends, data transmission between them does not have to go through cpu memory
+  * 什么是 framework backends？？？triton 内置的 framework backends（tf，pytorch，onnx，tensorrt）。如果某个子模块是 python-backends or custom，那么就有点难受了
+
 ## send requests to triton server
+
+
+
 
 # 参考资料
 
