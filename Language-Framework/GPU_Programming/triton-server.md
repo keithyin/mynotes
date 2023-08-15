@@ -520,6 +520,23 @@ model_warmup [
 
 `tritonserver --model-reposity=/path/to/model/repo`
 
+```shell
+# container
+
+docker run --gpus all -it --rm \
+   --shm-size=1g \
+   -p8000:8000 -p8001:8001 -p8002:8002 \
+   -v <host_model_repo>:<container_model_repo> \
+   ncvr.io/nvidia/tritonserver:21.07-py3
+
+# bin
+tritonserver --model-reposity=/path/to/model/repo
+
+
+# tritonserver --help to check all the options
+```
+
+
 ## configure an ensemble model
 
 ## send requests to triton server
