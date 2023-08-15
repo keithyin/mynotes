@@ -377,8 +377,41 @@ watch -n 1 nvidia-smi
 ```
 
 ```
---model-control-mode explicit # triton不会主动加载模型。客户端给特定请求，才会加载
+--model-control-mode explicit # triton不会主动加载模型。客户端给特定请求，才会加载, 客户端给请求，也会卸载
 ```
+
+
+### scheduling and batching
+
+default scheduler: no batching, send requests as they are
+
+```
+name: "simple"
+backend: "tensorrt"
+max_batch_size: 8  # 当maxbatchsize>0时，triton默认batchsize那一维是可变的，用户请求 [1, 3, 244, 244], [7, 3, 244, 244]都可以
+input [
+   {
+      name: "input0"
+      data_type: TYPE_FP32
+      dims: [3, 244, 244]
+   },
+
+   {
+      name: "input1"
+      data_type: TYPE_FP32
+      dims: [3, 244, 244]
+   }
+]
+
+output [
+   {
+      name: "output0"
+      data_type: TYPE_FP32
+      dims: [16]
+   }
+]
+```
+
 
 ## launch triton server
 > tritonserver 可以自己编译，也可以使用 docker image
