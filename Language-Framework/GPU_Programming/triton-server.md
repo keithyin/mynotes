@@ -670,6 +670,25 @@ ensemble_scheduling {
 
 ## send requests to triton server
 
+```python
+import tritonclient.grpc as grpcclient
+
+triton_client = grphclient.InferenceServerClient(url=url, verbose=verbose)
+
+model_metadata = triton_client.get_model_metadata(model_name=model_name, model_version=model_version)
+
+model_config = triton_client.get_cmodel_config(model_name=model_name, model_version=model_version)
+
+max_batch_size, input_name, output_name, c, h, w, format, dtype = parse_model(model_metadata, model_config)
+
+batched_image_data = np.array(???)
+
+requests = []
+responses = []
+
+inputs = [triton_client.InferInput(inp_name, )]
+
+```
 
 
 
