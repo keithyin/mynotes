@@ -382,10 +382,14 @@ watch -n 1 nvidia-smi
 
 
 ### scheduling and batching
+> 提升GPU利用率、吞吐率
 
-default scheduler: no batching, send requests as they are
+* default scheduler: no batching, send requests as they are
+* 
+
 
 ```
+# 这就是default scheduler
 name: "simple"
 backend: "tensorrt"
 max_batch_size: 8  # 当maxbatchsize>0时，triton默认batchsize那一维是可变的，用户请求 [1, 3, 244, 244], [7, 3, 244, 244]都可以
@@ -412,6 +416,104 @@ output [
 ]
 ```
 
+
+Dynamic Batcher
+* combines requests as batch dynamically
+* key feature for increasing throughput
+* only for stateless models
+
+```
+# dymanic batch
+
+dynamic_batching {
+   preferred_batch_size: [4, 8]   # the batch sizes that the dynamic batcher should attempt to create, 通常会设置多个值
+   max_queue_delay_microseconds: 100 # the time limit to wait for batching requests。微秒。数值越大，等待时间越长
+}
+```
+
+advanced options：
+* preserve_ording: 结果的顺序和请求的顺序一致
+* priority_levels：不同优先级的请求 处理的顺序 （优先级高的请求先打batch）
+* queue_policy：请求等待队列的行为，队列多长，。。。。
+
+
+Sequence Batcher
+* used for stateful model
+* ensures a sequence of inference requests are routed to the same model instance
+* detailed please refer to triton traning session: stateful model
+* .....
+
+```
+sequence_batching {
+   max_sequence_idle_microseconds: 5000000
+
+   control_input [
+      {
+         name: "START"
+         control [
+            {
+               kind: CONTROL_SEQUENCE_START
+               int32_false_true: [0, 1]
+            }
+
+         ]
+      }
+   ]
+}
+```
+
+ensamble scheduler
+* ....
+
+
+Optimization
+
+```
+# onnx 模型 开启 tensortrt加速
+# make use of TRT backend for onnx
+optimization {
+   execution_accelerators {
+      gpu_execution_accelerator: [
+         {
+            name: "tensorrt"
+            parameters {
+               key: "precision_mode"
+               value: "FP16"
+            }
+            parameters {
+               key: "max_workspace_size_bytes"
+               value: "1073741824"
+            }
+         }
+      ]
+   }
+}
+```
+
+model warmup
+* initialization may be deferred until the model receives its first few infernece requests
+* model_warmup makes triton not show the model as ready until warmup has completed
+* will cause triton to be less responsive to model update
+* triton在加载模型的时候，会发送warmup请求，来执行对model的warmup
+
+
+```
+model_warmup [
+   {
+      batch_size: 64
+      name: "warmup_requests"
+      input {
+         key: "input"
+         value: {
+            random_data: true
+            dims: [3, 244, 244]
+            data_type: TYPE_FP32
+         }
+      }
+   }
+      
+]
+```
 
 ## launch triton server
 > tritonserver 可以自己编译，也可以使用 docker image
