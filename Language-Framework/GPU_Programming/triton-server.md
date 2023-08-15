@@ -523,7 +523,7 @@ model_warmup [
 ```shell
 # container
 
-docker run --gpus all -it --rm \
+docker run --gpus all -it --rm \  # --gpus='"device=0"'
    --shm-size=1g \
    -p8000:8000 -p8001:8001 -p8002:8002 \
    -v <host_model_repo>:<container_model_repo> \
@@ -532,8 +532,33 @@ docker run --gpus all -it --rm \
 # bin
 tritonserver --model-reposity=/path/to/model/repo
 
-
 # tritonserver --help to check all the options
+```
+* 8000: http访问
+* 8001：grpc访问
+* 8002：metrics 访问
+
+```shell
+# check server readiness
+curl -v <server_ip>:8000/v2/health/ready
+
+# 
+```
+
+```
+--log-verbose  <integer>  (0 disable verbose logging and values>=1 enable verbose logging)
+--strict-model-config <boolean> if true, model config.pbtxt file must be provided and all required configruation settings must be specified.
+   if false the model config.pbtxt may be absent or only partially specified and the server will attempt to derive the missing required configuration
+--strict-readiness <boolean> if true, the server is reponsive only when all models are ready
+   if false, the server is responsive if some/all models unavailable
+--exit-on-error <boolean> if false, even when some of models fail to be loaded the server will still be launched.
+--http-port <integer> default 8000
+--grpc-port <integer> default 8001
+--metrics-port <integer> default 8002
+--model-control-mode <string> specify the mode for model management, options are "none", "pool", "explicit"
+--repository-poll-secs <integer> interval in seconds between each poll of model repository to check for changes. valid only when --model-control-mode=poll is specified
+--load-model <string> name of the model to be loaded on server startup. Only take affet if --model-control-model=explicit is true
+
 ```
 
 
