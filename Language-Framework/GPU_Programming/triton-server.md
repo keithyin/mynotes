@@ -542,8 +542,8 @@ tritonserver --model-reposity=/path/to/model/repo
 # check server readiness
 curl -v <server_ip>:8000/v2/health/ready
 
-# 
 ```
+
 
 ```
 --log-verbose  <integer>  (0 disable verbose logging and values>=1 enable verbose logging)
