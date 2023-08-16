@@ -214,6 +214,7 @@ if __name__ == '__main__':
     # shutdown the queue correctly
     logging.info("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")  # 没有配置 basicConfig 是打印不出来的，如果配置了basicConfig，在多进程条件下，会有重复打印！
     queue.put(None)
+    logger_p.join()
 ```
 
 
