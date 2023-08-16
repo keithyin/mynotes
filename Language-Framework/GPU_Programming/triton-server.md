@@ -686,10 +686,137 @@ batched_image_data = np.array(???)
 requests = []
 responses = []
 
-inputs = [triton_client.InferInput(inp_name, )]
+inputs = [triton_client.InferInput(inp_name, batched_image_data.shape, dtype)]
+inputs[0].set_data_from_numpy(batched_image_data)
+
+# 有了label文件 加上 这里配置了 class_count=num_classes, 这里拿到的就是 类别标签的字符了！！！
+# 不设置 class_count, 返回的就是模型的输出！
+outputs = [grpcclient.InferRequestedOutput(output_name, class_count=num_classes)]
+
+# 同步推理！
+response = triton_client.infer(model_name, inputs, request_id=str(sent_count), model_version=model_version, outputs=outputs)
+
+# streaming 推理
+
+
+
+output_array = response.as_numpy(output_name)
+print(output_array)
+```
+
+```python
+import queue
+# 异步推理
+
+triton_client.async_infer(
+   model_name,
+   inputs,
+   partial(completion_callback, user_data),  # 回调。用user_data装返回的结果
+   request_id=str(sent_count),
+   model_version=model_version,
+   outputs=outputs
+)
+
+# 没完成的时候，这个位置会阻塞
+(response, error) = user_data._completed_requests.get()
+output_array = response.as_numpy(output_name)
+
+
+# 设置了该回调之后，当服务端执行完infer的时候，就会执行该函数
+def completion_callback(user_data, result, error):
+   user_data._completed_requests.put((result, error))
+
+
+class UserData:
+   def __init__(self):
+      self._completed_requests = queue.Queue()
+
+```
+### 通过 shared memory 传递数据
+> 如果client 和 server 在同一台机器上，就没必要用 grpc/http 传数据了，可以直接用 shared memory 传数据
+
+cpushm
+```python
+import tritonclient.grpc as grpcclient
+import tritonclient.utils.shared_memory as shm
+
+triton_client = grphclient.InferenceServerClient(url=url, verbose=verbose)
+# 刚开始，要清空
+triton_client.unregister_system_shared_memory()
+triton_client.unregister_cuda_shared_memory()
+
+input_byte_size = input0_data.size * input0_data.itemsize
+
+# 创建 shared memory
+shm_op_handle = shm.create_shared_memory_region("output_data", "/output_simple", output_byte_size)
+# 注册 system shared memory
+triton_client.register_system_shared_memory("output_data", "/output_simple", output_byte_size)
+
+# input 端。
+sh_ip_handle = shm.create_shared_memory_region("input_data", "/input_simple", input_byte_size)
+shm.set_shared_memory_region(shm_ip_handle, [batched_image_data])
+# 注册 cuda shared memory
+triton_client.register_system_shared_memory("input_data", "/input_simple", input_byte_size)
+
+
+# 准备发请求，请求中只需要包含 shared memory 的信息就好了。不能使用 set_data_from_numpy(batched_image_data) 传数据
+
+inputs = []
+outputs = []
+inputs.append(triton_client.InferInput(inp_name, batched_image_data.shape, dtype))
+inputs[-1].set_shared_memory("input_data", input_byte_size)
+
+outputs.append(grpcclient.InferRequestedOutput(output_name, class_count=num_classes)
+outputs[-1].set_shared_memory("output_data", output_byte_size)
+
+response = triton_client.infer(model_name=model_name, inputs=inputs, model_version=model_version, outputs=outputs)
+
+output = response.get_output(output_name)
+# 输出的数据从 共享内存中拿出来。output 只是提供了一些meta信息
+output_data = shm.get_contents_as_numpy(shm_op_handle, utils.triton_to_np_dtype(output.datatype), output.shape)
 
 ```
 
+使用 cudashm
+```python
+import tritonclient.grpc as grpcclient
+import tritonclient.utils.cuda_shared_memory as cudashm
+
+triton_client = grphclient.InferenceServerClient(url=url, verbose=verbose)
+# 刚开始，要清空
+triton_client.unregister_system_shared_memory()
+triton_client.unregister_cuda_shared_memory()
+
+input_byte_size = input0_data.size * input0_data.itemsize
+
+# 创建 shared memory. deviceid=0. 设备0上开共享内存
+shm_op_handle = cudashm.create_shared_memory_region("output_data", output_byte_size, 0)
+# 注册 system shared memory
+triton_client.register_cuda_shared_memory("output_data", cudashm.get_raw_handle(shm_op_handle), 0, output_byte_size)
+
+# input 端。 这里的共享内存创建是可以放到 循环里面的！！！！ 一个名字可以重复创建！！！
+sh_ip_handle = cudashm.create_shared_memory_region("input_data", input_byte_size, 0)
+cudashm.set_shared_memory_region(shm_ip_handle, [batched_image_data])
+# 注册 cuda shared memory
+triton_client.register_cuda_shared_memory("input_data", cudashm.get_raw_handle(sh_ip_handle), 0, input_byte_size)
+
+
+# 准备发请求，请求中只需要包含 shared memory 的信息就好了。不能使用 set_data_from_numpy(batched_image_data) 传数据
+
+inputs = []
+outputs = []
+inputs.append(triton_client.InferInput(inp_name, batched_image_data.shape, dtype))
+inputs[-1].set_shared_memory("input_data", input_byte_size)
+
+outputs.append(grpcclient.InferRequestedOutput(output_name, class_count=num_classes)
+outputs[-1].set_shared_memory("output_data", output_byte_size)
+
+response = triton_client.infer(model_name=model_name, inputs=inputs, model_version=model_version, outputs=outputs)
+
+output = response.get_output(output_name)
+# 输出的数据从 共享内存中拿出来。output 只是提供了一些meta信息
+output_data = cudashm.get_contents_as_numpy(shm_op_handle, utils.triton_to_np_dtype(output.datatype), output.shape)
+```
 
 
 # 参考资料
