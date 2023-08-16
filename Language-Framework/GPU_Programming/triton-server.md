@@ -695,3 +695,4 @@ inputs = [triton_client.InferInput(inp_name, )]
 # 参考资料
 
 * https://www.bilibili.com/video/BV1R3411g7VR/?p=3&spm_id_from=pageDriver
+* https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/protocol/extension_shared_memory.html#grpc 共享内存
