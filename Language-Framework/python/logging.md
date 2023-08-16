@@ -111,9 +111,110 @@ logging.basicConfig(level=logging.INFO,
 ```
 
 
+# 多进程 logger
+
+基本思路：
+1. worker进程的logger通过配置 QueyeHandler 将 日志信息发送到 queue中
+2. logging_process 读 queue 中的数据，然后打日志。
 
 
+```python
 
+# SuperFastPython.com
+# example of logging from multiple processes in a process-safe manner
+from random import random
+from time import sleep
+from multiprocessing import current_process
+from multiprocessing import Process
+from multiprocessing import Queue
+from logging.handlers import QueueHandler
+import logging
+ 
+# 在多进程打印的时候，如果执行了下面这句。会出现 重复打印的现象！！！ 所以多进程条件下，只有 queue 进行打印就可以了
+# 而且 多进程条件下，不要再调用 logging.info 这种了
+# 所以 多进程 log 的最佳实践是。  就只用 QueueHandler记日志就好了。不要用 logging.info 了
+# logging.basicConfig(
+#                     level=logging.DEBUG,
+#                     format="%(levelname)s %(name)s %(message)s %(asctime)s")
+
+# executed in a process that performs logging
+def logger_process(queue):
+    # create a logger
+    logger = logging.getLogger('app')
+    
+    # configure a stream handler
+    handler = logging.StreamHandler()
+    # 这里 format 是共享的！
+    handler.setFormatter(logging.Formatter(fmt='%(asctime)s  %(levelname)s %(name)s %(message)s'))
+    logger.addHandler(handler)
+    # log all messages, debug and up
+    logger.setLevel(logging.INFO)  # 这里配置的level不影响 子进程的 level
+
+    logger.info("logger process")
+
+    # run forever
+    while True:
+        # consume a log message, block until one arrives
+        message = queue.get()
+        # check for shutdown
+        if message is None:
+            break
+        # log the message
+        logger.handle(message)
+ 
+# task to be executed in child processes
+def task(queue):
+    process = current_process()
+    # create a logger
+    # logger = logging.getLogger(f"app.{__name__}.{process.ident}")
+    logger = logging.getLogger("app")   # 各个subprocess 这个 logger 是独立的！！
+    # add a handler that uses the shared queue
+    logger.addHandler(QueueHandler(queue))
+    # log all messages, debug and up
+    logger.setLevel(logging.DEBUG)
+    # get the current process
+    # report initial message
+    logger.info(f'Child {process.name} starting.')
+    # simulate doing work
+    for i in range(5):
+        # report a message
+        logger.debug(f'Child {process.name} step {i}.')
+        # block
+        sleep(random())
+    # report final message
+    logger.info(f'Child {process.name} done.')
+ 
+# protect the entry point
+if __name__ == '__main__':
+    logging.info("process start")
+
+    # create the shared queue
+    queue = Queue()
+    # create a logger
+    logger = logging.getLogger('app')
+    # add a handler that uses the shared queue
+    logger.addHandler(QueueHandler(queue))
+    # log all messages, debug and up
+    logger.setLevel(logging.DEBUG)
+    # start the logger process
+    logger_p = Process(target=logger_process, args=(queue,))
+    logger_p.start()
+    # report initial message
+    logger.info('Main process started.')
+    # configure child processes
+    processes = [Process(target=task, args=(queue,)) for i in range(5)]
+    # start child processes
+    for process in processes:
+        process.start()
+    # wait for child processes to finish
+    for process in processes:
+        process.join()
+    # report final message
+    logger.info('Main process done.')
+    # shutdown the queue correctly
+    logging.info("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")  # 没有配置 basicConfig是打印不出来的，如果配置了，在多进程条件下，会有重复打印！
+    queue.put(None)
+```
 
 
 ## 参考资料
