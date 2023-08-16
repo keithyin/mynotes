@@ -186,7 +186,7 @@ def task(queue):
  
 # protect the entry point
 if __name__ == '__main__':
-    logging.info("process start")
+    logging.info("process start") # 没有配置 basicConfig是打印不出来的，如果配置了basicConfig，在多进程条件下，会有重复打印！
 
     # create the shared queue
     queue = Queue()
@@ -212,7 +212,7 @@ if __name__ == '__main__':
     # report final message
     logger.info('Main process done.')
     # shutdown the queue correctly
-    logging.info("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")  # 没有配置 basicConfig是打印不出来的，如果配置了，在多进程条件下，会有重复打印！
+    logging.info("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")  # 没有配置 basicConfig 是打印不出来的，如果配置了basicConfig，在多进程条件下，会有重复打印！
     queue.put(None)
 ```
 
