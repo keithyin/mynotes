@@ -47,6 +47,8 @@ docker images # 打印所有镜像
 docker pull $image_name:$version # 拉取（下载）镜像
 docker images $image_name # 查看 image 信息
 docker search $image_name # 查找镜像
+
+docker inspect $image_name #查看镜像的详细信息
 ```
 
 * 交互式容器：会打开交互式shell，shell退出后，容器会停止运行
@@ -67,12 +69,18 @@ docker run --name deamon_dave -d ubuntu /bin/bash -c "while true; do echo hello 
 -t : 为创建的容器分配一个 伪tty终端
 /bin/bash: 终端执行 该命令, 启动了一个 bash shell，也可以启动其它shell
 
-# 
+--name some_name 指定容器的名字。
+-p 80 指定公开哪些端口给宿主机，如果有多个，那就多个 -p
 
+-p 8080::80 宿主机8080 和 容器 80 进行绑定
+
+-e "WEB_PORT=8080" 运行时指定容器的环境变量
+
+--volume, -v. -v host_dir:container_dir 将主机的目录映射(挂载)到 容器内的某个目录。
 ```
 
 # 构建镜像
-* 使用 `docker commit` 构建镜像
+* 使用 `docker commit` 将当前的容器状态 构建镜像
 * 使用 `docker build & Dockerfile` 构建镜像
 
 
@@ -81,5 +89,93 @@ docker run --name deamon_dave -d ubuntu /bin/bash -c "while true; do echo hello 
 * 在容器中进行修改（装软件，创建文件，etc）
 * 将修改提交为一个新镜像
 
+```shell
+docker run -i -t ubuntu /bin/bash
+
+# do some installation within container
+# exit container
+
+# 这个是提交到了 远程还是本地？  应该是本地吧
+docker commit 4aab3ce image_repo_name/image_name
+
+docker commit \
+  -m"message" \
+  -a"author" \
+  4aab3ce \
+  image_repo_name/image_name:tag
+
+```
+
+
 使用 docker build & Dockerfile 构建镜像
 * 就像是在写配置文件(Dockerfile)， docker build 根据 Dockerfile进行构建镜像
+
+```Dockerfile
+FROM ubuntu  # 基础镜像
+MAINTAINER ky "yinpenghhz@hotmail.com" # 作者信息
+
+ENV RVM_APTH /home/rvm #镜像构建过程中 设置环境变量。该变量可以在Dockerfile中使用。$RVM_APTH. 这些环境变量也会持久化到使用该镜像创建的任何容器中。
+
+# 以下开始执行命令
+# 默认情况下，RUN指令 会在shell里使用命令 包装器 /bin/bash -c "cmd_str" 来执行。如果在不支持shell的平台，或者不希望在 shell中执行(比如避免shell的字符串篡改)，可以用 exec 格式执行
+RUN apt-get update && apt-get install -y nginx
+RUN echo 'Hi' 
+
+RUN ["apt-get", "install", "-y", "nginx"] # exec格式的run指令
+
+
+
+WORKDIR /opt/web/app #容器内部设置的一个工作目录，ENTRYPOINT/CMD/ "./" 都会在该目录下执行
+
+VOLUME #向容器中添加卷，见 docker run 的 --volumn
+
+ADD file.txt /container/path/to/file.txt #将构建环境下的 文件/目录 复制到镜像中。 如果 目的地址以 / 结尾，docker就认为源是一个目录，否则，认为源是文件
+ADD http://wordpress.org/file.zip /root/file.zip
+ADD file.zip /root/file/ # 会对其进行解压
+
+# copy 只关心在构建上下文传文件，而且不会做 压缩、解压 操作
+COPY dir/ /container/dir/ # dir目录下的文件传输
+
+# 向镜像中添加元数据。
+LABEL version="0.1.0"
+LABEL location="China" type="What?"  # docker inspect image_name 查看 LABEL
+
+# 停止容器时，发送什么系统调用信号给 容器
+STOPSIGNAL SIGKILL
+
+# docker build时，传递给 构建运行时的变量 docker build --build-arg build=1234 -t repo_name/image_name 
+ARG build
+ARG webapp_user=rocy
+
+# 添加触发器, 当一个镜像被用作其它镜像的基础镜像时，该触发器会被执行。
+ONBUILD ADD . /app/src
+
+
+# CMD:指定容器启动时该运行什么命令
+CMD /bin/bash # docker会在命令前 加 /bin/bash -c 来执行
+# CMD ["/bin/bash"] # exec格式。
+# docker 命令行可以覆盖 CMD指令 docker run -i -t ubuntu /bin/bash. /bin/bash会取代Dockerfile配置的CMD指令
+
+# ENTRYPOINT 指定容器启动时 执行什么命令。不会被 docker run 的参数覆盖，docker run 中的参数 会被 传递给 ENTRYPOINT 指定的指令
+ENTRYPOINT ["/usr/sbin/nginx", "-g", "daemon off;"] # exec 格式。也可以 /bin/bash 格式
+
+# 当指定了 ENTRYPOINT 时，CMD 就变成了传给 ENTRYPOINT 的参数. ENTRYPOINT ["/usr/sbin/nginx"]; CMD ["-h"]. 那么会按照 /usr/sbin/nginx -h 启动容器。CMD 依旧可以被 命令行覆盖
+
+
+
+EXPOSE 80
+```
+
+```shell
+# 如何基于Dockerfile构建
+# 1. cd 到 Dockerfile存在的目录
+# 2. 执行下面命令
+docker build -t="repo_name/image_name[:tag]"
+
+# 或者指定 Dockerfile存在的位置
+docker build -t="repo_name/image_name[:tag]" git@github.com:git_prog_path #这个假设git_prog_path这个repo里有 Dockerfile
+docker build -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个直接指定的 dockerfile的绝对路径
+
+# 其它指令
+# --no-cache 忽略dockerfile的构建缓存
+```
