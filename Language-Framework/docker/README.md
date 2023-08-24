@@ -72,7 +72,8 @@ docker run --name deamon_dave -d ubuntu /bin/bash -c "while true; do echo hello 
 --name some_name 指定容器的名字。
 -p 80 指定公开哪些端口给宿主机，如果有多个，那就多个 -p
 
--p 8080::80 宿主机8080 和 容器 80 进行绑定
+-p8080:80 宿主机8080 和 容器 80 进行绑定
+--rm 退出容器后，容器被删除
 
 -e "WEB_PORT=8080" 运行时指定容器的环境变量
 
