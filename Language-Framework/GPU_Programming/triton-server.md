@@ -472,6 +472,15 @@ Optimization
 # onnx 模型 开启 tensortrt加速
 # make use of TRT backend for onnx
 optimization {
+
+
+   input_pinned_memory {
+      enable: true
+   }
+   output_pinned_memory {
+      enable: true
+   }
+
    execution_accelerators {
       gpu_execution_accelerator: [
          {
