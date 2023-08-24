@@ -144,14 +144,14 @@ Streaming Inference Requests
   * 根据 model 的 backends 进行 serving
  
 
-1. prepare the model model reposity
+1. prepare the model model repository
 2. configure the served model
 3. launch triton server
 4. configure an ensemble model
 5. send requests to triton server
 
 
-## prepare the model model reposity
+## prepare the model model repository
 
 ```
 # repo 目录结构
@@ -518,7 +518,7 @@ model_warmup [
 ## launch triton server
 > tritonserver 可以自己编译，也可以使用 docker image
 
-`tritonserver --model-reposity=/path/to/model/repo`
+`tritonserver --model-repository=/path/to/model/repo`
 
 ```shell
 # container
@@ -530,7 +530,7 @@ docker run --name some_name --gpus all -it --rm \  # --gpus='"device=0"'
    ncvr.io/nvidia/tritonserver:21.07-py3
 
 # bin
-tritonserver --model-reposity=/path/to/model/repo
+tritonserver --model-repository=/path/to/model/repo
 
 # tritonserver --help to check all the options
 ```
