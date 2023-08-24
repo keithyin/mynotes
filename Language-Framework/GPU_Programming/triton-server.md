@@ -523,7 +523,7 @@ model_warmup [
 ```shell
 # container
 
-docker run --gpus all -it --rm \  # --gpus='"device=0"'
+docker run --name some_name --gpus all -it --rm \  # --gpus='"device=0"'
    --shm-size=1g \
    -p8000:8000 -p8001:8001 -p8002:8002 \
    -v <host_model_repo>:<container_model_repo> \
