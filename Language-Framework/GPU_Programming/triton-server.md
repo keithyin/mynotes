@@ -695,7 +695,7 @@ batched_image_data = np.array(???)
 requests = []
 responses = []
 
-inputs = [triton_client.InferInput(inp_name, batched_image_data.shape, dtype)]
+inputs = [grpcclient.InferInput(inp_name, batched_image_data.shape, dtype)]
 inputs[0].set_data_from_numpy(batched_image_data)
 
 # 有了label文件 加上 这里配置了 class_count=num_classes, 这里拿到的就是 类别标签的字符了！！！
@@ -743,6 +743,7 @@ class UserData:
 ```
 ### 通过 shared memory 传递数据
 > 如果client 和 server 在同一台机器上，就没必要用 grpc/http 传数据了，可以直接用 shared memory 传数据
+> 注意在启动 容器时，加上 --ipc host, 否则 triton server 无法分配共享内存
 
 cpushm
 ```python
@@ -764,6 +765,8 @@ triton_client.register_system_shared_memory("output_data", "/output_simple", out
 # input 端。
 sh_ip_handle = shm.create_shared_memory_region("input_data", "/input_simple", input_byte_size)
 shm.set_shared_memory_region(shm_ip_handle, [batched_image_data])
+
+
 # 注册 cuda shared memory
 triton_client.register_system_shared_memory("input_data", "/input_simple", input_byte_size)
 
