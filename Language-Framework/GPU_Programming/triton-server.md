@@ -836,3 +836,5 @@ output_data = cudashm.get_contents_as_numpy(shm_op_handle, utils.triton_to_np_dt
 * https://www.bilibili.com/video/BV1R3411g7VR/?p=3&spm_id_from=pageDriver
 * https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/protocol/extension_shared_memory.html#grpc 共享内存
 * https://github.com/triton-inference-server/server/issues/4361 共享内存
+* https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tritonserver/tags
+* https://github.com/triton-inference-server/common/blob/main/protobuf/grpc_service.proto 
