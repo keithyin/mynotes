@@ -159,15 +159,43 @@ gpu_properties.maxGridSize[2];
 
 # GPU 硬件架构
 
-* SM：streaming processor，流处理器，有一个L1 cache，多个GPU core
+* SM：streaming processor，流处理器，
+ * 一个L1 cache
+ * 一个寄存器文件
+ * 多个GPU core
 * GPU core：都有 ALU、FPU
 * 千兆线程调度器：将线程块分配给SM的 调度器，可以很快的完成块的分配。
  * 每个SM接收 线程块 的个数是由限制的，超过限制的话，SM就会阻止 调度器 向其分配线程块。所以 千兆线程调度器 有时会阻塞
 * L1缓存：一个SM一个，同SM的GPU core共享
 * L2缓存：全局一个，所有SM共享
 
+
 ```c++
 // 设备端数组，不是主机端的，编译器将决定其去向！
 __device__ double gauss[2][5] = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}};
 ```
+
+SM：流处理器包含：
+* GPU core：
+* DPU：双精度单元（不在gpu core里）
+* 特殊功能单元（SFU）
+* 寄存器文件（RF）
+* 读取、存储队列：数据流向 GPU memory -》 gpu core，gpu core -》 gpu memory。这些请求都会在这里排队
+* L1 cache 与 纹理高速缓存
+* 共享内存
+* 常量高速缓存
+* 指定高速缓存
+* 指令缓冲区
+* 线程束调度器：线程块分成一个个 线程束 并安排他们一个个的执行。线程束是串行执行的
+* 分发单元：一旦资源足够，分发单元开始分发 线程束  到 GPU core
+
+## 核心 友好 代码
+
+* 降低 寄存器使用（减少函数参数传递 & 局部变量）
+* 能在cpu上统一计算的就不要在 gpu 上的每个线程中重复计算！
+* 多使用 N-D block 以降低运算量
+
+
+# GPU 内存
+
 
