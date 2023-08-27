@@ -156,3 +156,18 @@ gpu_properties.maxGridSize[2];
 * GPU 与 全局内存：336GBps
 
 *  
+
+# GPU 硬件架构
+
+* SM：streaming processor，流处理器，有一个L1 cache，多个GPU core
+* GPU core：都有 ALU、FPU
+* 千兆线程调度器：将线程块分配给SM的 调度器，可以很快的完成块的分配。
+ * 每个SM接收 线程块 的个数是由限制的，超过限制的话，SM就会阻止 调度器 向其分配线程块。所以 千兆线程调度器 有时会阻塞
+* L1缓存：一个SM一个，同SM的GPU core共享
+* L2缓存：全局一个，所有SM共享
+
+```c++
+// 设备端数组，不是主机端的，编译器将决定其去向！
+__device__ double gauss[2][5] = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}};
+```
+
