@@ -224,6 +224,33 @@ __constant__ int gauss[2][5] = {{1, 2, 3, 4, 5}, {6, 7, 8, 9, 10}};
 
 # CUDA Stream
 
+> 为了GPU能够流水线做一些工作
 
+CUDA的工作流为：
+1. CPU 到 GPU 的数据传输
+2. 计算
+3. GPU 到 CPU 的数据传输
+
+在计算的时候 是 可以进行数据传输的。所以有了Stream
+
+Stream：同一个stream 的操作 串行执行。不同stream之间的操作可以并行执行。比如：一个流传输数据，另一个流执行计算
+
+```c++
+cudaStream_t streams[NUM_STREAMS];
+
+// 创建流
+for(int i=0; i<NUM_STREAMS; i++) {
+ cudaStreamCreate(&streams[i]);
+}
+
+// 流是资源，需要销毁！
+for(int i=0; i<NUM_STREAMS; i++) {
+ cudaStreamDestroy(streams[i]);
+}
+
+// 同步流。如果在该流上issue的操作没有执行完的话， 该句会block住
+cudaStreamSynchronize(streams[i]);
+
+```
 
 
