@@ -15,6 +15,7 @@
 当一个package仅包含 `src/main.rs`，说明其仅包含一个名为 $package_name `crate`。当一个package同时包含 `src/main.rs, src/lib.rs`，它将有两个`crate`，一个 `binary`, 一个`library`，两个的名字都是 $project_name. 通过将crate放到 `src/bin/`目录下，一个package可以有多个 binary crate，每个文件都是一个 binary crate.
 
 
+
 * 创建一个binary  `cargo new some_proj --bin`  
 * 创建一个lib     `cargo new some_proj --lib`
 * 模块：通过 use 来使用，用来控制作用域和路径的私有性
