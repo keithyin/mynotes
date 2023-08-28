@@ -16,8 +16,8 @@
 
 
 
-* 创建一个binary  `cargo new some_proj --bin`  
-* 创建一个lib     `cargo new some_proj --lib`
+* 创建一个binary：  `cargo new some_proj --bin`  
+* 创建一个lib：     `cargo new some_proj --lib`
 * 模块：通过 use 来使用，用来控制作用域和路径的私有性
 * 路径：一个命名例如结构体、函数或模块等项的方式。
 * 包与create
