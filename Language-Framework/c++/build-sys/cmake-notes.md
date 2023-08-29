@@ -341,7 +341,9 @@ cpack -G ZIP -C Debug
 ```
 
 # 10. static lib 还是 shared lib
-通过设置Cmake变量 `BUILD_SHARE_BIBS` 的值来决定 `add_library()` 的默认行为。通常通过 `option` 来指定，这样就可以从命令行空值该值。
+1. 通过设置Cmake变量 `BUILD_SHARE_BIBS` 的值来决定 `add_library()` 的默认行为。通常通过 `option` 来指定，这样就可以从命令行空值该值。
+2. `add_library(libname STATIC sourcefiles)` 默认行为
+3. `add_library(libname SHARED sourcefiles)` 构建动态链接库
 
 ```cmake
 cmake_minimum_required(VERSION 3.0.0)
