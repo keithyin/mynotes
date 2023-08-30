@@ -199,5 +199,44 @@ pub mod world{
 
 # workspace
 
+> 管理多个相互关联 且需要协同开发的包
+
+工作空间是由 **共用同一个Cargo.lock和输出目录** 的一系列包构成
+
+```shell
+mkdir add
+cd add
+
+vim Cargo.toml<<<
+# workspace 的 配置文件以 [workspace] 开始，里面配置了members(即：工作空间内所包含的包)
+[workspace]
+members = [
+	"adder",
+	"adder-one",
+	"adder-two"
+]
+<<<
+
+cargo new adder
+cargo new adder-one --lib
+cargo new adder-two --lib
+
+
+# 二进制包 adder 如何依赖 lib 包？
+vim adder/Cargo.toml<<<
+....
+[dependencies]
+adder-one = {path = "../adder-one"}
+adder-two = {path = "../adder-two"}
+<<<
+```
+
+工作空间中依赖外部包：
+1. 由于工作空间共享同一个Cargo.lock, 那么工作空间中的外部包依赖 都会使用相同的版本。
+2. 外部包依赖依旧是在 package 中的 Cargo.toml 中指定的
+
+工作空间测试：
+1. 依旧是在 package 代码中写测试
+2. 然后可以在 package 目录下下执行 `cargo test` 或者在 workspace 目录下执行 `cargo test -p adder`
 
 
