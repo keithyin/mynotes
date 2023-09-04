@@ -16,4 +16,8 @@ apt remove git
 apt-get install libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev
 
 sudo make prefix=/usr/local install
+
+cd git/contrib/subtree
+make
+sudo make install
 ```
