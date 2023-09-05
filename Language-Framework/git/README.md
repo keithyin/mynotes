@@ -7,8 +7,8 @@ centos
 sudo yum remove git
 sudo yum install -y xmlto
 yum install curl-devel expat-devel gettext-devel openssl-devel zlib-devel
-sudo make prefix=/usr/local install
 
+sudo make prefix=/usr/local install
 ```
 
 
@@ -20,7 +20,7 @@ apt-get install libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev
 sudo make prefix=/usr/local install
 ```
 
-安装 substree
+安装 substree（centos、ubuntu通用）
 ```shell
 cd git/contrib/subtree
 make
