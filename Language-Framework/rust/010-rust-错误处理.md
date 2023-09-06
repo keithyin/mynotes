@@ -10,6 +10,8 @@ rust中，将错误处理分为两类：1)不可恢复错误 `panic!` 。2）可
 
 # Result
 
+https://doc.rust-lang.org/std/result/
+
 ```rust
 enum Result<T, E> {
   Ok(T),
@@ -18,8 +20,6 @@ enum Result<T, E> {
 ```
 
 * `Result` 定义了两个变体：代码执行成功时，返回 `Ok(T)`, 如果执行失败时，返回`Err(E)`. 我们可以通过判断返回的是啥 来判断代码是否执行成功。
-
-
 
 对Result对象的处理
 
@@ -37,6 +37,17 @@ if let Ok(v) = SomeResult {
 
 * `.ok()` 转成 Option 来处理
 
+# Option
+这个不是处理错误的，这个是用来封装有可能是None 的值的。
+
+https://doc.rust-lang.org/std/option/
+
+```rust
+enum Option <T> {
+  Some(T),
+  None,
+}
+```
 
 
 
