@@ -23,9 +23,20 @@ enum Result<T, E> {
 
 对Result对象的处理
 
-* 失败时触发 `panic`. : `.unwrap(), .expect()`
-* 错误传播：`? 运算符` 。
+* 失败时触发 `panic`. :
+  *  `.unwrap()`: 直接抛异常
+  *  `.expect(msg)`：抛异常时候还会带 msg，知道是在什么地方发生的问题
+* 错误传播：`? 运算符` 。如果发生了错误就立刻返回！
 * 最原始方法：使用 `match`
+```rust
+if let Ok(v) = SomeResult {
+} else {
+  // exception process
+}
+```
+
+* `.ok()` 转成 Option 来处理
+
 
 
 
