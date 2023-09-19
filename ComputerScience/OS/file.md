@@ -27,4 +27,5 @@ The term **open file description** is the one used by POSIX to refer to the entr
 
  https://stackoverflow.com/questions/3054442/is-it-possible-to-use-threads-to-speed-up-file-reading
  https://stackoverflow.com/questions/15477925/is-is-possible-to-write-to-different-parts-of-the-same-file-from-multiple-thread 
+ https://stackoverflow.com/questions/2751734/how-do-filesystems-handle-concurrent-read-write 
 
