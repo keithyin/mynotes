@@ -23,9 +23,13 @@ The term **open file description** is the one used by POSIX to refer to the entr
 指向 open file description 的一个句柄，int 值
 
 
+
+
+
 # 参考资料
 
  https://stackoverflow.com/questions/3054442/is-it-possible-to-use-threads-to-speed-up-file-reading
  https://stackoverflow.com/questions/15477925/is-is-possible-to-write-to-different-parts-of-the-same-file-from-multiple-thread 
  https://stackoverflow.com/questions/2751734/how-do-filesystems-handle-concurrent-read-write 
+ https://softwareengineering.stackexchange.com/questions/163931/is-using-a-bigger-buffer-useful 
 
