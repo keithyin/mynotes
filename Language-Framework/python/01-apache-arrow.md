@@ -48,4 +48,9 @@ print("LEN:", len(loaded_array))
 print("RSS: {}MB".format(pa.total_allocated_bytes() >> 20))
 ### RSS: 0MB
 
+
+table[0] # 得到的是 某个 record_batch
+table.num_chunks # 有多少个 record_batch
+table.chunk(0) # 和 table[0] 等价
+
 ```
