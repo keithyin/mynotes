@@ -28,8 +28,12 @@ read_arrow = feather.read_table('/path/to/file')
 
 # 读。和read_table等价
 with pa.OSFile('bigfile.arrow', 'rb') as source:
-   loaded_array = pa.ipc.open_file(source).read_all()
+   reader = pa.ipc.open_file(source)
+   # num_record_batches = reader.num_record_batches
+   # reader.get_batch(number)
 
+   loaded_array = reader.read_all()
+   
 
 print("LEN:", len(loaded_array))
 ### LEN: 10000000
@@ -39,7 +43,10 @@ print("RSS: {}MB".format(pa.total_allocated_bytes() >> 20))
 
 # mmap读
 with pa.memory_map('bigfile.arrow', 'rb') as source:
-   loaded_array = pa.ipc.open_file(source).read_all()
+   reader = pa.ipc.open_file(source)
+   # num_record_batches = reader.num_record_batches
+   # reader.get_batch(number)
+   loaded_array = reader.read_all()
 
 
 print("LEN:", len(loaded_array))
