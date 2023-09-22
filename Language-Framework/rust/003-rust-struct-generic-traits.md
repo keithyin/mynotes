@@ -215,7 +215,7 @@ pub fn notify(item: dyn Summary) {
 
 
 
-## Trait bound syntex
+## Trait bound syntex （限制泛型对象的 类型范围。即：只有实现了trait的类型对象可以作为实参）
 
 上述的 `&impl Summary`这种做法实际是 `Trait bound syntext` 的 `syntex sugar`
 
