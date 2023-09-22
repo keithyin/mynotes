@@ -132,6 +132,54 @@ impl Summary for Tweet {
 }
 ```
 
+## 为泛型Struct实现Trait
+```rust
+// 泛型结构体
+pub struct CommonNode <T> {
+    num_threads: i32,
+    pre_receiver: Option<Receiver<T>>,
+
+    cur_sender: Option<Sender<T>>,
+    cur_receiver: Option<Receiver<T>>,
+
+    work_func: Option<fn (Option<Receiver<T>>, Option<Sender<T>>)>,
+
+}
+
+impl<T: Send + 'static> CommonNode<T> {
+
+    pub fn new(num_threads: i32, work_func: fn (Option<Receiver<T>>, Option<Sender<T>>)) -> Self {
+        let (s, r) = channel::unbounded::<T>();
+        CommonNode { num_threads: num_threads,
+            pre_receiver: None, 
+            cur_sender: Some(s), 
+            cur_receiver: Some(r),
+            work_func: Some(work_func)
+         }
+    }
+}
+
+// 泛型结构体实现Trait。如果T 有 Trait的约束的话这么写
+// 如果没有泛型约束的话 impl<T> PipelineNode for CommonNode<T> 即可
+impl<T: Send + 'static> PipelineNode for CommonNode<T>  {
+    type CommType = T;
+
+    fn get_cur_receiver(&mut self) -> Receiver<Self::CommType> {
+        self.cur_receiver.take().unwrap()
+    }
+
+    fn get_cur_sender(&mut self) -> Sender<Self::CommType> {
+        self.cur_sender.take().unwrap()
+    }
+
+    fn set_pre_receiver(&mut self, receiver: Receiver<Self::CommType>) {
+        self.pre_receiver = Some(receiver);
+    }
+
+}
+
+```
+
 ## trait 作为形参
 
 [Why does `dyn Trait` require a Box? - help - The Rust Programming Language Forum](https://users.rust-lang.org/t/why-does-dyn-trait-require-a-box/23471)
@@ -159,7 +207,7 @@ pub fn notify(item: &dyn Summary) {
 pub fn notify(item: Box<dyn Summary>) {
     println!("Breaking news! {}", item.summarize());
 }
-// 编译会报错
+// 编译会报错 dyn是用来描述对象大小不确定的？
 pub fn notify(item: dyn Summary) {
     println!("Breaking news! {}", item.summarize());
 }
@@ -316,4 +364,32 @@ mod test {
 }
 ```
 
-> 
+
+## 带Type placehoulder的trait作为形参
+
+```rust
+// 所有实现了 Summary 的 对象都可以传进去（传的是引用）
+// 静态派发
+pub fn notify<T> (item: &impl Summary<TypePlaceholder=T>) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+// 所有实现了 Summary 的 对象都可以传进去（传的是对象）
+pub fn notify<T> (item: impl Summary<TypePlaceholder=T>) {
+    println!("Breaking news! {}", item.summarize());
+}
+
+
+// 动态派发！ (dyn Summary 是 Unsized 的，不能直接搞这么一个类型，只能通过引用。)
+// 调用时传对象引用
+pub fn notify<T>(item: &dyn Summary<TypePlaceholder=T>) {
+    println!("Breaking news! {}", item.summarize());
+}
+pub fn notify<T>(item: Box<dyn Summary<TypePlaceholder=T>>) {
+    println!("Breaking news! {}", item.summarize());
+}
+// 编译会报错. dyn是用来描述对象大小不确定的？
+pub fn notify(item: dyn Summary<TypePlaceholder=T>) {
+    println!("Breaking news! {}", item.summarize());
+}
+```
