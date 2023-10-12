@@ -22,6 +22,12 @@ docker rm $container_name # 删除容器
 
 docker run --name $your_container_name -i -t -d $image_name /bin/bash (创建容器, 交互式容器)
 
+
+# 数据传输
+docker cp /opt/test/file.txt mycontainer:/opt/testnew/  # 宿主机->容器
+docker cp mycontainer:/opt/testnew/file.txt /opt/test/  # 容器->宿主机
+
+
 # 查看容器内部的情况，对于非deamon容器，直接进去执行linux命令即可。如果是deamon容器，可以通过
 docker top $daemon_container  （查看容器内进程）
 docker stat $deamon_container (统计信息)
