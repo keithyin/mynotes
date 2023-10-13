@@ -180,6 +180,7 @@ target_include_directories(Tutorial PUBLIC
 ```
 
 # 3. Usage Requirements for a Library
+
 > library自己定义自己的 使用所需条件。一旦定义了，该使用条件就会传递给调用方。具体的例子为，在上面的demo中，上层target依赖子目录taget的时候，需要 target_include_directories 和 target_link_libraries。如果子目录定义了使用自己时所需的头文件，那么 上层CMakeLists.txt中就不用 target_include_directories 了。
 
 
@@ -463,10 +464,13 @@ include ( "${CMAKE_CURRENT_LIST_DIR}/MathToolsTargets.cmake" )
 # 目标文件依赖项使用范围
 > target_** 中的 PUBLIC PRIVATE INTERFACE
 > [https://zhuanlan.zhihu.com/p/82244559](https://zhuanlan.zhihu.com/p/82244559)
+> [public private interface](https://blog.csdn.net/weixin_43862847/article/details/119762230#:~:text=target_link_libraries%E9%87%8C%E7%9A%84%E5%85%B3%E9%94%AE%E5%AD%97,%E6%96%87%E4%BB%B6%E7%9B%AE%E5%BD%95%E4%BB%A5%E5%8F%8A%E9%93%BE%E6%8E%A5%E5%BA%93%E3%80%82)
 
-* PRIVATE 自己用，不会向上暴露
+* PRIVATE 自己用，不会向上暴露。即上面target的编译命令是不是包含 -I.. ..
 * INTERFACE 自己不用，但是会向上暴露
 * PUBLIC 自己用，且向上暴露
+
+
 
 target_include_directories(hello-world PRIVATE hello)
 > 自己编译的时候 搜索 hello 目录，但是上一级如果 link 当前lib的话，不会自动搜索 hello 目录
