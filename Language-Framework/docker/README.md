@@ -52,6 +52,7 @@ docker exec -t -i $daemon_container /bin/bash # 这样之后我们就可以用�
 docker images # 打印所有镜像
 docker pull $image_name:$version # 拉取（下载）镜像
 docker images $image_name # 查看 image 信息
+docker image rm $image_name # 删除镜像
 docker search $image_name # 查找镜像
 
 docker inspect $image_name #查看镜像的详细信息
