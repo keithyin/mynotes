@@ -21,6 +21,9 @@ mkdir build_dir & cd build_dir
 cmake ..
 # 3. 构建
 cmake --build .
+
+# 多线程编译
+cmake --build . -- -j8
 ```
 
 ## 设置C++版本
