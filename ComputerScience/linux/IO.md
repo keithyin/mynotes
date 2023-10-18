@@ -33,10 +33,17 @@ select输入：
 ```
 
 ```c
-poll
+// 返回值表示 满足事件的项数
+int poll(struct pollfd fdarray[], ndfs_t nfds, int timeout);
+
+struct {
+    int fd;
+    short events;  // 感兴趣的事件，由调用者设置。
+    short revents; // 发生在 fd 上的事件。由内核设置
+}
 
 /*
-
+类似select，但是程序接口不大一样.
 
 */
 
