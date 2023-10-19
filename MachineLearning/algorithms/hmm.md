@@ -117,7 +117,12 @@ $$
 
 ## 学习算法
 
-EM
+核心还是MLE。
+
+* 如果 state sequence 已知：这个就简单多了，直接log likelihood，然后求导得0就好了。
+* 如果 state sequence 未知：
+    * EM算法: 
+    * veterbi training：随机给一个转移概率，然后用veterbi计算最大可能路径，然后用mle来估算参数，然后估算完参数之后，再去计算最大可能路径
 
 
 
