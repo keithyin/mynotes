@@ -127,5 +127,10 @@ EM
 
 已知 马尔可夫模型 $\lambda$ 和观测序列 $\mathcal O$ ，求在时刻 $t$ 处于状态 $q_i$ 的概率。
 
+## veterbi VS 前向后向算法
+
+* veterbi 是求最大
+* 前向后向是 求和
+
 
 
