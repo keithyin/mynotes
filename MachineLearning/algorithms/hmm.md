@@ -15,8 +15,8 @@
 一个三元组定义了 HMM，他们分别是：
 
 * 初始概率分布
-* 状态转移概率 $\mathcal A = [a_{ij}]_{N*N}, a_{ij}=P(q_j|q_i)$ 
-* 观测概率分布 $\mathcal B=[b_{ij}]_{N*M}, b_{i,j}=P(v_j|q_i)$ 
+* 状态转移概率 $\mathcal A = [a_{ij}]\_{N*N}, a_{ij}=P(q_j|q_i)$ 
+* 观测概率分布 $\mathcal B=[b_{ij}]\_{N*M}, b_{i,j}=P(v_j|q_i)$ 
 
 
 
