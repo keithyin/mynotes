@@ -22,7 +22,7 @@
 
 $\mathcal Q$ 是所有可能状态的集合，$\mathcal V$ 是所有可能的观测的集合：
 $$
-\mathcal Q=\{q_1, q_2, ..., q_N\}, \mathcal V=\{v_1,v_2, ..., v_M\}
+\mathcal Q=\{ q_1, q_2, ..., q_N \}, \mathcal V = \{ v_1,v_2, ..., v_M \}
 $$
 其中， N 是可能的状态数，M是可能的观测数。
 
