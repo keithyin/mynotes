@@ -41,7 +41,7 @@ $\mathcal O$ 是长度为 T 的观测序列。
 > 前向后向算法
 
 
-如何计算$ P(\mathcal O|\lambda)$
+如何计算$P(\mathcal O|\lambda)$
 
 
 $$
