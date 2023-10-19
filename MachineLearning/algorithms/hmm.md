@@ -40,7 +40,9 @@ $\mathcal O$ 是长度为 T 的观测序列。
 
 > 前向后向算法
 
-如何计算$ P(\mathcal O|\lambda)$$
+如何计算$ P(\mathcal O|\lambda)$
+
+
 $$
 \begin{aligned}
  P(\mathcal O|\lambda) &= \sum_I P(\mathcal O, \mathcal I|\lambda) \\
@@ -48,6 +50,7 @@ $$
  &= \sum_{i_1,i_2,i_3,...,i_T} \pi_{i1}b_{i1}(o_1)a_{i1,i2}b_{i2}(o_2)...a_{i_{T-1}}b_{i_T}(o_T)
 \end{aligned}
 $$
+
 如果暴力求解的话，发现算法的复杂度是 $O(TN^T)$,用计算机很难求解。
 
 **当然这个公式有可优化空间：如果仅仅只是 $i_t$ 变化了话，那么只需要求变化部分的概率，其它部分就没必要重新求。**
