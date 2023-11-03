@@ -393,3 +393,21 @@ pub fn notify(item: dyn Summary<TypePlaceholder=T>) {
     println!("Breaking news! {}", item.summarize());
 }
 ```
+
+## Newtype Pattern
+
+在开发中，如果想对 一个 `struct` 实现一个 `trait` 的话，要么 `struct` 在我们的 crate中，要么 `trait` 在我们的 `crate` 中。但是我们可以通过Newtype Pattern来规避这个限制。
+
+Newtype Pattern：使用 Tuple Structs without named fields to create different types
+
+```rust
+use std::fmt;
+
+struct Wrapper(Vec<String>);
+
+impl fmt::Display for Wrapper {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    write!(f, "[{}]", self.0.join(", "));
+  }
+}
+```
