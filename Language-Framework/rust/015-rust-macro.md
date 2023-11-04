@@ -188,6 +188,7 @@ macro_rules! vec {
    ( $( $x:expr ),+ ,) => {
       vec![ $( $x ),* ]
    };
+}
 ```
 
 >  *表示0 or more
