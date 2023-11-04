@@ -138,7 +138,6 @@ assert_eq!{gcd(6, 10), 2}
 
 // 展开后，等价于, $left, $right替换为调用时的参数
 
-```
 {
    match(&gcd(6, 10), &2) {
       (left_val, right_val) => {
@@ -148,6 +147,7 @@ assert_eq!{gcd(6, 10), 2}
       }
    }
 }
+
 ```
 pattern. 满足该pattern会进入该pattern的 arm。就是后面的中括号。
 pattern是匹配rust的代码结构的，所以和rust代码的match pattern 不大一样
