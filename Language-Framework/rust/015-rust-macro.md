@@ -105,6 +105,22 @@ a + b + (c + d[0]) + e
 
 声明宏的使用方式为 `$name!$arg` : `$arg` 是怎么传入到声明宏的定义中去的呢？是 `token trees`. `$arg` 必须是一个具有单一 `root` 的，非叶子节点 `token tree`. 意味着 `$arg` 必然是 `(...), [...], {...}` 这种格式。回忆`vec!, println!` 的用法. `vec![1, 2, 3], println!("{}", "hello")` , 其实，`vec!(1, 2, 3) `也是一样的。
 
+定义一个宏, 使用 `macro_rules!`
+```rust
+#[macro_export]
+macro_rules! vec {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_vec = Vec::new();
+            $(
+                temp_vec.push($x);
+            )*
+            temp_vec
+        }
+    };
+}
+```
+
 
 
 **宏展开**
