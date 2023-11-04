@@ -147,6 +147,7 @@ assert_eq!{gcd(6, 10), 2}
       }
    }
 }
+```
 
 ```
 pattern. 满足该pattern会进入该pattern的 arm。就是后面的中括号。
