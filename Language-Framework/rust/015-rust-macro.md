@@ -208,6 +208,13 @@ $( ... );? Match 0 or 1 times, separated by semicolons
 ```
 
 
+## 过程宏（procedural macro）
+
+> 因为该宏是通过rust函数实现的，所以称之为 过程宏
+
+https://doc.rust-lang.org/book/ch19-06-macros.html#procedural-macros-for-generating-code-from-attributes
+
+
 **宏展开**
 
 在生成 AST *之后* ，对程序进行语义理解之前的某个时间点，编译器将会对所有宏进行展开。
@@ -215,6 +222,15 @@ $( ... );? Match 0 or 1 times, separated by semicolons
 这一过程包括，遍历 AST，定位所有宏调用，并将它们用其展开进行替换。
 
 
+## 其它rust代码生成方式
+
+Build script
+
+1. It involves writing a program that generates the Rust code you want
+2. adding a line to Cargo.toml to run that program as part of the build process
+3. using include! to get the generated code into your crate
+
+https://doc.rust-lang.org/cargo/reference/build-scripts.html#case-study-code-generation 
 
 # 参考资料
 
