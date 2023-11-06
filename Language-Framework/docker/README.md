@@ -178,11 +178,11 @@ EXPOSE 80
 # 如何基于Dockerfile构建
 # 1. cd 到 Dockerfile存在的目录
 # 2. 执行下面命令
-docker build -t="repo_name/image_name[:tag]"
+docker build . -t="repo_name/image_name[:tag]"
 
 # 或者指定 Dockerfile存在的位置
-docker build -t="repo_name/image_name[:tag]" git@github.com:git_prog_path #这个假设git_prog_path这个repo里有 Dockerfile
-docker build -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个直接指定的 dockerfile的绝对路径
+docker build . -t="repo_name/image_name[:tag]" git@github.com:git_prog_path #这个假设git_prog_path这个repo里有 Dockerfile
+docker build . -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个直接指定的 dockerfile的绝对路径
 
 # 其它指令
 # --no-cache 忽略dockerfile的构建缓存
