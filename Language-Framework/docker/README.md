@@ -7,6 +7,8 @@
 ```shell
 # 启动 docker 服务
 
+sudo systemctl restart docker
+
 # docker 状态信息查询
 docker info （查看容器，image信息）
 docker ps -a (查看当前系统的容器列表)
@@ -187,3 +189,8 @@ docker build . -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个�
 # 其它指令
 # --no-cache 忽略dockerfile的构建缓存
 ```
+
+
+# 参考资料
+
+1. https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
