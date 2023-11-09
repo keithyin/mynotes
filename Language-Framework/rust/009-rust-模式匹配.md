@@ -38,7 +38,28 @@ if let Some(x) = SomeOptionValue {}; // 🙆
 
 `match arms` 必须使用 `refutable patterns` . 但是 `match arms` 的最后一个一定要是一个 `irrefutable pattern`。要保证所有的情况都要关注到。
 
+## match
 
+```rust
+// 可以当 c 的 switch用
+match code {
+ 0 => println!("OK"),
+ 1 => println!("Wires Tangled"),
+ 2 => println!("User Asleep"),
+ _ => println!("unrecognized Error {}", code)  // _ matches anything
+}
+```
+
+```rust
+// enum
+
+match params.get("name") {
+ Some(name) => println!("Hello, {}", name),
+ None => println!("Greetings, stranger")
+
+}
+
+```
 
 
 
