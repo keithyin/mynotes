@@ -32,11 +32,11 @@ if let Some(x) = SomeOptionValue {}; // 🙆
 
 `while let, if let` 同时支持 `refutable patterns, irrefutable patterns`
 
-* 但是不建议在 `while let, if let` 中使用 `irrefutable patterns`
+* 但是不建议在 `while let, if let` 中使用 `irrefutable patterns`。在这种地方使用irrefutable patterns就没有条件分支存在的价值了，就是永远走某一个分支了。
 
 
 
-`match arms` 必须使用 `refutable patterns` . 但是 `match arms` 的最后一个一定要是一个 `irrefutable pattern`
+`match arms` 必须使用 `refutable patterns` . 但是 `match arms` 的最后一个一定要是一个 `irrefutable pattern`。要保证所有的情况都要关注到。
 
 
 
