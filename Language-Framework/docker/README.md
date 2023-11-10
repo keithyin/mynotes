@@ -190,6 +190,14 @@ docker build . -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个�
 # --no-cache 忽略dockerfile的构建缓存
 ```
 
+# 其它
+
+```shell
+# 1. 容器执行一条命令就退出
+sudo docker run --rm $image_name /bin/bash -c "you shell commond" #注意不要用 -it
+
+
+``
 
 # 参考资料
 
