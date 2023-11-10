@@ -45,9 +45,12 @@ docker exec -t -i $daemon_container /bin/bash # 这样之后我们就可以用�
 
 # 自动重启容器
 
-```
 --restart=always
 --restart=on-failure:5
+```
+
+----
+
 ```
 
 # 操作镜像
