@@ -197,7 +197,7 @@ docker build . -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个�
 sudo docker run --rm $image_name /bin/bash -c "you shell commond" #注意不要用 -it
 
 
-``
+```
 
 # 参考资料
 
