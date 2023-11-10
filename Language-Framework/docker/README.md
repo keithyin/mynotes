@@ -192,11 +192,28 @@ docker build . -t="repo_name/image_name[:tag]" /path/to/your/dockerfile #这个�
 
 # 其它
 
+1. 容器执行一条命令就退出
+
 ```shell
-# 1. 容器执行一条命令就退出
 sudo docker run --rm $image_name /bin/bash -c "you shell commond" #注意不要用 -it
+```
 
+2. image位置迁移
 
+```shell
+cp -a /var/lib/docker /store_location
+
+mv -u /var/lib/docker /var/lib/docker.bak
+
+vim /etc/docker/daemon.json
+
+#{
+#    "data-root": "/store_location/docker",
+#    "storage-driver": "overlay2" # 这个是 Docker 是默认设置，这里也可以不用加
+#}
+
+sudo systemctl restart docker # 或者 sudo service docker restart
+rm -rf /var/lib/docker.bak
 ```
 
 # 参考资料
