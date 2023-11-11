@@ -121,6 +121,12 @@ impl Clone for MyStruct {
 }
 ```
 
+# Default
+
+> 用来返回类型默认值的trait
+
+
+
 # `std::marker::Send`
 
 [rust - Understanding the Send trait - Stack Overflow](https://stackoverflow.com/questions/59428096/understanding-the-send-trait)[rust - Understanding the Send trait - Stack Overflow](https://stackoverflow.com/questions/59428096/understanding-the-send-trait)
