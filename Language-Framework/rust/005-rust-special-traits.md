@@ -1,6 +1,7 @@
 # `use std::ops::Deref`
 
 两个作用：
+
 * 当对一个对象 `v` 调用 `*`, `.` 的时候，会自动插入代码 `*v ==> *v.deref()`
 * Deref coercion.
 
