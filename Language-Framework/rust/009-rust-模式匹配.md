@@ -46,6 +46,8 @@ match code {
  0 => println!("OK"),
  1 => println!("Wires Tangled"),
  2 => println!("User Asleep"),
+ 3 | 4 => println!(""),
+ 5..=6 => println!(""),
  _ => println!("unrecognized Error {}", code)  // _ matches anything
 }
 ```
@@ -61,6 +63,9 @@ match params.get("name") {
 
 ```
 
+# 参考资料
+
+1. https://doc.rust-lang.org/book/ch18-03-pattern-syntax.html
 
 
  
