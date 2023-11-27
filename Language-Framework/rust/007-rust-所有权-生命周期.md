@@ -56,7 +56,7 @@ fn main(){
 	* 该机制能够正确的保证 栈内存 不会出现 data race问题
 	* 当然：该规则还会有一些其它的诡异的影响。。。。。 
 * References must always be valid.
-	* 防止 dangling pointer
+	* 防止 dangling pointer，比如 Vec 的 push，可能导致所有的数据移动位置。这样之前的 & 就会指向无效数据，当前的rust规则就会防止这种问题。
 
 rust 使用什么机制保证我们遵守该规则
 * At any given time, you can have either one mutable reference or any number of immutable references.
