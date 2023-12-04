@@ -26,6 +26,8 @@ enum Result<T, E> {
 * 失败时触发 `panic`. :
   *  `.unwrap()`: 直接抛异常
   *  `.expect(msg)`：抛异常时候还会带 msg，知道是在什么地方发生的问题
+  *  `result.unwrap_or(fallback)`：如果错误了，就返回 fallback
+  *  `result.unwrap_or_else(fallback_fn)` 如果计算 fallback值成本高的话，可以用这个
 * 错误传播：`? 运算符` 。如果发生了错误就立刻返回！
 * 最原始方法：使用 `match`
 ```rust
