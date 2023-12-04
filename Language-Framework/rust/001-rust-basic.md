@@ -123,3 +123,33 @@ https://runrust.miraheze.org/wiki/Zero-sized_type
 
 https://www.hardmo.de/article/2021-03-14-zst-proof-types.md
 
+## 运算符说明
+
+```rust
+// The . operator follows as many references as ittakes to find its target
+struct Point { x: i32, y: i32 }
+let point = Point { x: 1000, y: 729 };
+let r: &Point = &point;
+let rr: &&Point = &r;
+let rrr: &&&Point = &rr;
+
+assert_eq!(rrr.y, 729);
+
+// == operator follows all the references and performs the comparison on their final targets
+
+let x = 10;
+let y = 10;
+let rx = &x;
+let ry = &y;
+let rrx = &rx;
+let rry = &ry;
+assert!(rrx <= rry);
+assert!(rrx == rry);
+
+assert!(rx == ry); // their referents are equal
+
+// 如果想比较地址的话
+assert!(!std::ptr::eq(rx, ry));
+```
+
+
