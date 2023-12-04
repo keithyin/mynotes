@@ -127,6 +127,8 @@ https://www.hardmo.de/article/2021-03-14-zst-proof-types.md
 
 ```rust
 // The . operator follows as many references as ittakes to find its target
+//  deference OR borrow reference automatically
+
 struct Point { x: i32, y: i32 }
 let point = Point { x: 1000, y: 729 };
 let r: &Point = &point;
@@ -249,6 +251,14 @@ let answer = loop {
   }
 };
 ```
+
+为什么rust需要 `loop` ???
+
+
+# 异常处理
+
+panic 是可以处理的！
+
 
 
 
