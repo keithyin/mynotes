@@ -152,4 +152,105 @@ assert!(rx == ry); // their referents are equal
 assert!(!std::ptr::eq(rx, ry));
 ```
 
+# 表达式
+
+> expression: 表达式有值
+> statement: statement没有值返回，不能用在 表达式里
+
+rust中 block 也是表达式。
+
+```rust
+
+// 如果block的不以 ; 结构，那么该block的返回值，就是 最后一行表示的值
+{
+  let a = 10;
+  a
+}
+
+// 如果block最后一个以 ; 结尾，那其返回值为 (), 即c中的void  （表示无返回值
+{
+  let a = 10;
+  a;
+}
+
+```
+
+需要注意： 没有 else 的if表达式 必须返回 () !!.
+
+block:
+1.  可以包含多个声明语句
+2.  可以包含 item declarations. (fn, struct, use
+3.  可以包含 expressions
+4.  可以包含 其它 blocks
+
+## 声明
+
+```rust
+let name: Type = expr;
+```
+
+## loops
+
+```rust
+while condition {
+
+}
+
+while let pattern = expr {
+
+}
+
+for pattern in iterable {
+
+}
+
+loop {
+
+}
+
+```
+
+while 和 for 循环永远返回 (), loop 可以返回一个值，break 出来！
+
+
+```rust
+// for
+
+let values = vec!["a".to_string(), "b".to_string()];
+
+// 直接消耗
+for v in values {
+
+}
+
+// 引用
+for v in &values {
+
+}
+
+//可变引用
+
+for v in &mut values {
+
+}
+
+```
+
+
+```rust
+// loop
+let answer = loop {
+  if let Some(line) = next_line() {
+    if line.starts_with("answer: ") {
+      break line;
+    }
+  } else {
+    break "answer: nothing";
+  }
+};
+```
+
+
+
+
 
