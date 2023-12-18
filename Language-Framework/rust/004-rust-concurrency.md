@@ -191,6 +191,51 @@ fn main() {
 }
 ```
 
+
+## `Sync & Send` marker trait
+
+* `Send`: 如果 `T` 移动到其它线程是安全的，那么 `T` 就是 `Send`
+  * 什么时候发生移动？ 创建新线程时，通常是在一个线程执行 `spawn`，然后共享数据会 移动到 `spawn` 的新线程。
+  * 什么是安全？ 因为移动数据会导致 在当前线程销毁，需要确定这个销毁过程是不是安全的？无法理解。。。
+ 
+* `Sync`: 如果 `T` 可以被多个线程同时操作是安全的，那么 `T` 是 `Sync`。与其等价的定义是，如果 `&T` 是 `Send`, 那么 `T` 是 `Sync`. 刚才的 `&T` 理解是 `Box<T>, Rc<T>, Arc<T>`, 不是简单的`&T`操作。
+
+Send + Sync
+
+> Most types you come across are Send + Sync:
+
+* i8, f32, bool, char, &str, …
+* (T1, T2), [T; N], &[T], struct { x: T }, …
+* String, Option<T>, Vec<T>, Box<T>, …
+* Arc<T>: Explicitly thread-safe via atomic reference count.
+* Mutex<T>: Explicitly thread-safe via internal locking.
+* AtomicBool, AtomicU8, …: Uses special atomic instructions.
+* The generic types are typically Send + Sync when the type parameters are Send + Sync.
+
+Send + !Sync
+
+> These types can be moved to other threads, but they’re not thread-safe. Typically because of interior mutability:
+
+* mpsc::Sender<T>
+* mpsc::Receiver<T>
+* Cell<T>
+* RefCell<T>
+
+!Send + Sync
+
+> These types are thread-safe, but they cannot be moved to another thread:
+
+* MutexGuard<T: Sync>: Uses OS level primitives which must be deallocated on the thread which created them.
+
+
+!Send + !Sync
+
+> These types are not thread-safe and cannot be moved to other threads:
+
+* Rc<T>: each Rc<T> has a reference to an RcBox<T>, which contains a non-atomic reference count.
+* *const T, *mut T: Rust assumes raw pointers may have special concurrency considerations.
+
+
 ## `Sync & Send` marker trait
 
 > `send` & `sync` 是 marker trait，什么是 `marker trait` 呢？就是编译器负责做标记，rust用户无法干预的 trait。
