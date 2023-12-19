@@ -191,8 +191,14 @@ fn main() {
 }
 ```
 
+## `Sync & Send` marker trait (1)
 
-## `Sync & Send` marker trait
+* `Send`: `T` 被发送到其它线程后，执行的任何操作如果没有任何 `DataRace` 问题，就是 `Send`
+* `Sync`: 如果多个线程持有 `&T`, 执行的任何操作如果没有任何 `DataRace` 问题， 那么 `T` 是 `Sync`。
+  * `Sync` 定义可以简化，如果 `&T` 是 Send，那么 `T` 是 `Sync` 
+
+
+## `Sync & Send` marker trait (2)
 
 * `Send`: 如果 `T` 移动到其它线程是安全的，那么 `T` 就是 `Send`
   * 什么时候发生移动？ 创建新线程时，通常是在一个线程执行 `spawn`，然后共享数据会 移动到 `spawn` 的新线程。
@@ -236,7 +242,7 @@ Send + !Sync
 * *const T, *mut T: Rust assumes raw pointers may have special concurrency considerations.
 
 
-## `Sync & Send` marker trait
+## `Sync & Send` marker trait (3)
 
 > `send` & `sync` 是 marker trait，什么是 `marker trait` 呢？就是编译器负责做标记，rust用户无法干预的 trait。
 
