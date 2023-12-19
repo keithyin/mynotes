@@ -75,6 +75,39 @@ Local variables are immutable unless declared otherwise. For example: let mut x 
     * 当 `some_obj` 是 `T` 的时候，该代码会展开 `*(some_obj.deref(&self)) or *(some_obj.deref_mut(&mut self))` 
     * 当 `some_obj` 是 `&T, &mut T` 时候，就会返回 `T, mut T` 了。
 
+# 几个特殊类型
+
+* `()`: 等价于 void，返回 空 。
+* `Never`: `!` Never类型，表示不返回数据。 panic("") 就是返回 Never
+
+* PhantomData: 幽灵数据。不表示任何数据，一个Zero-Type类型，主要是为了将 泛型，生命周期标记 绑定到上面的。
+
+PhantomData用法：
+```rust
+// 和裸指针一起使用, 因为裸指针是没办法附着声明周期的，可以将声明周期 附着在 PhantomData上
+// 为什么要加声明周期标注？ 因为 SomeRef 对象有可能会绑定到 其它生命周期的变量上，如果加了 生命周期标注，就能在编译期进行 生命周期检查，减少错误发生。
+
+struct SomeRef<'a, T> {
+    data_ptr: *const T,
+    _phantom: PhantomData<&'a T>
+}
+
+impl<'a, T: 'a> SomeRef<'a, T> {
+    pub fn new(ptr: &'a T) -> SomeRef<T> {
+        SomeRef{
+            data_ptr: ptr as *const T,
+            _phantom: PhantomData
+        }
+    }
+
+    pub fn get_ref(&self) ->&T {
+        unsafe {&*self.data_ptr}
+    }
+}
+
+
+```
+
 
 
 # 其它资料
