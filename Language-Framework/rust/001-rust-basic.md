@@ -260,6 +260,11 @@ let answer = loop {
 panic 是可以处理的！
 
 
+# 参考资料
+
+1. https://stackoverflow.com/questions/75809087/in-rust-what-the-mechanism-of-transferring-a-mutable-reference-into-a-function
+
+
 
 
 
