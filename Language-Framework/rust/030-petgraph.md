@@ -83,3 +83,21 @@ pub struct Edge<E, Ix = DefaultIx> {
 * `e = e.next[1]`, 遍历得到所有的入边
 
 
+# GraphMap
+
+```rust
+pub struct GraphMap<N, E, Ty> {
+    nodes: IndexMap<N, Vec<(N, CompactDirection)>>, //节点 到 临边节点的映射
+    edges: IndexMap<(N, N), E>,  // 边的信息。可以快速判断 两个节点是否有边直接相连。
+    ty: PhantomData<Ty>,
+}
+```
+
+# MatrixGraph
+
+使用 O(|V| ** 2) 空间来保存图。
+
+插入边非常快
+
+
+
