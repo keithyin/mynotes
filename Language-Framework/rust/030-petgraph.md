@@ -54,6 +54,11 @@ pub struct Edge<E, Ix = DefaultIx> {
     /// Start and End node index
     node: [NodeIndex<Ix>; 2],
 }
-
 ```
+
+**增加节点的逻辑**
+
+**增加边的逻辑**
+
+
 
