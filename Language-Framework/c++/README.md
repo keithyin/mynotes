@@ -239,6 +239,36 @@ f3(1,2);
 ```
 
 
+## const, constexpr
+
+* `constexpr`: 常量表达式（编译期求值的表达式
+  * `constexpr` 限制：`constexpr` 函数可以调用其它 `constexpr` 函数，但是无法调用非 `constexpr` 函数
+  * `constexpr` 指定函数可以在编译期执行，但并不能保证一定会在编译期执行 ！！！
+ 
+```c++
+const int getArraySize() {return 32;}
+
+constexpr int getArraySize2() {return 32;}
+
+constexpr int getArraySize3(int v) {return v;}
+
+int main() {
+    int myArray[getArraySize()]; // error. 声明数组时必须指定其大小
+
+    int myArray2[getArraySize2()]; // correct, 因为 getArraySize2 声明为了 constexpr，且可以在编译期被求值。
+
+    int myArray3[getArraySize3(2)]; // correct, 可以在编译期求值
+
+    int a = 10;
+    int myArray4[getArraySize3(a)]; // error , 无法编译期求值，因为a是变量
+
+    constexpr int b = 10;
+    int myArray5[getArraySize3(b)]; // correct, 因为是 b 也是 constexpr，所以 getArraySize3 是能够正常在编译期求值的。
+    
+}
+
+```
+
 
 # C++ 中的右值与左值
 
