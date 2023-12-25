@@ -77,7 +77,7 @@ struct Demo<'a>{
 
 # rust中的高级类型
 
-* `Never type`: `!`  it stands in the place of the return type when a function will never return
+* `Never type`: `!`  it stands in the place of the return type when a function will never return。 比如 panic ...
   * `!` never has a value
 
 ```rust
@@ -252,7 +252,7 @@ let answer = loop {
 };
 ```
 
-为什么rust需要 `loop` ???
+为什么rust需要 `loop` ??? 因为 for 和 while 表达式都是返回 `()` 的，如果需要循环表达式返回一个值的话，使用 `loop`， `loop` 将 `break` 的结果作为该表达式的值。
 
 
 # 异常处理
