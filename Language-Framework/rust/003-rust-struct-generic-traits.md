@@ -66,12 +66,12 @@ rust 可以通过1）实参，2）返回值 进行自动类型推断，当然我
 // let a = demo_init::<TypeA>(10); 显式指定
 // let a: TypeA = demo_init(10); 返回值类型自动推断
 
-fn<T: Init> demo_init(i: i32) -> T {
+fn demo_init<T: Init>(i: i32) -> T {
     T::init(0)
 }
 
 // 通过函数签名就可以 自动类型推断
-fn<T: Mul> demo_mul(val: T) -> T {
+fn demo_mul<T: Mul>(val: T) -> T {
     val.mul(3)
 }
 
