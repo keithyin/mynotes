@@ -159,7 +159,7 @@ set -g prefix C-a
 # Use 256 colors
 set -g default-terminal "screen-256color"
 
-# Use mouse
+# Use mouse. set -g mouse on 
 setw -g mode-mouse on
 set -g mouse-select-window on
 set -g mouse-select-pane on
@@ -221,8 +221,7 @@ bind t command-prompt -p "Panel title:" "send-keys 'printf \"'\\033]2;%%\\033\\\
 # easy way to differentiate the two
 if-shell 'test -z "$SSH_CLIENT"' \
   "source-file ~/.tmux-theme.conf"
-setw -g utf8 on
-set -g status-utf8 on
+
 set -g display-panes-time 2000
 ```
 
