@@ -160,11 +160,8 @@ set -g prefix C-a
 set -g default-terminal "screen-256color"
 
 # Use mouse. set -g mouse on 
-setw -g mode-mouse on
-set -g mouse-select-window on
-set -g mouse-select-pane on
-set -g mouse-resize-pane on
-# set -g mouse-utf on
+set-option -g mouse on
+
 
 # Start numbering at 1
 set -g base-index 1
