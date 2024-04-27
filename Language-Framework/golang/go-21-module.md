@@ -53,8 +53,8 @@ export GOPROXY=https://goproxy.cn
 
 * 创建一个 module：cd 到项目的根目录，然后 `go mod init`。当我们执行 `go mod init` 就会看到项目根目录多了一个 `go.mod` 文件，打开进去看
 ```
-go mod init # 如果不加参数的话 生成的 go.mod 第一行就是该项目 src/ 后面根的路径
-go mod init github.com/keithyin/ProjName # 加参数的话， 这个参数就构成了 go.mod 的第一行。
+go mod init <module_name> # module_name 构成了 go.mod 文件的第一行
+go mod init github.com/keithyin/ProjName # go.mod 的第一行就是 github.com/keithyin/ProjName
 ```
 
 ```
