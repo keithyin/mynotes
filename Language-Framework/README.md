@@ -156,12 +156,21 @@ set -sg escape-time 0
 # All commands start with C-a
 set -g prefix C-a
 
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+run '~/.tmux/plugins/tpm/tpm'
+set -g @plugin 'dracula/tmux'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
+#set-option -g default-shell /bin/zsh
+
+
 # Use 256 colors
 set -g default-terminal "screen-256color"
 
-# Use mouse. set -g mouse on 
+# Use mouse
 set-option -g mouse on
-
+# set -g mouse-utf on
 
 # Start numbering at 1
 set -g base-index 1
@@ -181,9 +190,9 @@ unbind [
 bind Escape copy-mode
 unbind p
 bind p paste-buffer
-bind -t vi-copy 'v' begin-selection
-bind -t vi-copy 'y' copy-selection
-bind -t vi-copy 'V' rectangle-toggle
+#bind -t vi-copy 'v' begin-selection
+#bind -t vi-copy 'y' copy-selection
+#bind -t vi-copy 'V' rectangle-toggle
 
 # move x clipboard into tmux paste buffer
 bind C-p run "tmux set-buffer \"$(xclip -o)\"; tmux paste-buffer"
@@ -199,9 +208,11 @@ bind -n C-h if-shell "$is_vim" "send-keys C-h" "select-pane -L"
 bind -n C-j if-shell "$is_vim" "send-keys C-j" "select-pane -D"
 bind -n C-k if-shell "$is_vim" "send-keys C-k" "select-pane -U"
 bind -n C-l if-shell "$is_vim" "send-keys C-l" "select-pane -R"
-bind -n C-\ if-shell "$is_vim" "send-keys C-\\" "select-pane -l"
+#bind -n C-\ if-shell "$is_vim" "send-keys C-\\" "select-pane -l"
+bind -n 'C-\' if-shell "$is_vim" "send-keys 'C-\\'" "select-pane -l"
 
 bind C-l send-keys 'C-l'
+
 
 bind -n M-h previous-window
 bind -n M-l next-window
@@ -218,8 +229,8 @@ bind t command-prompt -p "Panel title:" "send-keys 'printf \"'\\033]2;%%\\033\\\
 # easy way to differentiate the two
 if-shell 'test -z "$SSH_CLIENT"' \
   "source-file ~/.tmux-theme.conf"
-
 set -g display-panes-time 2000
+
 ```
 
 # To See a Big World
